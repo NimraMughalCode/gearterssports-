@@ -31,6 +31,7 @@ export default function SendMessage() {
       if (response.ok) {
         setMessage("Email sent successfully!");
         toast.success("Email sent successfully!");
+        reset();
       } else {
         setMessage(result.error || "Failed to send email.");
         toast.error("Something went wrong!");
