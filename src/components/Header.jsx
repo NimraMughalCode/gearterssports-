@@ -25,20 +25,20 @@ export default function Header() {
 
         {/* Navigation Links */}
         <nav
-          className={`absolute top-full left-0 w-fit bg-white lg:static lg:flex lg:items-center lg:gap-6 ${
+          className={`absolute top-full left-0 w-full bg-white  lg:static lg:flex lg:items-center lg:gap-6 lg:w-auto lg:ml-auto transition-all duration-300 shadow-md lg:shadow-none ${
             isOpen ? "block" : "hidden"
           }`}
         >
-          <NavItem href="/" pathname={pathname}>
+          <NavItem href="/" pathname={pathname} setIsOpen={setIsOpen}>
             Home
           </NavItem>
-          <NavItem href="/about" pathname={pathname}>
+          <NavItem href="/about" pathname={pathname} setIsOpen={setIsOpen}>
             About
           </NavItem>
-          <NavItem href="/products" pathname={pathname}>
+          <NavItem href="/products" pathname={pathname} setIsOpen={setIsOpen}>
             Products
           </NavItem>
-          <NavItem href="/contact" pathname={pathname}>
+          <NavItem href="/contact" pathname={pathname} setIsOpen={setIsOpen}>
             Contact
           </NavItem>
         </nav>
@@ -47,12 +47,13 @@ export default function Header() {
   );
 }
 
-function NavItem({ href, pathname, children }) {
+function NavItem({ href, pathname, children, setIsOpen }) {
   const isActive = pathname === href;
   return (
     <Link
       href={href}
-      className={`block px-6 py-2 font-semibold transition ${
+      onClick={() => setIsOpen(false)} // Close menu on click
+      className={`block px-6 py-3 font-semibold transition ${
         isActive ? "text-blue-600" : "text-gray-900 hover:text-blue-500"
       }`}
     >

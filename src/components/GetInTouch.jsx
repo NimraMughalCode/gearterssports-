@@ -1,4 +1,4 @@
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 
 export default function GetInTouch() {
   return (
@@ -6,18 +6,31 @@ export default function GetInTouch() {
       <h2 className="text-xl font-semibold text-gray-900">Get in Touch</h2>
       <div className="space-y-3">
         <ContactItem icon={<Mail className="w-6 h-6 text-blue-600" />} text="prorgrumar@gmail.com" />
-        <ContactItem icon={<Phone className="w-6 h-6 text-green-600" />} text="+92 310 7285247" />
+        <ContactItem icon={<Phone className="w-6 h-6 text-green-600" />} text="+92 308 0903030" />
         <ContactItem icon={<MapPin className="w-6 h-6 text-red-600" />} text="Sialkot, Punjab, Pakistan" />
+        
+        {/* WhatsApp Contact Item */}
+        <ContactItem
+          icon={<MessageCircle className="w-6 h-6 text-green-500" />}
+          text="Chat on WhatsApp"
+          link="https://wa.me/923080903030"
+        />
       </div>
     </div>
   );
 }
 
-function ContactItem({ icon, text }) {
+function ContactItem({ icon, text, link }) {
   return (
-    <div className="flex items-center space-x-4">
+    <div className="flex items-center gap-3">
       {icon}
-      <p className="text-gray-900 font-medium">{text}</p>
+      {link ? (
+        <a href={link} target="_blank" rel="noopener noreferrer" className="text-gray-900 font-medium hover:text-green-600">
+          {text}
+        </a>
+      ) : (
+        <span className="text-gray-900 font-medium">{text}</span>
+      )}
     </div>
   );
 }

@@ -19,8 +19,9 @@ export default function About() {
         <section className="mb-12">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">Vision & Mission</h2>
           <p className="text-gray-700 leading-relaxed">
-            We envision a future where technology empowers communities to thrive. That’s why we develop innovative B2C software solutions that tackle real-world challenges and create a positive social impact. We believe in technology that’s ethical, inclusive, and designed with people in mind.
-          </p>
+  We envision a future where technology empowers communities to thrive. That’s why we develop innovative B2C and B2B software solutions that tackle real-world challenges and create a positive social impact. Whether it's enhancing consumer experiences or optimizing business operations, we believe in technology that’s ethical, inclusive, and designed with people in mind.
+</p>
+
         </section>
 
         {/* Our Story */}
