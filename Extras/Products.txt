@@ -1,18 +1,20 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import Image from "next/image";
 import { products } from "@/app/utils/products";
 import { useRouter } from "next/navigation";
 
-export default function ProductsComponent() {
+export default function Products() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const category = searchParams.get("category");
+  
+  const params = useParams();
+  console.log("Params:", params); 
+  const category = params.category; // Extract category from dynamic route
 
   // Filter products based on the selected category
   const filteredProducts = category
-    ? products.filter((product) => product.category === category)
+    ? products.filter((product) => product.category.toLowerCase() === category.toLowerCase())
     : products;
 
   return (
@@ -27,7 +29,7 @@ export default function ProductsComponent() {
         </button>
         {/* Heading */}
         <h1 className="text-[65px] font-bold text-red-500">
-          {category ? `${category}` : "All Products"}
+          {category ? ${category} : "All Products"}
         </h1>
       </div>
 
@@ -72,7 +74,7 @@ export default function ProductsComponent() {
 
                   {/* Button at the bottom */}
                   <button
-                    onClick={() => router.push(`/productview?id=${product.id}`)}
+                  onClick={() => router.push(/productview/${product.id})}
                     className="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition"
                   >
                     View Details
