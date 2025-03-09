@@ -1,4 +1,5 @@
 "use client"
+import CategoryList from "@/components/CategoriesList";
 import CTA from "@/components/CTA";
 import Hero from "@/components/Hero";
 import HeroCarousel from "@/components/HeroCarousel";
@@ -11,9 +12,10 @@ export default function Home() {
     // </div>
     <div className="gap-4">
     <HeroCarousel />
-      <Hero />
-      <Services />
-      <CTA />
+      {/* <Hero /> */}
+      <CategoryList />
+      {/* <Services /> */}
+      {/* <CTA /> */}
       {/* <CRMPipeline /> */}
         </div>
   );

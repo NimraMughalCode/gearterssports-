@@ -8,13 +8,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
+        background: "#000000",
         foreground: "var(--foreground)",
-        primary: "#1E3A8A", // Dark Blue
-        secondary: "#9333EA", // Purple
+        primary: "#cf971a", // Dark Red
+        secondary: "#FFFFFF", // Purple
         accent: "#22D3EE", // Cyan
         background: "#111827", // Dark Gray
-        text: "#F3F4F6", // Light Gray
+        text: '#E5E5E5', // Light Grey for readability
         card: "#1F2937", // Grayish Card Background
       },
     },

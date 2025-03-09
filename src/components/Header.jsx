@@ -8,24 +8,24 @@ export default function Header() {
   const pathname = usePathname(); // Get current route
 
   return (
-    <header className="bg-white shadow-md fixed w-full top-0 z-50">
+    <header className="bg-black shadow-md border-b-[1px] border-primary fixed w-full top-0 z-50">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo */}
-        <Link href="/" className="text-2xl font-bold text-gray-900">
-          ProgrUmar
+        <Link href="/" className="text-2xl font-bold text-white">
+          Gearterssports
         </Link>
 
         {/* Mobile Menu Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="lg:hidden text-gray-900 focus:outline-none"
+          className="lg:hidden text-secondary focus:outline-none"
         >
           {isOpen ? "✖" : "☰"}
         </button>
 
         {/* Navigation Links */}
         <nav
-          className={`absolute top-full left-0 w-full bg-white  lg:static lg:flex lg:items-center lg:gap-6 lg:w-auto lg:ml-auto transition-all duration-300 shadow-md lg:shadow-none ${
+          className={`absolute top-full left-0 w-full  lg:static lg:flex lg:items-center lg:gap-6 lg:w-auto lg:ml-auto transition-all duration-300 shadow-md lg:shadow-none ${
             isOpen ? "block" : "hidden"
           }`}
         >
@@ -53,8 +53,8 @@ function NavItem({ href, pathname, children, setIsOpen }) {
     <Link
       href={href}
       onClick={() => setIsOpen(false)} // Close menu on click
-      className={`block px-6 py-3 font-semibold transition ${
-        isActive ? "text-blue-600" : "text-gray-900 hover:text-blue-500"
+      className={`block px-6 py-3 font-semibold transition border-b-2 border-transparent ${
+        isActive ? "text-primary border-primary" : "text-secondary hover:text-primary hover:border-primary"
       }`}
     >
       {children}

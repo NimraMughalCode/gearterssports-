@@ -1,74 +1,85 @@
 "use client";
 
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination, Autoplay } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/pagination";
-import { 
-  Globe, 
-  Smartphone, 
-  Headphones, 
-  Paintbrush,  
-  MonitorSmartphone 
-} from "lucide-react";
+import { useRef } from "react";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-export default function HeroCarousel() {
-  const services = [
+export default function Hero() {
+  const sliderRef = useRef(null);
+
+  const slides = [
     {
-      title: "Complete Website Development",
-      description: "Modern, responsive, and feature-rich websites tailored to your needs.",
-      icon: <Globe size={64} className="text-white mb-6" />,
+      image: "https://i.pinimg.com/736x/27/27/42/27274264807378cc95e40491a78f297d.jpg",
+      text: "We provide high-quality products for combat sports.",
     },
     {
-      title: "Complete Mobile App Development",
-      description: "Native & cross-platform apps for iOS and Android with top performance.",
-      icon: <Smartphone size={64} className="text-white mb-6" />,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZ2rSDmg8yaI59lbLFpgmmDUfANLB2I5Uu-Q&s",
+      text: "Gear up with our premium boxing equipment.",
     },
     {
-      title: "24/7 Support",
-      description: "Dedicated customer support to ensure seamless operations.",
-      icon: <Headphones size={64} className="text-white mb-6" />,
-    },
-    {
-      title: "Premium Design",
-      description: "Aesthetic and user-friendly designs that enhance engagement.",
-      icon: <Paintbrush size={64} className="text-white mb-6" />,
-    },
-    {
-      title: "Mobile Responsive",
-      description: "Optimized for all devices ensuring the best user experience.",
-      icon: <MonitorSmartphone size={64} className="text-white mb-6" />,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShp6gJIclFpBAI2yRHwWTQ9A0XOJn76mYtGQ&s",
+      text: "Train like a champion with the best MMA gear.",
     },
   ];
 
+  const settings = {
+    dots: false,
+    infinite: true,
+    speed: 1000,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed:2000,
+    pauseOnHover: false,
+    fade: true,
+    arrows: false, // Disabling default arrows
+  };
+
   return (
-    <div className="relative w-full min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-700 to-purple-800 ">
-      {/* Overlay for better contrast */}
-      <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-
-      <div className="relative z-10 w-full max-w-5xl text-white text-center px-6">
-        <h2 className="text-5xl font-bold mb-8">
-          Progr<span className="text-gray-300">Umar</span> Solutions
-        </h2>
-
-        <Swiper
-          modules={[Pagination, Autoplay]}
-          pagination={{ clickable: true }}
-          autoplay={{ delay: 3000 }}
-          loop={true}
-          className="w-full"
-        >
-          {services.map((service, index) => (
-            <SwiperSlide key={index}>
-              <div className="flex flex-col items-center justify-center min-h-[60vh] p-8 bg-white bg-opacity-10 rounded-2xl shadow-lg backdrop-blur-md">
-                {service.icon}
-                <h3 className="text-3xl font-semibold">{service.title}</h3>
-                <p className="mt-4 text-lg text-gray-200">{service.description}</p>
+    <section className="relative w-full h-screen overflow-hidden">
+      <Slider ref={sliderRef} {...settings} className="h-full">
+        {slides.map((slide, index) => (
+          <div key={index} className="relative w-full h-screen">
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${slide.image})` }}
+            >
+              <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center text-center px-6">
+                <h1 className="text-4xl md:text-6xl font-bold text-white">
+                  {slide.text}
+                </h1>
+                <p className="mt-4 text-lg text-gray-300 max-w-2xl">
+                  Elevate your game with our top-tier combat sports products.
+                </p>
+                <a
+                  href="/products"
+                  className="mt-6 bg-red-600 text-white px-6 py-3 rounded-lg text-lg font-medium shadow-md hover:bg-red-700 transition"
+                >
+                  See Now
+                </a>
               </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
-    </div>
+            </div>
+          </div>
+        ))}
+      </Slider>
+
+      {/* Custom Left Arrow */}
+      <button
+        className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 p-3 rounded-full hover:bg-opacity-80 transition"
+        onClick={() => sliderRef.current.slickPrev()}
+      >
+        <ChevronLeft size={32} className="text-white" />
+      </button>
+
+      {/* Custom Right Arrow */}
+      <button
+        className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 p-3 rounded-full hover:bg-opacity-80 transition"
+        onClick={() => sliderRef.current.slickNext()}
+      >
+        <ChevronRight size={32} className="text-white" />
+      </button>
+    </section>
   );
 }
