@@ -1,48 +1,80 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { products } from "@/app/utils/products";
 import { categories } from "@/app/utils/constants";
+import ProductCard from "./ProductCard";
 
-export default function CategoriesSection() {
-  const router = useRouter();
+export default function CategoriesWithSubcategories() {
+  const [selectedCategory, setSelectedCategory] = useState(categories[0].title);
+  const [selectedSubcategory, setSelectedSubcategory] = useState(
+    categories[0].subcategories[0]
+  );
 
-  const handleCategoryClick = (category) => {
-    router.push(`/products/${encodeURIComponent(category)}`);
-  };
+  const currentCategory = categories.find(
+    (cat) => cat.title === selectedCategory
+  );
+
+  const filteredProducts = products.filter(
+    (p) =>
+      p.category === selectedCategory &&
+      p.subcategory === selectedSubcategory
+  );
 
   return (
-    <div className="bg-black text-center py-12">
-    <h2 className="text-4xl font-bold text-white mb-10">Categories</h2>
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
-      {categories.slice(0, 9).map((category, index) => (
-        <div
-          key={index}
-          className="relative group rounded-3xl overflow-hidden bg-gray-900 shadow-lg transition-transform transform hover:scale-105 cursor-pointer"
-          onClick={() => handleCategoryClick(category.title)}
-        >
-          {/* Image Container */}
-          <div className="w-full aspect-square relative">
-            <img
-              src={category.image}
-              alt={category.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
+    <div className="flex flex-col md:flex-row bg-black text-white min-h-screen p-[70px]">
+      {/* Sidebar Categories */}
+      <aside className="w-full md:w-1/5 border md:border border-[#FCA600]">
+        <h3 className="p-4 bg-[#FCA600] font-bold text-white py-2 font-semibold text-sm cursor-pointer hover:bg-yellow-600 transition-all">
+          CATEGORIES
+        </h3>
 
-          {/* Title */}
-          <div className="absolute bottom-4 left-0 right-0 bg-black bg-opacity-60 text-white text-xl font-semibold text-center py-2">
-            {category.title}
-          </div>
+        <ul className="m-4 space-y-3">
+          {categories.map((cat) => (
+            <li
+              key={cat.title}
+              onClick={() => {
+                setSelectedCategory(cat.title);
+                setSelectedSubcategory(cat.subcategories[0]);
+              }}
+              className={`cursor-pointer px-2 py-1 rounded uppercase text-gray-400 font-medium transition-all flex items-center ${
+                selectedCategory === cat.title
+                  ? "text-white font-semibold before:content-['→'] before:mr-2 before:text-[#FCA600]"
+                  : "hover:text-[#FCA600] hover:font-semibold"
+              }`}
+            >
+              {cat.title}
+            </li>
+          ))}
+        </ul>
+      </aside>
 
-          {/* Hover Effect - Click Here Button */}
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <button className="bg-red-600 text-white px-4 py-2 font-medium text-lg shadow-md hover:bg-red-700 transition">
-              Click Here
+      {/* Main Content */}
+      <main className="flex-1 p-6">
+        {/* Subcategories */}
+        <div className="flex flex-wrap gap-4 mb-8">
+          {currentCategory.subcategories.map((sub) => (
+            <button
+              key={sub}
+              onClick={() => setSelectedSubcategory(sub)}
+              className={`px-4 py-2 border-b-2 transition font-semibold ${
+                selectedSubcategory === sub
+                  ? "border-[#FCA600] text-[#FCA600]"
+                  : "border-transparent hover:text-[#FCA600]"
+              }`}
+            >
+              {sub}
             </button>
-          </div>
+          ))}
         </div>
-      ))}
+
+        {/* Products */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {filteredProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </main>
     </div>
-  </div>
   );
 }

@@ -20,8 +20,7 @@ export default function Footer() {
               Gearters<span className="text-primary">Sports</span>
             </h2>
             <p className="mt-4 text-gray-400">
-              Our products are designed to empower our customers, enhance their well-being, and enrich their lives.
-              We ensure our products are user-friendly, secure, and reliable.
+            Our gloves are designed to empower our customers, providing superior comfort, protection, and durability. We prioritize user-friendly designs, ensuring a secure and reliable fit for every task.
             </p>
             <div className="flex justify-center md:justify-start space-x-4 mt-4">
               <a href="#" className="text-gray-300 hover:text-red-500"><Facebook size={24} /></a>
@@ -37,7 +36,7 @@ export default function Footer() {
             <ul className="mt-4 space-y-2">
               <li><Link href="/about" className={isActive("/about")}>About</Link></li>
               <li><Link href="/contact" className={isActive("/contact")}>Contact</Link></li>
-              <li><Link href="/products" className={isActive("/products")}>Products</Link></li>
+              
             </ul>
           </div>
 
@@ -56,7 +55,7 @@ export default function Footer() {
       <div className="bg-gray-900 text-gray-500 text-center py-4 relative">
         <p className="text-sm">All rights reserved © 2025</p>
         <p className="text-sm">
-          Powered By <span className="font-semibold text-primary">ProgrUmar</span>
+          Powered By <span className="font-semibold text-primary">Gearters Sports</span>
         </p>
 
         {/* Scroll to Top Button */}

@@ -27,14 +27,14 @@ export default function Hero() {
   const settings = {
     dots: false,
     infinite: true,
-    speed: 1000,
+    speed: 3000,
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed:2000,
+    autoplaySpeed: 3000,
     pauseOnHover: false,
     fade: true,
-    arrows: false, // Disabling default arrows
+    arrows: false,
   };
 
   return (
@@ -46,26 +46,58 @@ export default function Hero() {
               className="absolute inset-0 bg-cover bg-center"
               style={{ backgroundImage: `url(${slide.image})` }}
             >
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center text-center px-6">
-                <h1 className="text-4xl md:text-6xl font-bold text-white">
-                  {slide.text}
-                </h1>
-                <p className="mt-4 text-lg text-gray-300 max-w-2xl">
-                  Elevate your game with our top-tier combat sports products.
-                </p>
-                <a
-                  href="/products"
-                  className="mt-6 bg-red-600 text-white px-6 py-3 rounded-lg text-lg font-medium shadow-md hover:bg-red-700 transition"
-                >
-                  See Now
-                </a>
+              <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center px-20 py-30 ">
+
+              <div className=" flex flex-col justify-center  text-center lg:w-1/2 lg:items-start lg:text-left">
+
+                  <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight">
+                    YOUR RELIABLE PARTNER IN BOXING GEAR <br />
+                    <span style={{ color: "#FCA600" }}>GEARTERS SPORTS</span>
+                  </h1>
+                  <p className="mt-4 text-sm md:text-base text-gray-300 max-w-2xl">
+                    Manufacturers of World-Class Boxing Equipment, Crafted for Strength, Comfort, and Precision — Trusted by Fighters, Trainers, and Businesses Worldwide.
+                  </p>
+                  <a
+                    href="/contact"
+                    className="mt-6 border-2 border-[#FCA600] text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-[#FCA600] transition"
+                  >
+                    Contact Us
+                  </a>
+                  {/* Bottom Stats Section */}
+                  <div className="mt-12 flex flex-col md:flex-row gap-6 text-white text-center items-center">
+  {/* Block 1 */}
+  <div>
+    <p className="text-3xl font-bold text-[#FCA600]">8+</p>
+    <p className="text-sm">Years of Experience</p>
+  </div>
+
+  {/* Vertical Line */}
+  <div className="hidden md:block h-12 border-l-2 border-border-white"></div>
+
+  {/* Block 2 */}
+  <div>
+    <p className="text-3xl font-bold text-[#FCA600]">100+</p>
+    <p className="text-sm">Members Join</p>
+  </div>
+
+  {/* Vertical Line */}
+  <div className="hidden md:block h-12 border-l-2 border-border-white"></div>
+
+  {/* Block 3 */}
+  <div>
+    <p className="text-3xl font-bold text-[#FCA600]">88+</p>
+    <p className="text-sm">Happy Members</p>
+  </div>
+</div>
+
+                </div>
               </div>
             </div>
           </div>
         ))}
       </Slider>
 
-      {/* Custom Left Arrow */}
+      {/* Custom Arrows - unchanged */}
       <button
         className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 p-3 rounded-full hover:bg-opacity-80 transition"
         onClick={() => sliderRef.current.slickPrev()}
@@ -73,7 +105,6 @@ export default function Hero() {
         <ChevronLeft size={32} className="text-white" />
       </button>
 
-      {/* Custom Right Arrow */}
       <button
         className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 p-3 rounded-full hover:bg-opacity-80 transition"
         onClick={() => sliderRef.current.slickNext()}

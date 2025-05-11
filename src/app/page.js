@@ -1,9 +1,11 @@
 "use client"
 import CategoryList from "@/components/CategoriesList";
 import CTA from "@/components/CTA";
+import FollowInsta from "@/components/FollowInsta";
 import Hero from "@/components/Hero";
 import HeroCarousel from "@/components/HeroCarousel";
 import Services from "@/components/Services";
+import WhyChooseUs from "@/components/WhyChooseUs";
 
 export default function Home() {
   return (
@@ -14,6 +16,8 @@ export default function Home() {
     <HeroCarousel />
       {/* <Hero /> */}
       <CategoryList />
+      <WhyChooseUs />
+      <FollowInsta />
       {/* <Services /> */}
       {/* <CTA /> */}
       {/* <CRMPipeline /> */}
