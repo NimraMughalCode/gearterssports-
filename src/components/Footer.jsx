@@ -1,68 +1,98 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Facebook, Linkedin, Youtube, Instagram, ArrowUp } from "lucide-react";
+import React from "react";
+import Image from "next/image";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function Footer() {
+  const router = useRouter();
   const pathname = usePathname();
 
-  const isActive = (href) =>
-    pathname === href ? "text-primary font-bold" : "text-gray-300 hover:text-red-500";
+  const handleScrollTo = (sectionId) => {
+    if (pathname === "/") {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      router.push(`/#${sectionId}`);
+    }
+  };
 
   return (
-    <footer className="bg-gradient-to-r from-black to-gray-900 text-white">
-      <div className="container mx-auto px-6 py-12">
-        <div className="grid md:grid-cols-3 gap-10 text-center md:text-left">
-          {/* Branding Section */}
-          <div>
-            <h2 className="text-3xl font-bold text-white">
-              Gearters<span className="text-primary">Sports</span>
-            </h2>
-            <p className="mt-4 text-gray-400">
-            Our gloves are designed to empower our customers, providing superior comfort, protection, and durability. We prioritize user-friendly designs, ensuring a secure and reliable fit for every task.
-            </p>
-            <div className="flex justify-center md:justify-start space-x-4 mt-4">
-              <a href="#" className="text-gray-300 hover:text-red-500"><Facebook size={24} /></a>
-              <a href="#" className="text-gray-300 hover:text-red-500"><Linkedin size={24} /></a>
-              <a href="#" className="text-gray-300 hover:text-red-500"><Youtube size={24} /></a>
-              <a href="#" className="text-gray-300 hover:text-red-500"><Instagram size={24} /></a>
-            </div>
-          </div>
-
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-xl font-semibold text-white">Quick Links</h3>
-            <ul className="mt-4 space-y-2">
-              <li><Link href="/about" className={isActive("/about")}>About</Link></li>
-              <li><Link href="/contact" className={isActive("/contact")}>Contact</Link></li>
-              
-            </ul>
-          </div>
-
-          {/* Information Links */}
-          <div>
-            <h3 className="text-xl font-semibold text-white">Information</h3>
-            <ul className="mt-4 space-y-2">
-              <li><Link href="/terms" className={isActive("/terms")}>Terms and Conditions</Link></li>
-              <li><Link href="/privacy" className={isActive("/privacy")}>Privacy Policy</Link></li>
-            </ul>
-          </div>
+    <footer className="bg-black text-white py-[72px] px-6 font-[var(--font-bebas-neue)]">
+      <div className="max-w-7xl mx-auto flex flex-col items-center space-y-6">
+        {/* Logo */}
+        <div className="flex flex-col items-center">
+          <Image
+            src="/logo.svg"
+            alt="GEARTERS Logo"
+            width={193}
+            height={193}
+          />
         </div>
-      </div>
 
-      {/* Bottom Footer Section */}
-      <div className="bg-gray-900 text-gray-500 text-center py-4 relative">
-        <p className="text-sm">All rights reserved © 2025</p>
-        <p className="text-sm">
-          Powered By <span className="font-semibold text-primary">Gearters Sports</span>
-        </p>
+        {/* Navigation */}
+        <ul className="flex  font-extralight flex-wrap justify-center gap-6 text-sm font-light uppercase">
+          <li>
+            <a href="/" className="text-[#FCA600] hover:text-white transition-colors">
+              Home
+            </a>
+          </li>
+          <li>
+            <button
+              onClick={() => handleScrollTo("products")}
+              className="hover:text-[#FCA600] transition-colors"
+            >
+              Products
+            </button>
+          </li>
+          <li>
+            <a href="/about" className="hover:text-[#FCA600] transition-colors">
+              About Us
+            </a>
+          </li>
+          <li>
+            <button
+              onClick={() => handleScrollTo("testimonials")}
+              className="hover:text-[#FCA600] transition-colors"
+            >
+              Testimonials
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() => handleScrollTo("faq")}
+              className="hover:text-[#FCA600] transition-colors"
+            >
+              FAQ
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() => handleScrollTo("contact")}
+              className="hover:text-[#FCA600] transition-colors"
+            >
+              Contact Us
+            </button>
+          </li>
+        </ul>
 
-        {/* Scroll to Top Button */}
-        <a href="#" 
-           className="absolute right-6 top-1/2 transform -translate-y-1/2 bg-primary p-2 rounded-lg hover:bg-red-700 transition duration-300">
-          <ArrowUp size={20} className="text-white" />
-        </a>
+        {/* Footer Bottom */}
+        <div className="border-t border-gray-700 w-full mt-6 pt-3 text-center text-xs text-gray-500">
+          <div className="mb-1">
+            <a href="/privacy" className="hover:underline">
+              Privacy
+            </a>{" "}
+            |{" "}
+            <a href="/terms" className="hover:underline">
+              Terms and Conditions
+            </a>
+          </div>
+          <p className="font-light">
+            &copy; 2025 All rights reserved. Gearters Sports
+          </p>
+        </div>
       </div>
     </footer>
   );

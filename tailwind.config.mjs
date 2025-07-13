@@ -8,14 +8,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "#000000",
-        foreground: "var(--foreground)",
-        primary: "#cf971a", // Dark Red
-        secondary: "#FFFFFF", // Purple
+        background: "#111827", // Dark Gray background
+        backgroundBlack: "#000000", // True black
+        foreground: "var(--foreground)", // CSS var if you want
+        primary: "#cf971a", // Gold-ish (adjust if needed)
+        secondary: "#7b3f99", // Purple-ish
         accent: "#22D3EE", // Cyan
-        background: "#111827", // Dark Gray
         text: '#E5E5E5', // Light Grey for readability
         card: "#1F2937", // Grayish Card Background
+      },
+      fontFamily: {
+        bebas: ['var(--font-bebas-neue)', 'sans-serif'],
       },
     },
   },

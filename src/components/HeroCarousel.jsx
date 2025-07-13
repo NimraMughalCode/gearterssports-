@@ -38,7 +38,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative w-full h-screen overflow-hidden">
+    <section className="relative w-full h-screen overflow-hidden font-[var(--font-bebas-neue)]">
       <Slider ref={sliderRef} {...settings} className="h-full">
         {slides.map((slide, index) => (
           <div key={index} className="relative w-full h-screen">
@@ -46,50 +46,47 @@ export default function Hero() {
               className="absolute inset-0 bg-cover bg-center"
               style={{ backgroundImage: `url(${slide.image})` }}
             >
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center px-20 py-30 ">
-
-              <div className=" flex flex-col justify-center  text-center lg:w-1/2 lg:items-start lg:text-left">
-
-                  <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight">
+              <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center px-20 py-30">
+                <div className="flex flex-col justify-center text-center lg:w-1/2 lg:items-start lg:text-left">
+                  <h1 className="text-4xl md:text-6xl font-normal text-white leading-tight">
                     YOUR RELIABLE PARTNER IN BOXING GEAR <br />
                     <span style={{ color: "#FCA600" }}>GEARTERS SPORTS</span>
                   </h1>
-                  <p className="mt-4 text-sm md:text-base text-gray-300 max-w-2xl">
+                  <p className="mt-4 text-sm md:text-base font-normal text-gray-300 max-w-2xl">
                     Manufacturers of World-Class Boxing Equipment, Crafted for Strength, Comfort, and Precision — Trusted by Fighters, Trainers, and Businesses Worldwide.
                   </p>
                   <a
                     href="/contact"
-                    className="mt-6 border-2 border-[#FCA600] text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-[#FCA600] transition"
+                    className="mt-6 border-2 border-[#FCA600] text-[#FCA600] px-6 py-3 text-lg font-normal hover:bg-[#FCA600] transition"
                   >
                     Contact Us
                   </a>
                   {/* Bottom Stats Section */}
                   <div className="mt-12 flex flex-col md:flex-row gap-6 text-white text-center items-center">
-  {/* Block 1 */}
-  <div>
-    <p className="text-3xl font-bold text-[#FCA600]">8+</p>
-    <p className="text-sm">Years of Experience</p>
-  </div>
+                    {/* Block 1 */}
+                    <div>
+                      <p className="text-3xl font-normal text-[#FCA600]">8+</p>
+                      <p className="text-sm font-normal">Years of Experience</p>
+                    </div>
 
-  {/* Vertical Line */}
-  <div className="hidden md:block h-12 border-l-2 border-border-white"></div>
+                    {/* Vertical Line */}
+                    <div className="hidden md:block h-12 border-l-2 border-border-white"></div>
 
-  {/* Block 2 */}
-  <div>
-    <p className="text-3xl font-bold text-[#FCA600]">100+</p>
-    <p className="text-sm">Members Join</p>
-  </div>
+                    {/* Block 2 */}
+                    <div>
+                      <p className="text-3xl font-normal text-[#FCA600]">100+</p>
+                      <p className="text-sm font-normal">Members Join</p>
+                    </div>
 
-  {/* Vertical Line */}
-  <div className="hidden md:block h-12 border-l-2 border-border-white"></div>
+                    {/* Vertical Line */}
+                    <div className="hidden md:block h-12 border-l-2 border-border-white"></div>
 
-  {/* Block 3 */}
-  <div>
-    <p className="text-3xl font-bold text-[#FCA600]">88+</p>
-    <p className="text-sm">Happy Members</p>
-  </div>
-</div>
-
+                    {/* Block 3 */}
+                    <div>
+                      <p className="text-3xl font-normal text-[#FCA600]">88+</p>
+                      <p className="text-sm font-normal">Happy Members</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -97,10 +94,11 @@ export default function Hero() {
         ))}
       </Slider>
 
-      {/* Custom Arrows - unchanged */}
+      {/* Custom Arrows */}
       <button
         className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 p-3 rounded-full hover:bg-opacity-80 transition"
         onClick={() => sliderRef.current.slickPrev()}
+        aria-label="Previous Slide"
       >
         <ChevronLeft size={32} className="text-white" />
       </button>
@@ -108,6 +106,7 @@ export default function Hero() {
       <button
         className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 p-3 rounded-full hover:bg-opacity-80 transition"
         onClick={() => sliderRef.current.slickNext()}
+        aria-label="Next Slide"
       >
         <ChevronRight size={32} className="text-white" />
       </button>

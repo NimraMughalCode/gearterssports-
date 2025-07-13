@@ -1,6 +1,9 @@
 "use client"
 import CategoryList from "@/components/CategoriesList";
+import ClientTestimonials from "@/components/ClientsTestimonials";
+import ContactBoxingBusiness from "@/components/ContactBoxingBusiness";
 import CTA from "@/components/CTA";
+import FAQs from "@/components/FAQ";
 import FollowInsta from "@/components/FollowInsta";
 import Hero from "@/components/Hero";
 import HeroCarousel from "@/components/HeroCarousel";
@@ -21,6 +24,9 @@ export default function Home() {
       {/* <Services /> */}
       {/* <CTA /> */}
       {/* <CRMPipeline /> */}
+      <ClientTestimonials />
+      <FAQs />
+      <ContactBoxingBusiness />
         </div>
   );
 }

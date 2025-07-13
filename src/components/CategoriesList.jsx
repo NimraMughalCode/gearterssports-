@@ -22,10 +22,10 @@ export default function CategoriesWithSubcategories() {
   );
 
   return (
-    <div className="flex flex-col md:flex-row bg-black text-white min-h-screen p-[70px]">
+    <div id="products" className="flex flex-col md:flex-row bg-black text-white min-h-screen p-[70px] font-[var(--font-bebas-neue)]">
       {/* Sidebar Categories */}
       <aside className="w-full md:w-1/5 border md:border border-[#FCA600]">
-        <h3 className="p-4 bg-[#FCA600] font-bold text-white py-2 font-semibold text-sm cursor-pointer hover:bg-yellow-600 transition-all">
+        <h3 className="p-4 bg-[#FCA600] font-normal text-white py-2 text-sm cursor-pointer hover:bg-yellow-600 transition-all">
           CATEGORIES
         </h3>
 
@@ -37,10 +37,10 @@ export default function CategoriesWithSubcategories() {
                 setSelectedCategory(cat.title);
                 setSelectedSubcategory(cat.subcategories[0]);
               }}
-              className={`cursor-pointer px-2 py-1 rounded uppercase text-gray-400 font-medium transition-all flex items-center ${
+              className={`cursor-pointer px-2 py-1 rounded uppercase text-gray-400 font-normal transition-all flex items-center ${
                 selectedCategory === cat.title
-                  ? "text-white font-semibold before:content-['→'] before:mr-2 before:text-[#FCA600]"
-                  : "hover:text-[#FCA600] hover:font-semibold"
+                  ? "text-white  before:content-['→'] before:mr-2 before:text-[#FCA600]"
+                  : "hover:text-[#FCA600] "
               }`}
             >
               {cat.title}
@@ -57,7 +57,7 @@ export default function CategoriesWithSubcategories() {
             <button
               key={sub}
               onClick={() => setSelectedSubcategory(sub)}
-              className={`px-4 py-2 border-b-2 transition font-semibold ${
+              className={`px-4 py-2 border-b-2 transition text-[20px] font-normal ${
                 selectedSubcategory === sub
                   ? "border-[#FCA600] text-[#FCA600]"
                   : "border-transparent hover:text-[#FCA600]"

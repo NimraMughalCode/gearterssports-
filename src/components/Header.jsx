@@ -1,116 +1,65 @@
 "use client";
+
+import React from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { categories } from "@/app/utils/constants";
 
 export default function Header() {
-  const [isOpen, setIsOpen] = useState(false); // Mobile menu toggle
-  const [showCategories, setShowCategories] = useState(false); // Products dropdown toggle
-  const [isMobile, setIsMobile] = useState(false); // Track screen size
-  const pathname = usePathname();
   const router = useRouter();
+  const pathname = usePathname();
 
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 1024); // Adjust for Tailwind's lg breakpoint
-    };
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-    return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
-
-  const handleCategoryClick = (category) => {
-    setIsOpen(false); // Close mobile menu
-    setShowCategories(false); // Close categories list
-    router.push(`/products/${encodeURIComponent(category)}`);
+  const handleScrollTo = (sectionId) => {
+    if (pathname === "/") {
+      // If already on homepage, scroll smoothly
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      // Navigate to homepage with hash
+      router.push(`/#${sectionId}`);
+    }
   };
 
   return (
-    <header className="bg-black shadow-md border-b-[1px] border-primary fixed w-full top-0 z-50">
-      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        {/* Logo */}
-        <Link href="/" className="text-2xl font-bold text-white">
-          Gearterssports
-        </Link>
-
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="lg:hidden text-secondary focus:outline-none"
-        >
-          {isOpen ? "✖" : "☰"}
-        </button>
-
-        {/* Navigation Menu */}
-        <nav
-          className={`absolute top-full left-0 w-full lg:static lg:flex lg:items-center lg:gap-6 lg:w-auto bg-black transition-all duration-300 ${
-            isOpen ? "block" : "hidden"
-          }`}
-        >
-          <NavItem href="/" pathname={pathname} setIsOpen={setIsOpen}>
-            Home
-          </NavItem>
-          <NavItem href="/about" pathname={pathname} setIsOpen={setIsOpen}>
-            About
-          </NavItem>
-
-          {/* Products Dropdown */}
-          <div
-            className="relative"
-            onMouseEnter={() => !isMobile && setShowCategories(true)}
-            onMouseLeave={() => !isMobile && setShowCategories(false)}
-          >
-            <button
-              onClick={() => isMobile && setShowCategories((prev) => !prev)}
-              className={`w-full text-left px-6 py-3 font-semibold border-b-2 border-transparent flex justify-between items-center lg:inline lg:w-auto ${
-                pathname.startsWith("/products")
-                  ? "text-primary border-primary"
-                  : "text-secondary hover:text-primary hover:border-primary"
-              }`}
-            >
-              Products
-              <span>{showCategories ? "▲" : "▼"}</span>
-            </button>
-
-            {/* Category List */}
-            {showCategories && (
-              <div className="lg:absolute left-0 top-full bg-gray-900 shadow-lg lg:rounded-lg overflow-hidden lg:w-64">
-                {categories.map((category, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleCategoryClick(category.title)}
-                    className="block w-full text-left px-6 py-3 text-white hover:bg-red-600 transition"
-                  >
-                    {category.title}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <NavItem href="/contact" pathname={pathname} setIsOpen={setIsOpen}>
-            Contact
-          </NavItem>
-        </nav>
+ <header className="bg-black h-[90px] text-white py-4 px-6 shadow-md">
+  <div className="max-w-7xl mx-auto flex items-center justify-between">
+    {/* Logo */}
+    <div className="flex items-center space-x-2">
+      <Image src="/logo.svg" alt="Gearters Logo" width={50} height={50} />
+      <div className="leading-none">
+        <p className="text-sm font-normal tracking-wider">GEARTERS</p>  {/* Changed font-semibold → font-normal */}
+        <p className="text-[10px] tracking-widest text-gray-400">SPORTS</p>
       </div>
-    </header>
-  );
-}
+    </div>
 
-function NavItem({ href, pathname, children, setIsOpen }) {
-  const isActive = pathname === href;
-  return (
-    <Link
-      href={href}
-      onClick={() => setIsOpen(false)}
-      className={`block px-6 py-3 font-semibold transition border-b-2 border-transparent ${
-        isActive
-          ? "text-primary border-primary bg-gray-800 text-white"
-          : "text-secondary hover:text-primary hover:border-primary"
-      }`}
+    {/* Navigation */}
+<nav className="hidden md:flex space-x-8 font-light text-sm uppercase">
+  <Link href="/" className="text-[#FCA600] hover:text-white">Home</Link>
+  <button onClick={() => handleScrollTo("products")} className="hover:text-[#FCA600]">
+    Products
+  </button>
+  <Link href="/about" className="hover:text-[#FCA600]">About Us</Link>
+  <button onClick={() => handleScrollTo("testimonials")} className="hover:text-[#FCA600]">
+    Testimonials
+  </button>
+  <button onClick={() => handleScrollTo("faq")} className="hover:text-[#FCA600]">
+    FAQ
+  </button>
+</nav>
+
+
+
+    {/* Contact Button */}
+    <button
+      onClick={() => handleScrollTo("contact")}
+      className="bg-[#FCA600] w-[115px] h-[40px] hover:bg-white hover:text-black text-black md:text-white px-4 py-2   uppercase transition-all"
     >
-      {children}
-    </Link>
+      Contact Us
+    </button>
+  </div>
+</header>
+
   );
 }
