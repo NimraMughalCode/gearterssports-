@@ -1,29 +1,72 @@
+"use client"
 import Image from 'next/image';
+import React, { useRef, useEffect, useState } from 'react';
+
+const ABOUT_VIEWED_KEY = 'about-section-viewed';
 
 export default function About() {
+  const [visible, setVisible] = useState(false);
+  const [leftVisible, setLeftVisible] = useState(false);
+  const sectionRef = useRef(null);
+  const leftRef = useRef(null);
+
+  useEffect(() => {
+    if (localStorage.getItem(ABOUT_VIEWED_KEY) === 'true') {
+      setVisible(true);
+      setLeftVisible(true);
+      return;
+    }
+    const observer = new window.IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          localStorage.setItem(ABOUT_VIEWED_KEY, 'true');
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!visible) return;
+    const leftObs = new window.IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setLeftVisible(true);
+        leftObs.disconnect();
+      }
+    }, { threshold: 0.2 });
+    if (leftRef.current) leftObs.observe(leftRef.current);
+    return () => leftObs.disconnect();
+  }, [visible]);
+
   return (
-    <section className="bg-white py-16 px-6 md:px-12 lg:px-20">
+    <section ref={sectionRef} className="bg-white py-16 px-6 md:px-12 lg:px-20 font-sans">
       <div className="container mx-auto">
         {/* Section Heading */}
-        <h1 className="text-4xl font-bold text-gray-900 mb-6">About Us</h1>
+        <div ref={leftRef} className={`transition-all duration-1000 ease-out ${leftVisible ? 'opacity-100 -translate-x-0' : 'opacity-0 -translate-x-16 pointer-events-none'}`}>
+          <h1 className="text-4xl font-bold text-gray-900 mb-6">About Us</h1>
 
-        {/* Our Purpose */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Our Purpose</h2>
-          <p className="text-gray-700 leading-relaxed">
-            At Gearters Sports, our purpose is to craft high-quality, durable, and performance-driven gloves for athletes and professionals worldwide. 
-            We are dedicated to innovation, ensuring that every pair of gloves enhances grip, comfort, and protection for peak performance.
-          </p>
-        </section>
+          {/* Our Purpose */}
+          <section className="mb-12">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Our Purpose</h2>
+            <p className="text-gray-700 leading-relaxed">
+              At Gearters Sports, our purpose is to craft high-quality, durable, and performance-driven gloves for athletes and professionals worldwide. 
+              We are dedicated to innovation, ensuring that every pair of gloves enhances grip, comfort, and protection for peak performance.
+            </p>
+          </section>
 
-        {/* Vision & Mission */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Vision & Mission</h2>
-          <p className="text-gray-700 leading-relaxed">
-            Our vision is to be a global leader in premium sports gloves, trusted by athletes, trainers, and professionals in various sports and industries. 
-            Our mission is to continuously innovate, using top-tier materials and craftsmanship to produce gloves that offer superior performance, durability, and style.
-          </p>
-        </section>
+          {/* Vision & Mission */}
+          <section className="mb-12">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Vision & Mission</h2>
+            <p className="text-gray-700 leading-relaxed">
+              Our vision is to be a global leader in premium sports gloves, trusted by athletes, trainers, and professionals in various sports and industries. 
+              Our mission is to continuously innovate, using top-tier materials and craftsmanship to produce gloves that offer superior performance, durability, and style.
+            </p>
+          </section>
+        </div>
 
         {/* Our Story */}
         <section className="mb-12">

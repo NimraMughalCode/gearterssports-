@@ -4,12 +4,12 @@ import React from "react";
 const ProductCard = ({ product }) => {
   // const router = useRouter();
   return (
-    <div className="bg-black border border-[#FCA600] text-white w-full max-w-sm shadow-md flex flex-col">
+    <div className="bg-black border border-[#FCA600] text-white w-full max-w-sm shadow-md flex flex-col font-sans">
       <img src={product.imgSrc} alt={product.name} className="w-full h-60 object-cover" />
       <div className="p-4 flex flex-col justify-between flex-1">
         <div>
-          <h3 className="text-[#FCA600]  text-[24px] uppercase">{product.name}</h3>
-          <p className="text-[18px] text-gray-300 mt-1">{product.description}</p>
+          <h3 className="text-[#FCA600] text-[24px] uppercase font-bold">{product.name}</h3>
+          <p className="text-[18px] text-gray-300 mt-1 font-normal">{product.description}</p>
         </div>
       </div>
       {/* <div onClick={
@@ -23,7 +23,7 @@ const ProductCard = ({ product }) => {
            const message = `Hello, I'm interested in ${product.name}.\n\n${product.description}\n\nCheck it out here: https://yourwebsite.com/productview/${product.id}`;
               window.open(`https://wa.me/923045441722?text=${encodeURIComponent(message)}`, "_blank");
         }
-      } className="bg-[#FCA600] text-black text-center py-2 text-[22px] cursor-pointer hover:bg-yellow-600 transition-all">
+      } className="bg-[#FCA600] text-black text-center py-2 text-[22px] font-medium cursor-pointer hover:bg-yellow-600 hover:scale-105 transition-all duration-200 rounded-b-lg">
         INQUIRE NOW →
       </div>
     </div>

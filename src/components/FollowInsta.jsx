@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Slider from "react-slick";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import "slick-carousel/slick/slick.css";
@@ -13,8 +13,31 @@ const slides = [
   "https://thumbs.dreamstime.com/b/photo-rear-view-strong-boxer-boxing-ring-under-spotlights-depicting-determination-vertical-mobile-wallpaper-316567530.jpg",
 ];
 
+const FOLLOWINSTA_VIEWED_KEY = 'followinsta-section-viewed';
+
 export default function FollowInsta() {
+  const [visible, setVisible] = useState(false);
   const sliderRef = useRef(null);
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    if (localStorage.getItem(FOLLOWINSTA_VIEWED_KEY) === 'true') {
+      setVisible(true);
+      return;
+    }
+    const observer = new window.IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          localStorage.setItem(FOLLOWINSTA_VIEWED_KEY, 'true');
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   const settings = {
     dots: true,
@@ -37,17 +60,19 @@ export default function FollowInsta() {
 
   return (
     <div
-      className="relative flex flex-col items-center justify-center px-4 py-20 text-white bg-[#121212] font-[var(--font-bebas-neue)]"
+      ref={sectionRef}
+      className={`relative flex flex-col items-center justify-center w-full max-w-full px-2 sm:px-4 py-10 md:py-20 text-white bg-[#121212] font-sans overflow-x-hidden transition-all duration-1000 ease-out
+        ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}
     >
       {/* Text Content */}
       <div className="text-center max-w-3xl mb-10">
-        <h2 className="text-3xl md:text-5xl font-[200] leading-tight text-white">
+        <h2 className="text-3xl md:text-5xl font-bold leading-tight text-white">
           FOLLOW US ON <br />
-          <span style={{ color: "#FCA600" }} className="font-[200]">
+          <span style={{ color: "#FCA600" }} className="font-bold">
             INSTAGRAM
           </span>
         </h2>
-        <p className="mt-4 text-sm md:text-base font-[200] text-gray-300">
+        <p className="mt-4 text-sm md:text-base font-light text-gray-300">
           Stay connected with us through our latest posts, featuring boxing gear, training highlights, events, and more from around the world.
         </p>
       </div>

@@ -1,13 +1,13 @@
-import { Bebas_Neue } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FloatingWhatsApp from "@/components/WhatsAppFloating";
 
-const bebasNeue = Bebas_Neue({
-  variable: "--font-bebas-neue",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata = {
@@ -19,10 +19,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${bebasNeue.variable} antialiased bg-white`}
+        className={`${inter.variable} antialiased bg-white`}
       >
         <Header />
-        {children}
+          <main className="mt-20">{children}</main>
         <Footer />
         <FloatingWhatsApp />
       </body>

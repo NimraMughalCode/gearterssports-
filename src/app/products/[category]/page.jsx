@@ -16,7 +16,7 @@ export default function CategoryProducts() {
   );
 
     return (
-      <section className="flex flex-col items-start justify-center min-h-screen bg-gray-900 text-white px-6 py-10">
+      <section className="flex flex-col items-start justify-center min-h-screen bg-gray-900 text-white px-6 py-10 font-sans">
       {/* Back Button */}
       <div className="flex items-center gap-6">
         <button
@@ -58,7 +58,7 @@ export default function CategoryProducts() {
                   <p className="text-red-400 font-bold">
                     Article No: {product.articleNo}
                   </p>
-                  <p className="text-gray-400 text-sm">{product.description}</p>
+                  <p className="text-gray-400 text-sm font-normal">{product.description}</p>
                 </div>
 
                 <div>
@@ -74,8 +74,7 @@ export default function CategoryProducts() {
                   {/* Button at the bottom */}
                   <button
                  onClick={() => router.push(`/productview/${product.id}`)}
-
-                    className="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition"
+                    className="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 rounded-lg transition hover:scale-105 duration-200"
                   >
                     View Details
                   </button>

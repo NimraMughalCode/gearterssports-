@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { toast, Toaster } from "react-hot-toast";
+
+const CONTACTBUSINESS_VIEWED_KEY = 'contactbusiness-section-viewed';
 
 export default function ContactBoxingBusiness() {
   const {
@@ -14,6 +16,54 @@ export default function ContactBoxingBusiness() {
   } = useForm();
 
   const [loading, setLoading] = useState(false);
+
+  // Animation state for left/right columns
+  const [visible, setVisible] = useState(false);
+  const [leftVisible, setLeftVisible] = useState(false);
+  const [rightVisible, setRightVisible] = useState(false);
+  const sectionRef = useRef(null);
+  const leftRef = useRef(null);
+  const rightRef = useRef(null);
+
+  useEffect(() => {
+    if (localStorage.getItem(CONTACTBUSINESS_VIEWED_KEY) === 'true') {
+      setVisible(true);
+      setLeftVisible(true);
+      setRightVisible(true);
+      return;
+    }
+    const observer = new window.IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          localStorage.setItem(CONTACTBUSINESS_VIEWED_KEY, 'true');
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!visible) return;
+    const leftObs = new window.IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setLeftVisible(true);
+        leftObs.disconnect();
+      }
+    }, { threshold: 0.2 });
+    const rightObs = new window.IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setRightVisible(true);
+        rightObs.disconnect();
+      }
+    }, { threshold: 0.2 });
+    if (leftRef.current) leftObs.observe(leftRef.current);
+    if (rightRef.current) rightObs.observe(rightRef.current);
+    return () => { leftObs.disconnect(); rightObs.disconnect(); };
+  }, [visible]);
 
   const onSubmit = async (data) => {
     setLoading(true);
@@ -41,12 +91,17 @@ export default function ContactBoxingBusiness() {
   return (
     <section
       id="contact"
-      className="bg-black text-white py-2 px-4 flex justify-center items-center"
+      ref={sectionRef}
+      className="bg-black text-white py-2 md:px-4 px-2 flex justify-center items-center"
     >
       <Toaster position="top-right" />
       <div className="max-w-6xl w-full flex flex-col md:flex-row p-4 md:p-0 transform md:-skew-x-6">
         {/* Left Side Image */}
-        <div className="md:w-1/2 skew-x-0 md:skew-x-6 aspect-[3/2] relative">
+        <div
+          ref={leftRef}
+          className={`md:w-1/2 skew-x-0 md:skew-x-6 aspect-[3/2] relative transition-all duration-1000 ease-out
+            ${leftVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-16 pointer-events-none'}`}
+        >
           <Image
             src="https://thumbs.dreamstime.com/b/photo-rear-view-strong-boxer-boxing-ring-under-spotlights-depicting-determination-vertical-mobile-wallpaper-316567530.jpg"
             alt="Boxer"
@@ -56,7 +111,11 @@ export default function ContactBoxingBusiness() {
         </div>
 
         {/* Right Side Form */}
-        <div className="md:w-1/2 bg-black px-8 py-2 flex flex-col justify-center skew-x-0 md:skew-x-6">
+        <div
+          ref={rightRef}
+          className={`md:w-1/2 bg-black  md:px-8  py-2 flex flex-col justify-center skew-x-0 md:skew-x-6 transition-all duration-1000 ease-out
+            ${rightVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-16 pointer-events-none'}`}
+        >
           <h2 className="text-4xl md:text-5xl font-light leading-tight mb-2">
             LET’S TALK{" "}
             <span className="text-[#FCA600] font-extralight">BOXING</span>{" "}

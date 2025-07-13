@@ -7,7 +7,7 @@ export default function Terms() {
         <title>Terms and Conditions | Gearters Sports</title>
       </Head>
 
-      <div className="bg-black text-white mx-auto px-16 py-12">
+      <div className="bg-black text-white mx-auto px-16 py-12 font-sans">
         <h1 className="text-4xl font-bold text-primary mb-6">Terms and Conditions</h1>
 
         <p className="text-gray-300 mb-4">

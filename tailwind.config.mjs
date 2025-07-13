@@ -18,7 +18,7 @@ export default {
         card: "#1F2937", // Grayish Card Background
       },
       fontFamily: {
-        bebas: ['var(--font-bebas-neue)', 'sans-serif'],
+        inter: ['var(--font-inter)', 'sans-serif'],
       },
     },
   },

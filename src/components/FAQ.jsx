@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 const faqs = [
@@ -30,48 +30,101 @@ const faqs = [
   },
 ];
 
+// Helper to check if FAQ was already viewed
+const FAQ_VIEWED_KEY = 'faq-section-viewed';
+
 export default function FAQs() {
   const [activeIndex, setActiveIndex] = useState(null);
+  const [visible, setVisible] = useState(false);
+  const sectionRef = useRef(null);
 
   const toggleIndex = (index) => {
     setActiveIndex(index === activeIndex ? null : index);
   };
 
-  return (
-    <div id="faq" className="bg-black text-white px-4 py-16 font-[var(--font-bebas-neue)]">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-4xl md:text-5xl text-center mb-10 font-thin">
-          Frequently Asked{" "}
-          <span className="text-[#FCA600] font-thin">Questions</span>
-        </h2>
+  useEffect(() => {
+    if (localStorage.getItem(FAQ_VIEWED_KEY) === 'true') {
+      setVisible(true);
+      return;
+    }
+    const observer = new window.IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          localStorage.setItem(FAQ_VIEWED_KEY, 'true');
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
 
-        <div className="space-y-4">
-          {faqs.map((faq, index) => (
-            <div
-              key={index}
-              className="border border-gray-700 rounded-2xl overflow-hidden transition-all"
+  // Animation for each FAQ item
+  const [itemVis, setItemVis] = useState(Array(faqs.length).fill(false));
+  const itemRefs = useRef(faqs.map(() => React.createRef()));
+
+  useEffect(() => {
+    const observers = itemRefs.current.map((ref, idx) => {
+      if (!ref.current) return null;
+      return new window.IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setItemVis((v) => {
+              const arr = [...v];
+              arr[idx] = true;
+              return arr;
+            });
+            observers[idx]?.disconnect();
+          }
+        },
+        { threshold: 0.2 }
+      );
+    });
+    itemRefs.current.forEach((ref, idx) => {
+      if (ref.current && observers[idx]) observers[idx].observe(ref.current);
+    });
+    return () => observers.forEach((obs) => obs && obs.disconnect());
+  }, []);
+
+  return (
+    <div
+      id="faq"
+      ref={sectionRef}
+      className={`bg-black text-white px-4 py-16 font-sans transition-all duration-1000 ease-out
+        ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}
+    >
+      <div className="max-w-4xl mx-auto">
+        <h2 className="text-4xl md:text-5xl text-center mb-10 font-semibold">
+          Frequently Asked{" "}
+          <span className="text-[#FCA600] font-semibold">Questions</span>
+        </h2>
+        {faqs.map((faq, idx) => (
+          <div
+            key={faq.question}
+            ref={itemRefs.current[idx]}
+            className={`mb-6 border-b border-gray-700 pb-4 transition-all duration-700 ease-out
+              ${itemVis[idx] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}
+          >
+            <button
+              className="flex items-center justify-between w-full text-left focus:outline-none"
+              onClick={() => toggleIndex(idx)}
             >
-              <button
-                onClick={() => toggleIndex(index)}
-                className="w-full flex justify-between items-center px-6 py-4 text-left bg-[#1a1a1a] hover:bg-[#2a2a2a] transition"
-              >
-                <span className="text-lg  text-white">
-                  {faq.question}
-                </span>
-                {activeIndex === index ? (
-                  <ChevronUp className="text-[#FCA600]" />
-                ) : (
-                  <ChevronDown className="text-[#FCA600]" />
-                )}
-              </button>
-              {activeIndex === index && (
-                <div className="bg-[#0f0f0f] text-gray-300 px-6 py-4 text-sm md:text-base transition duration-300">
-                  {faq.answer}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+              <span className="text-xl md:text-2xl font-normal text-white">
+                {faq.question}
+              </span>
+              <span className="ml-4">
+                {activeIndex === idx ? <ChevronUp /> : <ChevronDown />}
+              </span>
+            </button>
+            {activeIndex === idx && (
+              <div className="mt-2 text-base md:text-lg text-gray-300 font-light transition-all duration-500">
+                {faq.answer}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );

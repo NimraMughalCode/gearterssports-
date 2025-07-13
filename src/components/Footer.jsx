@@ -20,7 +20,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-black text-white py-[72px] px-6 font-[var(--font-bebas-neue)]">
+    <footer className="bg-black text-white py-[72px] px-6 font-sans font-medium">
       <div className="max-w-7xl mx-auto flex flex-col items-center space-y-6">
         {/* Logo */}
         <div className="flex flex-col items-center">
