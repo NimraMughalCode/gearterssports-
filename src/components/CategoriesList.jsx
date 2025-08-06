@@ -40,7 +40,7 @@ export default function CategoriesWithSubcategories() {
 
   const filteredProducts = products.filter(
     (p) =>
-      p.category === selectedCategory &&
+      // p.category === selectedCategory &&
       p.subcategory === selectedSubcategory
   );
 
