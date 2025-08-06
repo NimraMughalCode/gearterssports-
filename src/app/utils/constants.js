@@ -10,12 +10,9 @@ export const CategoryTitle = {
   JUDO: "Judo",
 };
 
-const imageUrl = "https://media.istockphoto.com/id/1250685727/vector/realistic-pairs-of-red-boxing-gloves.jpg?s=612x612&w=0&k=20&c=8_bpUgjGLFEy5WKkRMEaKmdpW9MRQFt6Z7wZ-Fq0MSY=";
-
 export const categories = [
   {
     title: CategoryTitle.BOXING,
-    image: imageUrl,
     subcategories: [
       "Training Gloves",
       "Sparring Gloves",
@@ -25,7 +22,6 @@ export const categories = [
   },
   {
     title: CategoryTitle.MMA,
-    image: imageUrl,
     subcategories: [
       "Grappling Gloves",
       "Competition Gloves",
@@ -34,7 +30,6 @@ export const categories = [
   },
   {
     title: CategoryTitle.WRESTLING,
-    image: imageUrl,
     subcategories: [
       "Wrestling Shoes",
       "Headgear",
@@ -44,7 +39,6 @@ export const categories = [
   },
   {
     title: CategoryTitle.KICKBOXING,
-    image: imageUrl,
     subcategories: [
       "Kickboxing Gloves",
       "Shin Guards",
@@ -54,7 +48,7 @@ export const categories = [
   },
   {
     title: CategoryTitle.JIUJITSU,
-    image: imageUrl,
+
     subcategories: [
       "Gis",
       "Belts",
@@ -64,7 +58,7 @@ export const categories = [
   },
   {
     title: CategoryTitle.MUAYTHAI,
-    image: imageUrl,
+  
     subcategories: [
       "Muay Thai Shorts",
       "Elbow Pads",
@@ -74,7 +68,7 @@ export const categories = [
   },
   {
     title: CategoryTitle.KARATE,
-    image: imageUrl,
+  
     subcategories: [
       "Karate Gi",
       "Belts",
@@ -84,7 +78,7 @@ export const categories = [
   },
   {
     title: CategoryTitle.TAEKWONDO,
-    image: imageUrl,
+    
     subcategories: [
       "Dobok",
       "Headgear",
@@ -94,7 +88,7 @@ export const categories = [
   },
   {
     title: CategoryTitle.JUDO,
-    image: imageUrl,
+    
     subcategories: [
       "Judo Gi",
       "Belts",
