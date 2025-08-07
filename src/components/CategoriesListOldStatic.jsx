@@ -1,32 +1,19 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { getCategories, getProducts } from '@/app/utils/api';
+import { products } from "@/app/utils/products";
+import { categories } from "@/app/utils/constants";
 import ProductCard from "./ProductCard";
 
 const CATEGORIES_VIEWED_KEY = 'categories-section-viewed';
 
 export default function CategoriesWithSubcategories() {
-  const [categories, setCategories] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(categories[0].title);
+  const [selectedSubcategory, setSelectedSubcategory] = useState(
+    categories[0].subcategories[0]
+  );
   const [visible, setVisible] = useState(false);
   const sectionRef = useRef(null);
-
-  useEffect(() => {
-    async function fetchData() {
-      const categoriesData = await getCategories();
-      const productsData = await getProducts();
-      setCategories(categoriesData);
-      setProducts(productsData);
-
-      setSelectedCategory(categoriesData[0]);
-      setSelectedSubcategory(categoriesData[0]?.subcategories[0]);
-    }
-
-    fetchData();
-  }, []);
 
   useEffect(() => {
     if (localStorage.getItem(CATEGORIES_VIEWED_KEY) === 'true') {
@@ -47,8 +34,14 @@ export default function CategoriesWithSubcategories() {
     return () => observer.disconnect();
   }, []);
 
+  const currentCategory = categories.find(
+    (cat) => cat.title === selectedCategory
+  );
+
   const filteredProducts = products.filter(
-    (p) => p.subcategory === selectedSubcategory
+    (p) =>
+      // p.category === selectedCategory &&
+      p.subcategory === selectedSubcategory
   );
 
   return (
@@ -69,11 +62,11 @@ export default function CategoriesWithSubcategories() {
             <li
               key={cat.title}
               onClick={() => {
-                setSelectedCategory(cat);
+                setSelectedCategory(cat.title);
                 setSelectedSubcategory(cat.subcategories[0]);
               }}
               className={`cursor-pointer px-2 py-1 rounded uppercase text-gray-400 font-medium transition-all flex items-center ${
-                selectedCategory?.title === cat.title
+                selectedCategory === cat.title
                   ? "text-white  before:content-['→'] before:mr-2 before:text-[#FCA600]"
                   : "hover:text-[#FCA600] "
               }`}
@@ -88,7 +81,7 @@ export default function CategoriesWithSubcategories() {
       <main className="flex-1 p-6">
         {/* Subcategories */}
         <div className="flex flex-wrap gap-4 mb-8">
-          {selectedCategory?.subcategories.map((sub) => (
+          {currentCategory.subcategories.map((sub) => (
             <button
               key={sub}
               onClick={() => setSelectedSubcategory(sub)}
