@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FloatingWhatsApp from "@/components/WhatsAppFloating";
+import { Toaster } from 'react-hot-toast';
 
 const inter = Inter({
   variable: "--font-inter",
@@ -21,6 +22,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${inter.variable} antialiased bg-white`}
       >
+        <Toaster position="top-right" />
         <Header />
           <main className="mt-20">{children}</main>
         <Footer />

@@ -1,5 +1,6 @@
 'use client';
 
+import { supabase } from '@/lib/supabaseClient';
 import { useEffect, useState } from 'react';
 import {
   getCategories,
@@ -13,6 +14,10 @@ import {
 
 } from '@/app/utils/adminAPI';
 import { Folder, Package } from 'lucide-react'; // 
+import CategoriesManager from './CategoriesManagr';
+import ProductsManager from './ProductsManager';
+import toast from 'react-hot-toast';
+
 
 export default function AdminPage() {
   const [categories, setCategories] = useState([]);
@@ -22,13 +27,13 @@ export default function AdminPage() {
   const [productName, setProductName] = useState('');
   const [articleNo, setArticleNo] = useState('');
   const [productDescription, setProductDescription] = useState('');
-  const [productImage, setProductImage] = useState('');
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
   const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState('categories');
-
+  const [productImageFile, setProductImageFile] = useState(null);
+  const [editingProductFile, setEditingProductFile] = useState(null);
 
 
 useEffect(() => {
@@ -63,70 +68,199 @@ useEffect(() => {
   setProducts(data);
 }
 
+
 async function handleDeleteProduct(id) {
-  if (!confirm('Delete this product?')) return;
-  await deleteProduct(id);
-  fetchProducts();
+  const confirmed = window.confirm('Delete this product?');
+  if (!confirmed) return;
+
+  const toastId = toast.loading('Deleting product...');
+
+  try {
+    await deleteProduct(id);
+    fetchProducts();
+    toast.success('Product deleted!', { id: toastId });
+  } catch (err) {
+    toast.error('Failed to delete product', { id: toastId });
+  }
 }
 
 async function handleUpdateProduct() {
   const { id, name, article_no, description, img_src, subcategory } = editingProduct;
-  if (!name || !description || !img_src || !subcategory) return alert('All fields required');
-  await updateProduct({ id, name, article_no, description, img_src, subcategory });
-  setEditingProduct(null);
-  fetchProducts();
+  if (!name || !description || !subcategory) {
+    return toast.error('All fields are required');
+  }
+
+  const toastId = toast.loading('Updating product...');
+
+  try {
+    let finalImageURL = img_src;
+
+    if (editingProductFile) {
+      const fileExt = editingProductFile.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `products/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(filePath, editingProductFile);
+
+      if (uploadError) throw new Error('Image upload failed: ' + uploadError.message);
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('product-images').getPublicUrl(filePath);
+
+      finalImageURL = publicUrl;
+    }
+
+    await updateProduct({
+      id,
+      name,
+      article_no,
+      description,
+      img_src: finalImageURL,
+      subcategory,
+    });
+
+    setEditingProduct(null);
+    setEditingProductFile(null);
+    fetchProducts();
+
+    toast.success('Product updated successfully!', { id: toastId });
+  } catch (err) {
+    toast.error(err.message || 'Failed to update product', { id: toastId });
+  }
 }
 
 
 
-  async function handleAddCategory() {
-    if (!newCategory || !newSubcategories) return alert('All fields required');
-    console.log(newCategory, newSubcategories);
-    
-  await addCategory({
-  title: newCategory,
-  subcategories: newSubcategories.split(',').map(s => s.trim()),
-});
+async function handleAddCategory() {
+  if (!newCategory || !newSubcategories)
+    return toast.error('All fields required');
+
+  const toastId = toast.loading('Adding category...');
+
+  try {
+    await addCategory({
+      title: newCategory,
+      subcategories: newSubcategories.split(',').map(s => s.trim()),
+    });
+
     setNewCategory('');
     setNewSubcategories('');
-    fetchCategories();
+    await fetchCategories();
+    toast.success('Category added!', { id: toastId });
+  } catch (err) {
+    toast.error('Failed to add category', { id: toastId });
   }
+}
 
-  async function handleUpdateCategory() {
-    if (!editingCategory.title || !editingCategory.subcategories.length)
-      return alert('Fields cannot be empty');
+//   async function handleAddCategory() {
+//     if (!newCategory || !newSubcategories) return alert('All fields required');
+//     console.log(newCategory, newSubcategories);
+    
+//   await addCategory({
+//   title: newCategory,
+//   subcategories: newSubcategories.split(',').map(s => s.trim()),
+// });
+//     setNewCategory('');
+//     setNewSubcategories('');
+//     fetchCategories();
+//   }
 
+
+
+async function handleUpdateCategory() {
+  if (!editingCategory.title || !editingCategory.subcategories.length)
+    return toast.error('Fields cannot be empty');
+
+  const toastId = toast.loading('Updating category...');
+
+  try {
     await updateCategory(editingCategory);
     setEditingCategory(null);
-    fetchCategories();
+    await fetchCategories();
+    toast.success('Category updated!', { id: toastId });
+  } catch (err) {
+    toast.error('Failed to update category', { id: toastId });
   }
+}
+
+
+  // async function handleUpdateCategory() {
+  //   if (!editingCategory.title || !editingCategory.subcategories.length)
+  //     return alert('Fields cannot be empty');
+
+  //   await updateCategory(editingCategory);
+  //   setEditingCategory(null);
+  //   fetchCategories();
+  // }
 
   async function handleDeleteCategory(id) {
-    if (!confirm('Delete this category?')) return;
+  if (!confirm('Delete this category?')) return;
+
+  const toastId = toast.loading('Deleting category...');
+
+  try {
     await deleteCategory(id);
-    fetchCategories();
+    await fetchCategories();
+    toast.success('Category deleted!', { id: toastId });
+  } catch (err) {
+    toast.error('Failed to delete category', { id: toastId });
+  }
+}
+
+
+  // async function handleDeleteCategory(id) {
+  //   if (!confirm('Delete this category?')) return;
+  //   await deleteCategory(id);
+  //   fetchCategories();
+  // }
+
+
+async function handleAddProduct() {
+  if (!productName || !productDescription || !productImageFile || !selectedSubcategory) {
+    return toast.error('All product fields are required');
   }
 
-  async function handleAddProduct() {
-    if (!productName || !productDescription || !productImage || !selectedSubcategory)
-      return alert('All product fields are required');
-console.log(productImage);
+  const toastId = toast.loading('Uploading product...');
+
+  try {
+    const fileExt = productImageFile.name.split('.').pop();
+    const fileName = `${Date.now()}.${fileExt}`;
+    const filePath = `products/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('product-images')
+      .upload(filePath, productImageFile);
+
+    if (uploadError) throw new Error('Image upload failed: ' + uploadError.message);
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('product-images').getPublicUrl(filePath);
 
     await addProduct({
       name: productName,
       article_no: articleNo,
       description: productDescription,
-      img_src: productImage,
+      img_src: publicUrl,
       subcategory: selectedSubcategory,
     });
 
     setProductName('');
     setArticleNo('');
     setProductDescription('');
-    setProductImage('');
+    setProductImageFile(null);
     setSelectedSubcategory('');
-    alert('Product added');
+
+    toast.success('Product added successfully!', { id: toastId });
+    fetchProducts();
+  } catch (err) {
+    toast.error(err.message || 'Failed to add product', { id: toastId });
   }
+}
+
 
 if (!isAuthenticated) {
   return (
@@ -179,251 +313,44 @@ if (!isAuthenticated) {
 
 
 {activeTab === 'categories' && (
-  <>
-      {/* Add Category */}
-      <section>
-        <h2 className="text-xl font-semibold text-yellow-300 mb-2">Add Category</h2>
-        <div className="space-y-2">
-          <input
-            value={newCategory}
-            onChange={(e) => setNewCategory(e.target.value)}
-            placeholder="Category Title"
-            className="p-2 w-full bg-gray-800 border border-yellow-500"
-          />
-          <input
-            value={newSubcategories}
-            onChange={(e) => setNewSubcategories(e.target.value)}
-            placeholder="Subcategories (comma separated)"
-            className="p-2 w-full bg-gray-800 border border-yellow-500"
-          />
-          <button
-            onClick={handleAddCategory}
-            className="bg-yellow-500 text-black px-4 py-2 font-semibold"
-          >
-            Add Category
-          </button>
-        </div>
-      </section>
-
-      {/* Edit/Delete Category */}
-      <section>
-        <h2 className="text-xl font-semibold text-yellow-300 mb-4">Manage Categories</h2>
-        {categories.map((cat) => (
-          <div key={cat.id} className="mb-4 border border-yellow-500 p-4">
-            {editingCategory?.id === cat.id ? (
-              <>
-                <input
-                  value={editingCategory.title}
-                  onChange={(e) =>
-                    setEditingCategory({ ...editingCategory, title: e.target.value })
-                  }
-                  className="p-2 bg-gray-800 border border-yellow-500 w-full mb-2"
-                />
-                <input
-                  value={editingCategory.subcategories.join(', ')}
-                  onChange={(e) =>
-                    setEditingCategory({
-                      ...editingCategory,
-                      subcategories: e.target.value.split(',').map((s) => s.trim()),
-                    })
-                  }
-                  className="p-2 bg-gray-800 border border-yellow-500 w-full mb-2"
-                />
-                <button
-                  onClick={handleUpdateCategory}
-                  className="bg-green-500 px-4 py-1 text-black mr-2"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => setEditingCategory(null)}
-                  className="bg-red-600 px-4 py-1"
-                >
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <>
-                <h3 className="text-lg font-bold text-yellow-400">{cat.title}</h3>
-                <p className="text-sm text-gray-300">Subcategories: {cat.subcategories.join(', ')}</p>
-                <button
-                  onClick={() => setEditingCategory(cat)}
-                  className="text-sm text-blue-400 underline mr-4 mt-2"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDeleteCategory(cat.id)}
-                  className="text-sm text-red-400 underline mt-2"
-                >
-                  Delete
-                </button>
-              </>
-            )}
-          </div>
-        ))}
-      </section>
-
-     
-  </>
+  <CategoriesManager
+    categories={categories}
+    newCategory={newCategory}
+    newSubcategories={newSubcategories}
+    setNewCategory={setNewCategory}
+    setNewSubcategories={setNewSubcategories}
+    editingCategory={editingCategory}
+    setEditingCategory={setEditingCategory}
+    handleAddCategory={handleAddCategory}
+    handleUpdateCategory={handleUpdateCategory}
+    handleDeleteCategory={handleDeleteCategory}
+  />
 )}
-
 
 {activeTab === 'products' && (
-  <>
-   {/* Add Product */}
-      <section>
-        <h2 className="text-xl font-semibold text-yellow-300 mb-2">Add Product</h2>
-        <div className="space-y-2">
-          <input
-            value={productName}
-            onChange={(e) => setProductName(e.target.value)}
-            placeholder="Product Name"
-            className="p-2 w-full bg-gray-800 border border-yellow-500"
-          />
-                <input
-                value={articleNo}
-                onChange={(e) => setArticleNo(e.target.value)}
-                placeholder="Article No"
-                required
-                className="p-2 w-full bg-gray-800 border border-yellow-500"
-            />
-          <textarea
-            value={productDescription}
-            onChange={(e) => setProductDescription(e.target.value)}
-            placeholder="Product Description"
-            className="p-2 w-full bg-gray-800 border border-yellow-500"
-          />
-
-         
-          <input
-            value={productImage}
-            onChange={(e) => setProductImage(e.target.value)}
-            placeholder="Product Image URL"
-            className="p-2 w-full bg-gray-800 border border-yellow-500"
-          />
-          <select
-            value={selectedSubcategory}
-            onChange={(e) => setSelectedSubcategory(e.target.value)}
-            className="p-2 w-full bg-gray-800 border border-yellow-500"
-          >
-            <option value="">Select Subcategory</option>
-            {categories.flatMap((cat) =>
-              cat.subcategories.map((sub) => (
-                <option key={`${cat.id}-${sub}`} value={sub}>
-                  {cat.title} → {sub}
-                </option>
-              ))
-            )}
-          </select>
-          <button
-            onClick={handleAddProduct}
-            className="bg-yellow-500 text-black px-4 py-2 font-semibold"
-          >
-            Add Product
-          </button>
-        </div>
-      </section>
-    {/* All Products */}
-<section>
-  <h2 className="text-xl font-semibold text-yellow-300 mb-4">All Products</h2>
-  {products.map((prod) => (
-    <div key={prod.id} className="mb-4 border border-yellow-500 p-4">
-      {editingProduct?.id === prod.id ? (
-        <>
-          <input
-            value={editingProduct.name}
-            onChange={(e) =>
-              setEditingProduct({ ...editingProduct, name: e.target.value })
-            }
-            className="p-2 bg-gray-800 border border-yellow-500 w-full mb-2"
-            placeholder="Product Name"
-          />
-          <input
-            value={editingProduct.article_no}
-            onChange={(e) =>
-              setEditingProduct({ ...editingProduct, article_no: e.target.value })
-            }
-            className="p-2 bg-gray-800 border border-yellow-500 w-full mb-2"
-            placeholder="Article No"
-          />
-          <textarea
-            value={editingProduct.description}
-            onChange={(e) =>
-              setEditingProduct({ ...editingProduct, description: e.target.value })
-            }
-            className="p-2 bg-gray-800 border border-yellow-500 w-full mb-2"
-            placeholder="Description"
-          />
-          <input
-            value={editingProduct.img_src}
-            onChange={(e) =>
-              setEditingProduct({ ...editingProduct, img_src: e.target.value })
-            }
-            className="p-2 bg-gray-800 border border-yellow-500 w-full mb-2"
-            placeholder="Image URL"
-          />
-          <select
-            value={editingProduct.subcategory}
-            onChange={(e) =>
-              setEditingProduct({ ...editingProduct, subcategory: e.target.value })
-            }
-            className="p-2 bg-gray-800 border border-yellow-500 w-full mb-2"
-          >
-            <option value="">Select Subcategory</option>
-            {categories.flatMap((cat) =>
-              cat.subcategories.map((sub) => (
-                <option key={`${cat.id}-${sub}`} value={sub}>
-                  {cat.title} → {sub}
-                </option>
-              ))
-            )}
-          </select>
-          <button
-            onClick={handleUpdateProduct}
-            className="bg-green-500 px-4 py-1 text-black mr-2"
-          >
-            Save
-          </button>
-          <button
-            onClick={() => setEditingProduct(null)}
-            className="bg-red-600 px-4 py-1"
-          >
-            Cancel
-          </button>
-        </>
-      ) : (
-        <>
-          <h3 className="text-lg font-bold text-yellow-400">{prod.name}</h3>
-          <p className="text-sm text-gray-300">Article No: {prod.article_no}</p>
-          <p className="text-sm text-gray-300">Description: {prod.description}</p>
-          <p className="text-sm text-gray-300">Subcategory: {prod.subcategory}</p>
-          <img
-            src={prod.img_src}
-            alt={prod.name}
-            className="w-32 h-32 object-cover mt-2 border border-yellow-500"
-          />
-          <div className="mt-2">
-            <button
-              onClick={() => setEditingProduct(prod)}
-              className="text-sm text-blue-400 underline mr-4"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => handleDeleteProduct(prod.id)}
-              className="text-sm text-red-400 underline"
-            >
-              Delete
-            </button>
-          </div>
-        </>
-      )}
-    </div>
-  ))}
-</section>
-  </>
+  <ProductsManager
+    categories={categories}
+    products={products}
+    productName={productName}
+    articleNo={articleNo}
+    productDescription={productDescription}
+    selectedSubcategory={selectedSubcategory}
+    productImageFile={productImageFile}
+    setProductName={setProductName}
+    setArticleNo={setArticleNo}
+    setProductDescription={setProductDescription}
+    setSelectedSubcategory={setSelectedSubcategory}
+    setProductImageFile={setProductImageFile}
+    handleAddProduct={handleAddProduct}
+    editingProduct={editingProduct}
+    setEditingProduct={setEditingProduct}
+    editingProductFile={editingProductFile}
+    setEditingProductFile={setEditingProductFile}
+    handleUpdateProduct={handleUpdateProduct}
+    handleDeleteProduct={handleDeleteProduct}
+  />
 )}
+
 
 
 
