@@ -46,8 +46,12 @@ useEffect(() => {
     const username = prompt('Enter admin username:');
     const password = prompt('Enter admin password:');
     
+  const envUsername = process.env.NEXT_PUBLIC_ADMIN_USERNAME;
+    const envPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+
+
     // Replace with your desired username and password
-    if (username === 'nimramughal' && password === 'Nimra123$') {
+    if (username === envUsername && password === envPassword) {
       localStorage.setItem('admin-auth', 'true');
       setIsAuthenticated(true);
       fetchCategories();
@@ -155,18 +159,6 @@ async function handleAddCategory() {
   }
 }
 
-//   async function handleAddCategory() {
-//     if (!newCategory || !newSubcategories) return alert('All fields required');
-//     console.log(newCategory, newSubcategories);
-    
-//   await addCategory({
-//   title: newCategory,
-//   subcategories: newSubcategories.split(',').map(s => s.trim()),
-// });
-//     setNewCategory('');
-//     setNewSubcategories('');
-//     fetchCategories();
-//   }
 
 
 
@@ -187,14 +179,7 @@ async function handleUpdateCategory() {
 }
 
 
-  // async function handleUpdateCategory() {
-  //   if (!editingCategory.title || !editingCategory.subcategories.length)
-  //     return alert('Fields cannot be empty');
 
-  //   await updateCategory(editingCategory);
-  //   setEditingCategory(null);
-  //   fetchCategories();
-  // }
 
   async function handleDeleteCategory(id) {
   if (!confirm('Delete this category?')) return;
@@ -211,11 +196,7 @@ async function handleUpdateCategory() {
 }
 
 
-  // async function handleDeleteCategory(id) {
-  //   if (!confirm('Delete this category?')) return;
-  //   await deleteCategory(id);
-  //   fetchCategories();
-  // }
+
 
 
 async function handleAddProduct() {
