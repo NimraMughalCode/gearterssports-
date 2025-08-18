@@ -42,11 +42,8 @@ export default function Header() {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center space-x-2">
-          <Image src="/logo.svg" alt="Gearters Logo" width={50} height={50} />
-          <div className="leading-none">
-            <p className="text-sm font-bold tracking-wider">GEARTERS</p>
-            <p className="text-[10px] tracking-widest text-gray-400 font-medium">SPORTS</p>
-          </div>
+          <Image src="/logo.svg" alt="Gearters Logo" width={70} height={70} />
+         
         </div>
 
         {/* Desktop Nav */}

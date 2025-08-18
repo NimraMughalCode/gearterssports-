@@ -86,6 +86,10 @@ export default function CategoriesWithSubcategories() {
 
       {/* Main Content */}
       <main className="flex-1 p-6">
+       <h2 className="text-4xl md:text-5xl text-center mb-10 font-semibold">
+          Our {" "}
+          <span className="text-[#FCA600] font-semibold">Products</span>
+        </h2>
         {/* Subcategories */}
         <div className="flex flex-wrap gap-4 mb-8">
           {selectedCategory?.subcategories.map((sub) => (

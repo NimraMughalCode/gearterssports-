@@ -105,6 +105,14 @@ export default function WhyChooseUs() {
                 ${rightVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-16 pointer-events-none'}`}
             >
               {/* You can add more right-side content here if needed */}
+              {/* <Image
+    src="https://img.freepik.com/premium-photo/full-length-silhouette-teenage-boy-holding-barbell-darkroom_1048944-7644823.jpg?semt=ais_hybrid&w=740&q=80" // 👈 replace with your actual image path
+    alt="Why Choose Us - Boxing Gloves"
+    width={500}
+    height={500}
+    className="rounded-lg shadow-lg object-contain w-full h-auto"
+    priority
+  /> */}
             </div>
           </>;
         })()}
