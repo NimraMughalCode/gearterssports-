@@ -1,10 +1,6 @@
 'use client';
 
-import React from 'react';
-import { useState } from 'react';
-
-
-
+import React, { useState } from 'react';
 
 export default function ProductsManager({
   categories,
@@ -26,12 +22,9 @@ export default function ProductsManager({
   setEditingProductFile,
   handleUpdateProduct,
   handleDeleteProduct,
-}) 
-
-
-
-{
+}) {
   const [filterSubcategory, setFilterSubcategory] = useState('');
+
   return (
     <>
       {/* Add Product */}
@@ -86,10 +79,42 @@ export default function ProductsManager({
       </section>
 
       {/* All Products */}
-      
-        {/* <section>
-          <h2 className="text-xl font-semibold text-yellow-300 mb-4">All Products</h2>
-          {products.map((prod) => (
+      <section className="mt-8">
+        <h2 className="text-xl font-semibold text-yellow-300 mb-4">All Products</h2>
+
+        {/* Filter Tabs */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          <button
+            onClick={() => setFilterSubcategory('')}
+            className={`px-3 py-1 rounded ${
+              !filterSubcategory
+                ? 'bg-yellow-500 text-black font-semibold'
+                : 'bg-gray-700 text-white'
+            }`}
+          >
+            All
+          </button>
+          {Array.from(new Set(products.map((prod) => prod.subcategory))).map((subcat) => (
+            <button
+              key={subcat}
+              onClick={() => setFilterSubcategory(subcat)}
+              className={`px-3 py-1 rounded ${
+                filterSubcategory === subcat
+                  ? 'bg-yellow-500 text-black font-semibold'
+                  : 'bg-gray-700 text-white'
+              }`}
+            >
+              {subcat}
+            </button>
+          ))}
+        </div>
+
+        {/* Filtered Product List */}
+        {products
+          .filter((prod) =>
+            filterSubcategory ? prod.subcategory === filterSubcategory : true
+          )
+          .map((prod) => (
             <div key={prod.id} className="mb-4 border border-yellow-500 p-4">
               {editingProduct?.id === prod.id ? (
                 <>
@@ -134,7 +159,7 @@ export default function ProductsManager({
                     )}
                   </select>
                   <h4 className="text-white italic">
-                    This is optional. If left empty the old file will be saved
+                    Optional: Upload a new image (leave empty to keep existing)
                   </h4>
                   <input
                     type="file"
@@ -142,21 +167,23 @@ export default function ProductsManager({
                     onChange={(e) => setEditingProductFile(e.target.files[0])}
                     className="p-2 bg-gray-800 border border-yellow-500 w-full mb-2"
                   />
-                  <button
-                    onClick={handleUpdateProduct}
-                    className="bg-green-500 px-4 py-1 text-black mr-2"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => {
-                      setEditingProduct(null);
-                      setEditingProductFile(null);
-                    }}
-                    className="bg-red-600 px-4 py-1"
-                  >
-                    Cancel
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleUpdateProduct()}
+                      className="bg-green-500 px-4 py-1 text-black"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingProduct(null);
+                        setEditingProductFile(null);
+                      }}
+                      className="bg-red-600 px-4 py-1 text-white"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </>
               ) : (
                 <>
@@ -187,83 +214,7 @@ export default function ProductsManager({
               )}
             </div>
           ))}
-        </section> */}
-
-
-<section>
-  <h2 className="text-xl font-semibold text-yellow-300 mb-4">All Products</h2>
-
-  {/* Filter Tabs */}
-  <div className="flex flex-wrap gap-2 mb-4">
-    <button
-      onClick={() => setFilterSubcategory('')}
-      className={`px-3 py-1 rounded ${
-        !filterSubcategory
-          ? 'bg-yellow-500 text-black font-semibold'
-          : 'bg-gray-700 text-white'
-      }`}
-    >
-      All
-    </button>
-    {Array.from(
-      new Set(products.map((prod) => prod.subcategory))
-    ).map((subcat) => (
-      <button
-        key={subcat}
-        onClick={() => setFilterSubcategory(subcat)}
-        className={`px-3 py-1 rounded ${
-          filterSubcategory === subcat
-            ? 'bg-yellow-500 text-black font-semibold'
-            : 'bg-gray-700 text-white'
-        }`}
-      >
-        {subcat}
-      </button>
-    ))}
-  </div>
-
-  {/* Filtered Product List */}
-  {products
-    .filter((prod) =>
-      filterSubcategory ? prod.subcategory === filterSubcategory : true
-    )
-    .map((prod) => (
-      <div key={prod.id} className="mb-4 border border-yellow-500 p-4">
-        {editingProduct?.id === prod.id ? (
-          <>
-            {/* Editing Fields (same as before) */}
-          </>
-        ) : (
-          <>
-            <h3 className="text-lg font-bold text-yellow-400">{prod.name}</h3>
-            <p className="text-sm text-gray-300">Article No: {prod.article_no}</p>
-            <p className="text-sm text-gray-300">Description: {prod.description}</p>
-            <p className="text-sm text-gray-300">Subcategory: {prod.subcategory}</p>
-            <img
-              src={prod.img_src}
-              alt={prod.name}
-              className="w-32 h-32 object-cover mt-2 border border-yellow-500"
-            />
-            <div className="mt-2">
-              <button
-                onClick={() => setEditingProduct(prod)}
-                className="text-sm text-blue-400 underline mr-4"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDeleteProduct(prod.id)}
-                className="text-sm text-red-400 underline"
-              >
-                Delete
-              </button>
-            </div>
-          </>
-        )}
-      </div>
-    ))}
-</section>
-
+      </section>
     </>
   );
 }
