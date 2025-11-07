@@ -25,6 +25,14 @@ export default function ProductsManager({
 }) {
   const [filterSubcategory, setFilterSubcategory] = useState('');
 
+  // NEW STATES FOR ADD PRODUCT MODE
+  const [productImageType, setProductImageType] = useState("file");
+  const [productImageUrl, setProductImageUrl] = useState("");
+
+  // NEW STATES FOR EDIT PRODUCT MODE
+  const [editingProductImageType, setEditingProductImageType] = useState("file");
+  const [editingProductImageUrl, setEditingProductImageUrl] = useState("");
+
   return (
     <>
       {/* Add Product */}
@@ -49,12 +57,43 @@ export default function ProductsManager({
             placeholder="Product Description"
             className="p-2 w-full bg-gray-800 border border-yellow-500"
           />
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setProductImageFile(e.target.files[0])}
-            className="p-2 w-full bg-gray-800 border border-yellow-500"
-          />
+
+          {/* IMAGE INPUT MODE TOGGLE */}
+          <div className="flex gap-4 text-white">
+            <label>
+              <input
+                type="radio"
+                value="file"
+                checked={productImageType === "file"}
+                onChange={() => setProductImageType("file")}
+              /> Upload Image
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="url"
+                checked={productImageType === "url"}
+                onChange={() => setProductImageType("url")}
+              /> Image URL
+            </label>
+          </div>
+
+          {productImageType === "file" ? (
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setProductImageFile(e.target.files[0])}
+              className="p-2 w-full bg-gray-800 border border-yellow-500"
+            />
+          ) : (
+            <input
+              value={productImageUrl}
+              onChange={(e) => setProductImageUrl(e.target.value)}
+              placeholder="Enter Image URL"
+              className="p-2 w-full bg-gray-800 border border-yellow-500"
+            />
+          )}
+
           <select
             value={selectedSubcategory}
             onChange={(e) => setSelectedSubcategory(e.target.value)}
@@ -69,8 +108,15 @@ export default function ProductsManager({
               ))
             )}
           </select>
+
           <button
-            onClick={handleAddProduct}
+            onClick={() =>
+              handleAddProduct({
+                imageType: productImageType,
+                file: productImageFile,
+                url: productImageUrl,
+              })
+            }
             className="bg-yellow-500 text-black px-4 py-2 font-semibold"
           >
             Add Product
@@ -86,11 +132,7 @@ export default function ProductsManager({
         <div className="flex flex-wrap gap-2 mb-4">
           <button
             onClick={() => setFilterSubcategory('')}
-            className={`px-3 py-1 rounded ${
-              !filterSubcategory
-                ? 'bg-yellow-500 text-black font-semibold'
-                : 'bg-gray-700 text-white'
-            }`}
+            className={`px-3 py-1 rounded ${!filterSubcategory ? 'bg-yellow-500 text-black font-semibold' : 'bg-gray-700 text-white'}`}
           >
             All
           </button>
@@ -98,11 +140,7 @@ export default function ProductsManager({
             <button
               key={subcat}
               onClick={() => setFilterSubcategory(subcat)}
-              className={`px-3 py-1 rounded ${
-                filterSubcategory === subcat
-                  ? 'bg-yellow-500 text-black font-semibold'
-                  : 'bg-gray-700 text-white'
-              }`}
+              className={`px-3 py-1 rounded ${filterSubcategory === subcat ? 'bg-yellow-500 text-black font-semibold' : 'bg-gray-700 text-white'}`}
             >
               {subcat}
             </button>
@@ -111,42 +149,33 @@ export default function ProductsManager({
 
         {/* Filtered Product List */}
         {products
-          .filter((prod) =>
-            filterSubcategory ? prod.subcategory === filterSubcategory : true
-          )
+          .filter((prod) => (filterSubcategory ? prod.subcategory === filterSubcategory : true))
           .map((prod) => (
             <div key={prod.id} className="mb-4 border border-yellow-500 p-4">
               {editingProduct?.id === prod.id ? (
                 <>
                   <input
                     value={editingProduct.name}
-                    onChange={(e) =>
-                      setEditingProduct({ ...editingProduct, name: e.target.value })
-                    }
+                    onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
                     className="p-2 bg-gray-800 border border-yellow-500 w-full mb-2"
                     placeholder="Product Name"
                   />
                   <input
                     value={editingProduct.article_no}
-                    onChange={(e) =>
-                      setEditingProduct({ ...editingProduct, article_no: e.target.value })
-                    }
+                    onChange={(e) => setEditingProduct({ ...editingProduct, article_no: e.target.value })}
                     className="p-2 bg-gray-800 border border-yellow-500 w-full mb-2"
                     placeholder="Article No"
                   />
                   <textarea
                     value={editingProduct.description}
-                    onChange={(e) =>
-                      setEditingProduct({ ...editingProduct, description: e.target.value })
-                    }
+                    onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
                     className="p-2 bg-gray-800 border border-yellow-500 w-full mb-2"
                     placeholder="Description"
                   />
+
                   <select
                     value={editingProduct.subcategory}
-                    onChange={(e) =>
-                      setEditingProduct({ ...editingProduct, subcategory: e.target.value })
-                    }
+                    onChange={(e) => setEditingProduct({ ...editingProduct, subcategory: e.target.value })}
                     className="p-2 bg-gray-800 border border-yellow-500 w-full mb-2"
                   >
                     <option value="">Select Subcategory</option>
@@ -158,18 +187,52 @@ export default function ProductsManager({
                       ))
                     )}
                   </select>
-                  <h4 className="text-white italic">
-                    Optional: Upload a new image (leave empty to keep existing)
-                  </h4>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setEditingProductFile(e.target.files[0])}
-                    className="p-2 bg-gray-800 border border-yellow-500 w-full mb-2"
-                  />
+
+                  {/* EDIT IMAGE TYPE TOGGLE */}
+                  <div className="flex gap-4 text-white mb-2">
+                    <label>
+                      <input
+                        type="radio"
+                        value="file"
+                        checked={editingProductImageType === "file"}
+                        onChange={() => setEditingProductImageType("file")}
+                      /> Upload New Image
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        value="url"
+                        checked={editingProductImageType === "url"}
+                        onChange={() => setEditingProductImageType("url")}
+                      /> Use Image URL
+                    </label>
+                  </div>
+
+                  {editingProductImageType === "file" ? (
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setEditingProductFile(e.target.files[0])}
+                      className="p-2 bg-gray-800 border border-yellow-500 w-full mb-2"
+                    />
+                  ) : (
+                    <input
+                      value={editingProductImageUrl}
+                      onChange={(e) => setEditingProductImageUrl(e.target.value)}
+                      placeholder="Enter New Image URL"
+                      className="p-2 bg-gray-800 border border-yellow-500 w-full mb-2"
+                    />
+                  )}
+
                   <div className="flex gap-2">
                     <button
-                      onClick={() => handleUpdateProduct()}
+                      onClick={() =>
+                        handleUpdateProduct({
+                          imageType: editingProductImageType,
+                          file: editingProductFile,
+                          url: editingProductImageUrl,
+                        })
+                      }
                       className="bg-green-500 px-4 py-1 text-black"
                     >
                       Save

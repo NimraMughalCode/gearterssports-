@@ -88,8 +88,9 @@ async function handleDeleteProduct(id) {
   }
 }
 
-async function handleUpdateProduct() {
+async function handleUpdateProduct({ imageType, file, url }) {
   const { id, name, article_no, description, img_src, subcategory } = editingProduct;
+
   if (!name || !description || !subcategory) {
     return toast.error('All fields are required');
   }
@@ -97,24 +98,28 @@ async function handleUpdateProduct() {
   const toastId = toast.loading('Updating product...');
 
   try {
-    let finalImageURL = img_src;
+    let finalImageURL = img_src; // Keep old one by default
 
-    if (editingProductFile) {
-      const fileExt = editingProductFile.name.split('.').pop();
+    if (imageType === "file" && file) {
+      // Upload new file
+      const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `products/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('product-images')
-        .upload(filePath, editingProductFile);
+        .upload(filePath, file);
 
       if (uploadError) throw new Error('Image upload failed: ' + uploadError.message);
 
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from('product-images').getPublicUrl(filePath);
+      const { data: { publicUrl } } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(filePath);
 
       finalImageURL = publicUrl;
+
+    } else if (imageType === "url" && url) {
+      finalImageURL = url; // Replace with URL
     }
 
     await updateProduct({
@@ -131,10 +136,12 @@ async function handleUpdateProduct() {
     fetchProducts();
 
     toast.success('Product updated successfully!', { id: toastId });
+
   } catch (err) {
     toast.error(err.message || 'Failed to update product', { id: toastId });
   }
 }
+
 
 
 
@@ -199,48 +206,63 @@ async function handleUpdateCategory() {
 
 
 
-async function handleAddProduct() {
-  if (!productName || !productDescription || !productImageFile || !selectedSubcategory) {
+async function handleAddProduct({ imageType, file, url }) {
+  if (!productName || !productDescription || !selectedSubcategory) {
     return toast.error('All product fields are required');
   }
 
-  const toastId = toast.loading('Uploading product...');
+  const toastId = toast.loading('Saving product...');
 
   try {
-    const fileExt = productImageFile.name.split('.').pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `products/${fileName}`;
+    let finalImageURL = '';
 
-    const { error: uploadError } = await supabase.storage
-      .from('product-images')
-      .upload(filePath, productImageFile);
+    if (imageType === "file") {
+      if (!file) return toast.error("Please select an image file.");
 
-    if (uploadError) throw new Error('Image upload failed: ' + uploadError.message);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `products/${fileName}`;
 
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from('product-images').getPublicUrl(filePath);
+      const { error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(filePath, file);
+
+      if (uploadError) throw new Error('Image upload failed: ' + uploadError.message);
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('product-images').getPublicUrl(filePath);
+
+      finalImageURL = publicUrl;
+
+    } else if (imageType === "url") {
+      if (!url) return toast.error("Please enter an image URL.");
+      finalImageURL = url;
+    }
 
     await addProduct({
       name: productName,
       article_no: articleNo,
       description: productDescription,
-      img_src: publicUrl,
+      img_src: finalImageURL,
       subcategory: selectedSubcategory,
     });
 
+    // Reset fields
     setProductName('');
     setArticleNo('');
     setProductDescription('');
-    setProductImageFile(null);
     setSelectedSubcategory('');
+    setProductImageFile(null);
 
     toast.success('Product added successfully!', { id: toastId });
     fetchProducts();
+
   } catch (err) {
     toast.error(err.message || 'Failed to add product', { id: toastId });
   }
 }
+
 
 
 if (!isAuthenticated) {
