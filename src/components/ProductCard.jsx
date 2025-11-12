@@ -3,12 +3,16 @@ import React from "react";
 const ProductCard = ({ product }) => {
   return (
     <div className="bg-black border border-[#FCA600] text-white w-full max-w-md shadow-lg flex flex-col font-sans rounded-lg overflow-hidden">
-      <img
-        src={product.img_src}
-        alt={product.name}
-        className="w-full h-72 object-cover"
-      />
+      {/* Square Image */}
+      <div className="bg-white w-full aspect-square overflow-hidden">
+        <img
+          src={product.img_src}
+          alt={product.name}
+          className="w-full h-full object-contain"
+        />
+      </div>
 
+      {/* Content */}
       <div className="p-5 flex flex-col flex-1">
         <h3 className="text-[#FCA600] text-xl md:text-2xl uppercase font-semibold">
           {product.name}
@@ -18,6 +22,7 @@ const ProductCard = ({ product }) => {
         </p>
       </div>
 
+      {/* WhatsApp Button */}
       <div
         onClick={() => {
           const message = `Hello, I'm interested in ${product.name}.\n\n${product.description}\n\nCheck it out here: https://yourwebsite.com/productview/${product.id}`;
