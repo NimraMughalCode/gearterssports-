@@ -48,16 +48,16 @@ export default function Hero() {
             >
               <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center px-4 md:px-10 lg:px-20 py-10 md:py-20 w-full max-w-full overflow-hidden">
                 <div className="flex flex-col justify-center text-center lg:w-1/2 lg:items-start lg:text-left w-full max-w-full">
-                  <h1 className="text-4xl md:text-6xl font-bold text-white leading-tight">
+                  <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight">
                     YOUR RELIABLE PARTNER IN BOXING GEAR <br />
                     <span style={{ color: "#FCA600" }}>GEARTERS SPORTS</span>
                   </h1>
-                  <p className="mt-4 text-sm md:text-base font-normal text-gray-300 max-w-2xl">
+                  <p className="mt-4 text-sm md:text-base font-medium text-small text-gray-300 max-w-2xl">
                     Manufacturers of World-Class Boxing Equipment, Crafted for Strength, Comfort, and Precision — Trusted by Fighters, Trainers, and Businesses Worldwide.
                   </p>
                   <a
                     href="/contact"
-                    className="mt-6 border-2 border-[#FCA600] text-[#FCA600] px-6 py-3 text-lg font-medium hover:bg-[#FCA600] transition"
+                    className="mt-6 border-2 border-[#FCA600] text-[#FCA600] px-6 py-3  hover:bg-[#FCA600] hover:text-black font-medium text-small transition"
                   >
                     Contact Us
                   </a>
@@ -65,7 +65,7 @@ export default function Hero() {
                   <div className="mt-12 flex flex-col md:flex-row gap-6 text-white text-center items-center">
                     {/* Block 1 */}
                     <div>
-                      <p className="text-3xl font-semibold text-[#FCA600]">8+</p>
+                      <p className="text-3xl font-normal text-[#FCA600]">8+</p>
                       <p className="text-sm font-normal">Years of Experience</p>
                     </div>
 

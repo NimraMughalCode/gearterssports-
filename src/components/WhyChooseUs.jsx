@@ -78,15 +78,15 @@ export default function WhyChooseUs() {
           className={`flex-[2] flex flex-col max-w-2xl px-4 text-left transition-all duration-1000 ease-out
             ${leftVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-16 pointer-events-none"}`}
         >
-          <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight">
+          <h2 className="text-3xl md:text-4xl  font-bold text-white leading-tight">
             Why Choose <br />
             <span style={{ color: "#FCA600" }}>GEARTERS SPORTS</span>
           </h2>
-          <p className="mt-4 text-sm md:text-base font-normal text-gray-300">
+          <p className="mt-4 text-sm  font-normal text-gray-300">
             Quality You Can Feel, Performance You Can Trust. Your Reliable Partner
             for Boxing Product Exports.
           </p>
-          <ul className="mt-4 text-sm md:text-base font-normal text-gray-300 list-disc list-inside space-y-2">
+          <ul className="mt-4 text-sm  font-normal text-gray-300 list-disc list-inside space-y-2">
             <li>Premium Quality Materials</li>
             <li>Custom Designs & Private Label Options</li>
             <li>Competitive Pricing for Bulk Orders</li>
@@ -94,12 +94,14 @@ export default function WhyChooseUs() {
             <li>Strict Quality Control</li>
             <li>Exceptional Customer Support</li>
           </ul>
-          <a
-            href="/contact"
-            className="mt-6 border-2 border-[#FCA600] w-fit text-white px-6 py-3 text-lg font-medium hover:bg-[#FCA600] transition"
-          >
-            ABOUT US
-          </a>
+          
+
+             <a
+                    href="/about"
+                    className="mt-6 border-2 w-fit border-[#FCA600] text-[#FCA600] px-6 py-3  hover:bg-[#FCA600] hover:text-black font-medium text-small transition"
+                  >
+                    About Us
+                  </a>
         </div>
 
         {/* Right Column */}

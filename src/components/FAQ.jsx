@@ -96,10 +96,12 @@ export default function FAQs() {
         ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}
     >
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-4xl md:text-5xl text-center mb-10 font-semibold">
-          Frequently Asked{" "}
-          <span className="text-[#FCA600] font-semibold">Questions</span>
-        </h2>
+   
+
+         <h1 className="text-center  mb-10 text-3xl md:text-4xl font-bold text-white leading-tight">
+                    Frequently Asked
+                    <span style={{ color: "#FCA600" }}> Questions</span>
+                  </h1>
         {faqs.map((faq, idx) => (
           <div
             key={faq.question}
@@ -111,7 +113,7 @@ export default function FAQs() {
               className="flex items-center justify-between w-full text-left focus:outline-none"
               onClick={() => toggleIndex(idx)}
             >
-              <span className="text-xl md:text-2xl font-normal text-white">
+              <span className=" font-medium text-sm text-white">
                 {faq.question}
               </span>
               <span className="ml-4">
@@ -119,7 +121,7 @@ export default function FAQs() {
               </span>
             </button>
             {activeIndex === idx && (
-              <div className="mt-2 text-base md:text-lg text-gray-300 font-light transition-all duration-500">
+              <div className="mt-2 font-normal text-sm text-gray-300  transition-all duration-500">
                 {faq.answer}
               </div>
             )}

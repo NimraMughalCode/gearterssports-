@@ -66,13 +66,13 @@ export default function FollowInsta() {
     >
       {/* Text Content */}
       <div className="text-center max-w-3xl mb-10">
-        <h2 className="text-3xl md:text-5xl font-bold leading-tight text-white">
-          FOLLOW US ON <br />
+        <h2 className="text-3xl md:text-4xl font-bold leading-tight text-white">
+          Follow Us On <br />
           <span style={{ color: "#FCA600" }} className="font-bold">
-            INSTAGRAM
+            Instagram
           </span>
         </h2>
-        <p className="mt-4 text-sm md:text-base font-light text-gray-300">
+        <p className="mt-4 text-sm  font-normal text-gray-300">
           Stay connected with us through our latest posts, featuring boxing gear, training highlights, events, and more from around the world.
         </p>
       </div>

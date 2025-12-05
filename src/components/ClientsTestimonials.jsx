@@ -68,15 +68,17 @@ export default function ClientTestimonials() {
       className={`relative bg-[#121212] py-20 px-4 text-white text-center overflow-hidden font-sans transition-all duration-1000 ease-out
         ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}
     >
-      <h2 className="text-3xl md:text-5xl font-[200]">
-        WHAT OUR <span className="text-[#FCA600] font-bold">CLIENTS SAY</span>
-      </h2>
+    
 
+ <h1 className="text-center  mb-10 text-3xl md:text-4xl font-bold text-white leading-tight">
+                    What Our
+                    <span style={{ color: "#FCA600" }}> Clients Say</span>
+                  </h1>
       <div className="mt-12 max-w-4xl mx-auto relative">
         <Slider ref={sliderRef} {...settings}>
           {testimonials.map((item, idx) => (
             <div key={idx} className="px-6">
-              <p className="text-base md:text-lg font-light text-gray-300 leading-relaxed mb-6">
+              <p className="text-sm  font-normal   text-gray-300 leading-relaxed mb-6">
                 {item.text}
               </p>
 
@@ -93,8 +95,8 @@ export default function ClientTestimonials() {
                 </div>
               </div>
 
-              <h4 className="text-xl font-[200]">{item.name}</h4>
-              <p className="text-sm font-[200] text-gray-400">{item.title}</p>
+              <h4 className="text-lg font-medium">{item.name}</h4>
+              <p className="text-sm font-normal text-gray-400">{item.title}</p>
             </div>
           ))}
         </Slider>

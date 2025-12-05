@@ -116,12 +116,13 @@ export default function ContactBoxingBusiness() {
           className={`md:w-1/2 bg-black  md:px-8  py-2 flex flex-col justify-center skew-x-0 md:skew-x-6 transition-all duration-1000 ease-out
             ${rightVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-16 pointer-events-none'}`}
         >
-          <h2 className="text-4xl md:text-5xl font-light leading-tight mb-2">
-            LET’S TALK{" "}
-            <span className="text-[#FCA600] font-extralight">BOXING</span>{" "}
-            BUSINESS
-          </h2>
-          <p className="text-gray-300 mb-8 uppercase text-sm tracking-wide font-light">
+      
+
+           <h1 className="  text-3xl md:text-4xl font-bold text-white leading-tight">
+                     Let’s Talk
+                    <span style={{ color: "#FCA600" }}> Boxing Business</span>
+                  </h1>
+          <p className="text-gray-300 my-4 text-sm tracking-wide font-medium">
             Export Worldwide | Premium Quality | Custom Orders
           </p>
 
@@ -178,7 +179,7 @@ export default function ContactBoxingBusiness() {
             <button
               type="submit"
               disabled={loading}
-              className="mt-6 border-2 border-[#FCA600] text-[#FCA600] px-6 py-3 text-lg font-light hover:bg-[#FCA600] hover:text-black transition disabled:opacity-50"
+              className="mt-6 border-2 border-[#FCA600] text-[#FCA600] px-6 py-3  hover:bg-[#FCA600] hover:text-black font-medium text-small transition"
             >
               {loading ? "Sending..." : "Submit"}
             </button>

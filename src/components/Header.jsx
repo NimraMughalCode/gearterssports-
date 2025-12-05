@@ -58,7 +58,7 @@ export default function Header() {
         {/* Contact (Desktop Only) */}
         <button
           onClick={() => handleScrollTo("contact")}
-          className="hidden md:block bg-[#FCA600] text-black px-4 py-2 uppercase transition-all hover:bg-white hover:text-black"
+          className="hidden md:block bg-[#FCA600] text-black px-4 py-2 font-medium text-sm transition-all hover:bg-white hover:text-black"
         >
           Contact Us
         </button>
@@ -79,24 +79,24 @@ export default function Header() {
           menuOpen ? "block animate-fade-in-down" : "hidden"
         }`}
       >
-        <Link href="/" onClick={() => setMenuOpen(false)} className="text-[#FCA600] hover:text-white text-lg">
+        <Link href="/" onClick={() => setMenuOpen(false)} className="text-[#FCA600] hover:text-white text-sm">
           Home
         </Link>
-        <button onClick={() => { handleScrollTo("products"); setMenuOpen(false); }} className="text-white hover:text-[#FCA600] text-lg">
+        <button onClick={() => { handleScrollTo("products"); setMenuOpen(false); }} className="text-white hover:text-[#FCA600] text-sm">
           Products
         </button>
-        <Link href="/about" onClick={() => setMenuOpen(false)} className="text-white hover:text-[#FCA600] text-lg">
+        <Link href="/about" onClick={() => setMenuOpen(false)} className="text-white hover:text-[#FCA600] text-sm">
           About Us
         </Link>
-        <button onClick={() => { handleScrollTo("testimonials"); setMenuOpen(false); }} className="text-white hover:text-[#FCA600] text-lg">
+        <button onClick={() => { handleScrollTo("testimonials"); setMenuOpen(false); }} className="text-white hover:text-[#FCA600] text-sm">
           Testimonials
         </button>
-        <button onClick={() => { handleScrollTo("faq"); setMenuOpen(false); }} className="text-white hover:text-[#FCA600] text-lg">
-          FAQ
+        <button onClick={() => { handleScrollTo("faq"); setMenuOpen(false); }} className="text-white hover:text-[#FCA600] text-sm">
+          FAQs
         </button>
         <button
           onClick={() => { handleScrollTo("contact"); setMenuOpen(false); }}
-          className="bg-[#FCA600] w-[200px] h-[44px] hover:bg-white hover:text-black text-black text-lg font-semibold rounded uppercase transition-all"
+          className="bg-[#FCA600] w-[200px] h-[44px] hover:bg-white hover:text-black text-black text-sm rounded  transition-all"
         >
           Contact Us
         </button>
