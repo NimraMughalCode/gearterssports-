@@ -21,3 +21,15 @@ export async function getProducts() {
   if (error) throw new Error(error.message);
   return data;
 }
+
+
+export async function fetchProduct(id) {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
+}

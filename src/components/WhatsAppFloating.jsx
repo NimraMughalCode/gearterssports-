@@ -11,7 +11,7 @@ export default function FloatingWhatsApp() {
 
   return (
     <a
-      href="https://wa.me/923045441722"
+      href="https://wa.me/923279988069"
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat on WhatsApp"

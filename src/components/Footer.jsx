@@ -52,22 +52,7 @@ export default function Footer() {
               About Us
             </a>
           </li>
-          <li>
-            <button
-              onClick={() => handleScrollTo("testimonials")}
-              className="hover:text-[#FCA600] transition-colors"
-            >
-              Testimonials
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => handleScrollTo("faq")}
-              className="hover:text-[#FCA600] transition-colors"
-            >
-              FAQ
-            </button>
-          </li>
+     
           <li>
             <button
               onClick={() => handleScrollTo("contact")}

@@ -59,19 +59,19 @@ export default function FollowInsta() {
   };
 
   return (
-    <div
-      ref={sectionRef}
-      className={`relative flex flex-col items-center justify-center w-full max-w-full px-2 sm:px-4 py-10 md:py-20 text-white bg-[#121212] font-sans overflow-x-hidden transition-all duration-1000 ease-out
-        ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}
-    >
+  <div
+  ref={sectionRef}
+  className={`relative flex flex-col items-center justify-center w-full max-w-full px-2 md:px-[70px] py-10 md:py-20 text-white bg-[#121212] font-sans overflow-x-hidden transition-all duration-1000 ease-out
+    ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}
+>
+
       {/* Text Content */}
       <div className="text-center max-w-3xl mb-10">
-        <h2 className="text-3xl md:text-4xl font-bold leading-tight text-white">
-          Follow Us On <br />
-          <span style={{ color: "#FCA600" }} className="font-bold">
-            Instagram
-          </span>
-        </h2>
+     
+        <h1 className="  text-3xl md:text-4xl font-bold text-white leading-tight">
+Follow Us On
+                    <span style={{ color: "#FCA600" }}> Instagram</span>
+                  </h1>
         <p className="mt-4 text-sm  font-normal text-gray-300">
           Stay connected with us through our latest posts, featuring boxing gear, training highlights, events, and more from around the world.
         </p>
@@ -85,7 +85,7 @@ export default function FollowInsta() {
               <img
                 src={image}
                 alt={`Instagram post ${index + 1}`}
-                className="w-full h-96 object-cover border border-[#FCA600]"
+                className="w-full h-96 object-cover border rounded-lg border-[#FCA600]"
               />
             </div>
           ))}

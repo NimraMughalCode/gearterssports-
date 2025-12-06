@@ -17,9 +17,9 @@ export default function Home() {
       <CategoryList />
       <WhyChooseUs />
       <FollowInsta />
-      <ClientTestimonials />
-      <FAQs />
-      <ContactBoxingBusiness />
+      {/* <ClientTestimonials /> */}
+      {/* <FAQs />
+      <ContactBoxingBusiness /> */}
         </div>
   );
 }

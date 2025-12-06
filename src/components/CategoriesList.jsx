@@ -55,11 +55,11 @@ export default function CategoriesWithSubcategories() {
     <div
       id="products"
       ref={sectionRef}
-      className={`flex flex-col md:flex-row bg-black text-white min-h-screen p-2 md:p-[70px] gap-4 font-sans transition-all duration-1000 ease-out
+      className={`flex flex-col md:flex-row bg-black  text-white min-h-screen p-2 md:p-[70px] gap-4 font-sans transition-all duration-1000 ease-out
         ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}
     >
       {/* Sidebar Categories */}
-      <aside className="w-full md:w-1/5 border md:border border-[#FCA600]">
+      <aside className="w-full md:w-1/5 border md:border rounded-lg border-[#FCA600]">
         <h3 className="p-4 px-6 bg-[#FCA600] font-semibold text-white py-2 text-xl cursor-pointer hover:bg-yellow-600 transition-all">
           CATEGORIES
         </h3>
@@ -72,7 +72,7 @@ export default function CategoriesWithSubcategories() {
                 setSelectedCategory(cat);
                 setSelectedSubcategory(cat.subcategories[0]);
               }}
-              className={`cursor-pointer px-2 py-1 rounded  text-gray-400 font-medium text-sm transition-all flex items-center ${
+              className={`cursor-pointer px-2 py-1 rounded  text-white font-medium text-sm transition-all flex items-center ${
                 selectedCategory?.title === cat.title
                   ? "text-white  before:content-['→'] before:mr-2 before:text-[#FCA600]"
                   : "hover:text-[#FCA600] "

@@ -4,6 +4,8 @@ import React, { useRef, useEffect, useState } from 'react';
 
 const ABOUT_VIEWED_KEY = 'about-section-viewed';
 
+import WhyChooseUs from '@/components/WhyChooseUs';
+
 export default function About() {
   const [visible, setVisible] = useState(false);
   const [leftVisible, setLeftVisible] = useState(false);
@@ -43,16 +45,17 @@ export default function About() {
   }, [visible]);
 
   return (
-    <section ref={sectionRef} className="bg-white py-16 px-6 md:px-12 lg:px-20 font-sans">
+    <section ref={sectionRef} className="bg-black gap-8 flex flex-col text-white py-16 px-6 md:px-12 lg:px-20 font-sans">
+      <WhyChooseUs />
       <div className="container mx-auto">
         {/* Section Heading */}
         <div ref={leftRef} className={`transition-all duration-1000 ease-out ${leftVisible ? 'opacity-100 -translate-x-0' : 'opacity-0 -translate-x-16 pointer-events-none'}`}>
-          <h1 className="text-4xl font-bold text-gray-900 mb-6">About Us</h1>
+          <h1 className="text-4xl font-bold  mb-6">About Us</h1>
 
           {/* Our Purpose */}
           <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Our Purpose</h2>
-            <p className="text-gray-700 leading-relaxed">
+            <h2 className="text-2xl font-semibold mb-4">Our Purpose</h2>
+            <p className=" leading-relaxed">
               At Gearters Sports, our purpose is to craft high-quality, durable, and performance-driven gloves for athletes and professionals worldwide. 
               We are dedicated to innovation, ensuring that every pair of gloves enhances grip, comfort, and protection for peak performance.
             </p>
@@ -60,8 +63,8 @@ export default function About() {
 
           {/* Vision & Mission */}
           <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Vision & Mission</h2>
-            <p className="text-gray-700 leading-relaxed">
+            <h2 className="text-2xl font-semibold mb-4">Vision & Mission</h2>
+            <p className="leading-relaxed">
               Our vision is to be a global leader in premium sports gloves, trusted by athletes, trainers, and professionals in various sports and industries. 
               Our mission is to continuously innovate, using top-tier materials and craftsmanship to produce gloves that offer superior performance, durability, and style.
             </p>
@@ -70,21 +73,21 @@ export default function About() {
 
         {/* Our Story */}
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Our Story</h2>
-          <p className="text-gray-700 leading-relaxed mb-4">
+          <h2 className="text-2xl font-semibold mb-4">Our Story</h2>
+          <p className=" leading-relaxed mb-4">
             Gearters Sports was founded with a passion for excellence in sports gear. Recognizing the need for high-quality gloves that meet the demands of athletes,
             we set out to design and manufacture products that blend innovation with comfort. Our journey began with a small team of dedicated experts,
             and today, we proudly serve professionals and sports enthusiasts worldwide.
           </p>
-          <p className="text-gray-700 leading-relaxed">
+          <p className=" leading-relaxed">
             With a commitment to quality and performance, Gearters Sports continues to push the boundaries of glove manufacturing, ensuring that every product meets the highest industry standards.
           </p>
         </section>
 
         {/* Core Values */}
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Our Core Values</h2>
-          <ul className="list-disc list-inside text-gray-700 leading-relaxed space-y-2">
+          <h2 className="text-2xl font-semibold mb-4">Our Core Values</h2>
+          <ul className="list-disc list-inside  leading-relaxed space-y-2">
             <li><strong>Quality:</strong> We prioritize top-notch materials and craftsmanship in every glove we create.</li>
             <li><strong>Innovation:</strong> We continuously research and develop new designs to enhance performance and comfort.</li>
             <li><strong>Durability:</strong> Our gloves are built to withstand rigorous use, providing long-lasting reliability.</li>
@@ -94,8 +97,8 @@ export default function About() {
 
         {/* Our Team */}
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Our Team</h2>
-          <p className="text-gray-700 leading-relaxed mb-6">
+          <h2 className="text-2xl font-semibold mb-4">Our Team</h2>
+          <p className=" leading-relaxed mb-6">
             Our team consists of experienced designers, engineers, and sports enthusiasts who share a passion for excellence. 
             Together, we work tirelessly to develop and manufacture gloves that cater to the diverse needs of athletes and professionals.
           </p>
@@ -103,8 +106,8 @@ export default function About() {
 
         {/* Call to Action */}
         <section className="text-center">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Join Our Journey</h2>
-          <p className="text-gray-700 leading-relaxed mb-6">
+          <h2 className="text-2xl font-semibold mb-4">Join Our Journey</h2>
+          <p className=" leading-relaxed mb-6">
             At Gearters Sports, we are committed to revolutionizing the world of sports gloves. Whether you’re an athlete or a professional,
             we invite you to experience the perfect blend of comfort, durability, and performance.
           </p>
