@@ -5,9 +5,19 @@ import { getCategories, getProducts } from "@/app/utils/api";
 import { useSearchParams } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
 
+import { Suspense } from "react";
+
 const CATEGORIES_VIEWED_KEY = "categories-section-viewed";
 
-export default function Products() {
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="text-white p-10">Loading...</div>}>
+      <Products />
+    </Suspense>
+  );
+}
+
+ function Products() {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
