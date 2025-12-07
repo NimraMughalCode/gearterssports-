@@ -58,7 +58,7 @@ export default function WhyChooseUs() {
   return (
     <div
       ref={sectionRef}
-      className={`relative flex flex-col md:flex-row items-center justify-center w-full max-w-full  text-white overflow-x-hidden font-sans transition-all duration-1000 ease-out
+      className={`relative  flex flex-col md:flex-row items-center justify-center w-full max-w-full  text-white overflow-x-hidden font-sans transition-all duration-1000 ease-out
         ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8 pointer-events-none"}`}
     >
       {/* Background image */}
@@ -101,7 +101,7 @@ export default function WhyChooseUs() {
 
              <a
                     href="/about"
-                    className="mt-6 border-2 w-fit  rounded-lg border-[#FCA600] text-[#FCA600] px-6 py-3  hover:bg-[#FCA600] hover:text-black font-medium text-small transition"
+                    className="mt-6 border-2 w-fit mb-4 rounded-lg border-[#FCA600] text-[#FCA600] px-6 py-3  hover:bg-[#FCA600] hover:text-black font-medium text-small transition"
                   >
                     About Us
                   </a>

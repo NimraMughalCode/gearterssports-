@@ -84,12 +84,15 @@ export default function Hero() {
       <p className="mt-4 text-sm md:text-base font-medium text-gray-300 max-w-2xl">
         Manufacturers of World-Class Boxing Equipment...
       </p>
-      <button
-        onClick={() => handleScrollTo('contact')}
+         <a
+      href="https://wa.me/923279988069"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Chat on WhatsApp"
         className="mt-6 border-2 border-[#FCA600] rounded-lg text-[#FCA600] px-6 py-3 hover:bg-[#FCA600] hover:text-black transition font-medium"
       >
         Contact Us
-      </button>
+      </a>
 
       
     </div>

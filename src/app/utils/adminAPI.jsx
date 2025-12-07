@@ -16,12 +16,13 @@ export async function getCategories() {
 }
 
 // ✅ Add new category
-export async function addCategory({ title, subcategories }) {
-     console.log("Sending to Supabase:", { title, subcategories });
+export async function addCategory({ title, subcategories, img_src }) {
+   console.log("Sending to Supabase:", { title, subcategories, img_src });
   const { error } = await supabase.from("categories").insert([
     {
       title,
       subcategories,
+        img_src, 
       created_at: new Date().toISOString(),
     },
   ]);
@@ -30,12 +31,13 @@ export async function addCategory({ title, subcategories }) {
 }
 
 // ✅ Update existing category
-export async function updateCategory({ id, title, subcategories }) {
+export async function updateCategory({ id, title, subcategories,  img_src }) {
   const { error } = await supabase
     .from("categories")
     .update({
       title,
       subcategories,
+      img_src
     })
     .eq("id", id);
 

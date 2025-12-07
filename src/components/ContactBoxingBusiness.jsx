@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { toast, Toaster } from "react-hot-toast";
+import { Icon } from "@iconify/react"; // ⬅️ Added Iconify here
 
 const CONTACTBUSINESS_VIEWED_KEY = 'contactbusiness-section-viewed';
 
@@ -185,6 +186,33 @@ export default function ContactBoxingBusiness() {
               {loading ? "Sending..." : "Submit"}
             </button>
           </form>
+
+          {/* ⭐ SOCIAL ICONS (added from Header) */}
+          <div className="flex items-center space-x-6 mt-6">
+            <a
+              href="https://www.facebook.com/share/16oHMtQQQS/?mibextid=wwXIfr"
+              target="_blank"
+            >
+              <Icon
+                icon="logos:facebook"
+                width="34"
+                height="34"
+                className="hover:opacity-80 transition"
+              />
+            </a>
+
+            <a
+              href="https://www.instagram.com/gearterssports4"
+              target="_blank"
+            >
+              <Icon
+                icon="skill-icons:instagram"
+                width="34"
+                height="34"
+                className="hover:opacity-80 transition"
+              />
+            </a>
+          </div>
         </div>
       </div>
     </section>

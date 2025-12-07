@@ -44,17 +44,40 @@ export default function Header() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex space-x-8 font-medium text-sm">
-          <Link href="/" className="text-[#FCA600] hover:text-white">Home</Link>
-          <button onClick={() => handleScrollTo("products")} className="hover:text-[#FCA600]">Products</button>
-          <Link href="/about" className="hover:text-[#FCA600]">About Us</Link>
+    <Link
+    href="/"
+    className={`${pathname === "/" ? "text-[#FCA600]" : "text-white hover:text-[#FCA600]"}`}
+  >
+    Home
+  </Link>
+    <Link
+    href="/products"
+    className={`${pathname === "/products" ? "text-[#FCA600]" : "text-white hover:text-[#FCA600]"}`}
+  >
+    Products
+  </Link>
+
+         
+          <Link
+    href="/about"
+    className={`${pathname === "/about" ? "text-[#FCA600]" : "text-white hover:text-[#FCA600]"}`}
+  >
+    About Us
+  </Link>
       
-     <Link 
-  href="/faq"
-  onClick={() => setMenuOpen(false)} 
-  className="text-white hover:text-[#FCA600] text-sm"
->
-  FAQ
-</Link>
+    <Link
+    href="/faq"
+    className={`${pathname === "/faq" ? "text-[#FCA600]" : "text-white hover:text-[#FCA600]"}`}
+  >
+    FAQ
+  </Link>
+
+    <Link
+    href="/contact"
+    className={`${pathname === "/contact" ? "text-[#FCA600]" : "text-white hover:text-[#FCA600]"}`}
+  >
+    Contact
+  </Link>
 
         </nav>
 
@@ -79,49 +102,70 @@ export default function Header() {
       </div>
 
       {/* Mobile Menu */}
-      <nav
-        className={`md:hidden fixed top-[70px] left-0 w-full bg-black/95 backdrop-blur-md z-40
-        flex flex-col items-center space-y-6 py-8 transition-all duration-300
-        ${menuOpen ? "block animate-fade-in-down" : "hidden"}`}
-      >
-        <Link href="/" onClick={() => setMenuOpen(false)} className="text-[#FCA600] hover:text-white text-sm">
-          Home
-        </Link>
-
-        <button
-          onClick={() => { handleScrollTo("products"); setMenuOpen(false); }}
-          className="text-white hover:text-[#FCA600] text-sm"
-        >
-          Products
-        </button>
-
-        <Link href="/about" onClick={() => setMenuOpen(false)} className="text-white hover:text-[#FCA600] text-sm">
-          About Us
-        </Link>
-
-    
-
-        
-        <Link 
-  href="/faq"
-  onClick={() => setMenuOpen(false)} 
-  className="text-white hover:text-[#FCA600] text-sm"
+   {/* Mobile Menu */}
+<nav
+  className={`md:hidden fixed top-[70px] left-0 w-full bg-black/95 backdrop-blur-md z-40
+  flex flex-col items-center space-y-6 py-8 transition-all duration-300
+  ${menuOpen ? "block animate-fade-in-down" : "hidden"}`}
 >
-  FAQ
-</Link>
 
+  {/* Home */}
+  <Link
+    href="/"
+    onClick={() => setMenuOpen(false)}
+    className={`${pathname === "/" ? "text-[#FCA600]" : "text-white hover:text-[#FCA600]"} text-sm`}
+  >
+    Home
+  </Link>
 
-        {/* Mobile Social Icons */}
-        <div className="flex items-center space-x-6 pt-4">
-          <Link href="https://www.facebook.com/share/16oHMtQQQS/?mibextid=wwXIfr" target="_blank">
-            <Icon icon="logos:facebook" width="30" height="30" className="hover:opacity-80 transition" />
-          </Link>
+  {/* Products */}
+  <Link
+    href="/products"
+    onClick={() => setMenuOpen(false)}
+    className={`${pathname.startsWith("/products") ? "text-[#FCA600]" : "text-white hover:text-[#FCA600]"} text-sm`}
+  >
+    Products
+  </Link>
 
-          <Link href="https://www.instagram.com/gearterssports4" target="_blank">
-            <Icon icon="skill-icons:instagram" width="30" height="30" className="hover:opacity-80 transition" />
-          </Link>
-        </div>
-      </nav>
+  {/* About */}
+  <Link
+    href="/about"
+    onClick={() => setMenuOpen(false)}
+    className={`${pathname === "/about" ? "text-[#FCA600]" : "text-white hover:text-[#FCA600]"} text-sm`}
+  >
+    About Us
+  </Link>
+
+  {/* FAQ */}
+  <Link
+    href="/faq"
+    onClick={() => setMenuOpen(false)}
+    className={`${pathname === "/faq" ? "text-[#FCA600]" : "text-white hover:text-[#FCA600]"} text-sm`}
+  >
+    FAQ
+  </Link>
+
+  {/* Contact */}
+  <Link
+    href="/contact"
+    onClick={() => setMenuOpen(false)}
+    className={`${pathname === "/contact" ? "text-[#FCA600]" : "text-white hover:text-[#FCA600]"} text-sm`}
+  >
+    Contact
+  </Link>
+
+  {/* Social Icons */}
+  <div className="flex items-center space-x-6 pt-4">
+    <Link href="https://www.facebook.com/share/16oHMtQQQS/?mibextid=wwXIfr" target="_blank">
+      <Icon icon="logos:facebook" width="30" height="30" className="hover:opacity-80 transition" />
+    </Link>
+
+    <Link href="https://www.instagram.com/gearterssports4" target="_blank">
+      <Icon icon="skill-icons:instagram" width="30" height="30" className="hover:opacity-80 transition" />
+    </Link>
+  </div>
+</nav>
+
     </header>
   );
 }

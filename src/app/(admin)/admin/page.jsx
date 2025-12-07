@@ -34,6 +34,9 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('categories');
   const [productImageFile, setProductImageFile] = useState(null);
   const [editingProductFile, setEditingProductFile] = useState(null);
+  const [categoryImageUrl, setCategoryImageUrl] = useState("");
+const [categoryImageFile, setCategoryImageFile] = useState(null);
+
 
 
 useEffect(() => {
@@ -144,57 +147,141 @@ async function handleUpdateProduct({ imageType, file, url }) {
 
 
 
+async function handleCategoryImageUpload() {
+  if (!categoryImageFile) return categoryImageUrl || "";
+
+  const fileName = `${Date.now()}-${categoryImageFile.name}`;
+
+  const { data, error } = await supabase.storage
+    .from("product-images")
+    .upload(fileName, categoryImageFile);
+
+  if (error) {
+    console.error("Image upload failed:", error);
+    return categoryImageUrl || "";
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from("product-images")
+    .getPublicUrl(fileName);
+
+  return publicUrlData.publicUrl;
+}
+
+
 
 async function handleAddCategory() {
   if (!newCategory || !newSubcategories)
-    return toast.error('All fields required');
+    return toast.error("All fields required");
 
-  const toastId = toast.loading('Adding category...');
+  const toastId = toast.loading("Adding category...");
 
   try {
+    // Upload image (if provided)
+    let finalImageUrl = "";
+    if (categoryImageFile) {
+      const fileName = `categories/${Date.now()}-${categoryImageFile.name}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .upload(fileName, categoryImageFile);
+
+      if (uploadError) throw new Error(uploadError.message);
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("product-images").getPublicUrl(fileName);
+
+      finalImageUrl = publicUrl;
+    }
+
     await addCategory({
       title: newCategory,
-      subcategories: newSubcategories.split(',').map(s => s.trim()),
+      subcategories: newSubcategories.split(",").map((s) => s.trim()),
+      img_src: finalImageUrl,
     });
 
-    setNewCategory('');
-    setNewSubcategories('');
+    setNewCategory("");
+    setNewSubcategories("");
+    setCategoryImageFile(null);
+
     await fetchCategories();
-    toast.success('Category added!', { id: toastId });
+    toast.success("Category added!", { id: toastId });
+
   } catch (err) {
-    toast.error('Failed to add category', { id: toastId });
+    toast.error("Failed to add category: " + err.message, { id: toastId });
   }
 }
+
 
 
 
 
 async function handleUpdateCategory() {
   if (!editingCategory.title || !editingCategory.subcategories.length)
-    return toast.error('Fields cannot be empty');
+    return toast.error("Fields cannot be empty");
 
-  const toastId = toast.loading('Updating category...');
+  const toastId = toast.loading("Updating category...");
 
   try {
-    await updateCategory(editingCategory);
+    let finalImageUrl = editingCategory.img_src;
+
+    // Only upload new file if user selected a new one
+    if (categoryImageFile) {
+      const fileName = `categories/${Date.now()}-${categoryImageFile.name}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .upload(fileName, categoryImageFile);
+
+      if (uploadError) throw new Error(uploadError.message);
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("product-images").getPublicUrl(fileName);
+
+      finalImageUrl = publicUrl;
+    }
+
+    await updateCategory({
+      id: editingCategory.id,
+      title: editingCategory.title,
+      subcategories: editingCategory.subcategories,
+      img_src: finalImageUrl,
+    });
+
     setEditingCategory(null);
+    setCategoryImageFile(null);
+
     await fetchCategories();
-    toast.success('Category updated!', { id: toastId });
+    toast.success("Category updated!", { id: toastId });
+
   } catch (err) {
-    toast.error('Failed to update category', { id: toastId });
+    toast.error("Failed to update category", { id: toastId });
   }
 }
 
 
 
 
-  async function handleDeleteCategory(id) {
+async function handleDeleteCategory(id, imgSrc) {
   if (!confirm('Delete this category?')) return;
 
   const toastId = toast.loading('Deleting category...');
 
   try {
+    // 1. Delete DB record
     await deleteCategory(id);
+
+    // 2. Delete image from Supabase Storage if exists
+    if (imgSrc) {
+      const filePath = imgSrc.split('/product-images/')[1]; // extract path only
+
+      await supabase.storage
+        .from('product-images')
+        .remove([filePath]);
+    }
+
     await fetchCategories();
     toast.success('Category deleted!', { id: toastId });
   } catch (err) {
@@ -316,18 +403,21 @@ if (!isAuthenticated) {
 
 
 {activeTab === 'categories' && (
-  <CategoriesManager
+<CategoriesManager
     categories={categories}
     newCategory={newCategory}
     newSubcategories={newSubcategories}
-    setNewCategory={setNewCategory}
-    setNewSubcategories={setNewSubcategories}
+    categoryImageFile={categoryImageFile}
+    setCategoryImageFile={setCategoryImageFile}
     editingCategory={editingCategory}
     setEditingCategory={setEditingCategory}
     handleAddCategory={handleAddCategory}
     handleUpdateCategory={handleUpdateCategory}
     handleDeleteCategory={handleDeleteCategory}
-  />
+       setNewCategory={setNewCategory}          // ✅ ADD THIS
+    setNewSubcategories={setNewSubcategories} 
+/>
+
 )}
 
 {activeTab === 'products' && (

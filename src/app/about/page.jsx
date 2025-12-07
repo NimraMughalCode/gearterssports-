@@ -1,6 +1,7 @@
 "use client"
-import Image from 'next/image';
+
 import React, { useRef, useEffect, useState } from 'react';
+
 
 const ABOUT_VIEWED_KEY = 'about-section-viewed';
 
@@ -45,12 +46,12 @@ export default function About() {
   }, [visible]);
 
   return (
-    <section ref={sectionRef} className="bg-black gap-8 flex flex-col text-white py-16 px-6 md:px-12 lg:px-20 font-sans">
+    <section ref={sectionRef} className="bg-black gap-8 flex flex-col text-white py-16   font-sans">
       <WhyChooseUs />
-      <div className="container mx-auto">
+      <div className="container px-2 md:px-[70px]">
         {/* Section Heading */}
         <div ref={leftRef} className={`transition-all duration-1000 ease-out ${leftVisible ? 'opacity-100 -translate-x-0' : 'opacity-0 -translate-x-16 pointer-events-none'}`}>
-          <h1 className="text-4xl font-bold  mb-6">About Us</h1>
+        
 
           {/* Our Purpose */}
           <section className="mb-12">
@@ -111,9 +112,15 @@ export default function About() {
             At Gearters Sports, we are committed to revolutionizing the world of sports gloves. Whether you’re an athlete or a professional,
             we invite you to experience the perfect blend of comfort, durability, and performance.
           </p>
-          <a href="/contact" className="inline-block bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition duration-300">
-            Contact Us
-          </a>
+            <a
+      href="https://wa.me/923279988069"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Chat on WhatsApp"
+        className="mt-6 border-2 border-[#FCA600] rounded-lg text-[#FCA600] px-6 py-3 hover:bg-[#FCA600] hover:text-black transition font-medium"
+      >
+        Contact Us
+      </a>
         </section>
       </div>
     </section>

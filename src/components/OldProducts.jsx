@@ -6,7 +6,7 @@ import ProductCard from "./ProductCard";
 
 const CATEGORIES_VIEWED_KEY = 'categories-section-viewed';
 
-export default function CategoriesWithSubcategories() {
+export default function Products() {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
