@@ -125,7 +125,7 @@ export default function Hero() {
       </Slider>
 
       {/* Custom Arrows */}
-      <button
+      {/* <button
         className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 p-3 rounded-full hover:bg-opacity-80 transition"
         onClick={() => sliderRef.current.slickPrev()}
         aria-label="Previous Slide"
@@ -139,7 +139,7 @@ export default function Hero() {
         aria-label="Next Slide"
       >
         <ChevronRight size={32} className="text-white" />
-      </button>
+      </button> */}
     </section>
   );
 }

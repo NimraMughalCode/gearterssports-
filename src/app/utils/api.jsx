@@ -33,3 +33,13 @@ export async function fetchProduct(id) {
   if (error) throw new Error(error.message);
   return data;
 }
+
+export async function getPortfolio() {
+  const { data, error } = await supabase
+    .from('portfolio')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data;
+}

@@ -13,10 +13,11 @@ import {
   deleteProduct
 
 } from '@/app/utils/adminAPI';
-import { Folder, Package } from 'lucide-react'; // 
+import { Folder, Package, Video } from 'lucide-react'; // 
 import CategoriesManager from './CategoriesManagr';
 import ProductsManager from './ProductsManager';
 import toast from 'react-hot-toast';
+import PortfolioManager from './PortfolioMager';
 
 
 export default function AdminPage() {
@@ -36,6 +37,10 @@ export default function AdminPage() {
   const [editingProductFile, setEditingProductFile] = useState(null);
   const [categoryImageUrl, setCategoryImageUrl] = useState("");
 const [categoryImageFile, setCategoryImageFile] = useState(null);
+const [portfolio, setPortfolio] = useState([]);
+const [portfolioFile, setPortfolioFile] = useState(null);
+const [editingPortfolio, setEditingPortfolio] = useState(null);
+
 
 
 
@@ -45,6 +50,7 @@ useEffect(() => {
     setIsAuthenticated(true);
     fetchCategories();
     fetchProducts();
+        fetchPortfolio(); 
   } else {
     const username = prompt('Enter admin username:');
     const password = prompt('Enter admin password:');
@@ -76,18 +82,31 @@ useEffect(() => {
 }
 
 
-async function handleDeleteProduct(id) {
-  const confirmed = window.confirm('Delete this product?');
-  if (!confirmed) return;
+async function handleDeleteProduct(product) {
+  if (!confirm("Delete this product?")) return;
 
-  const toastId = toast.loading('Deleting product...');
+  const toastId = toast.loading("Deleting product...");
 
   try {
-    await deleteProduct(id);
+    // 1️⃣ Delete product image from storage
+    if (product.img_src) {
+      const filePath = getStoragePathFromUrl(product.img_src);
+
+      if (filePath) {
+        await supabase.storage
+          .from("product-images")
+          .remove([filePath]);
+      }
+    }
+
+    // 2️⃣ Delete product from DB
+    await deleteProduct(product.id);
+
     fetchProducts();
-    toast.success('Product deleted!', { id: toastId });
+    toast.success("Product deleted!", { id: toastId });
   } catch (err) {
-    toast.error('Failed to delete product', { id: toastId });
+    console.error(err);
+    toast.error("Failed to delete product", { id: toastId });
   }
 }
 
@@ -264,30 +283,34 @@ async function handleUpdateCategory() {
 
 
 
-async function handleDeleteCategory(id, imgSrc) {
-  if (!confirm('Delete this category?')) return;
+async function handleDeleteCategory(category) {
+  if (!confirm("Delete this category?")) return;
 
-  const toastId = toast.loading('Deleting category...');
+  const toastId = toast.loading("Deleting category...");
 
   try {
-    // 1. Delete DB record
-    await deleteCategory(id);
+    // 1️⃣ Delete image from storage
+    if (category.img_src) {
+      const filePath = getStoragePathFromUrl(category.img_src);
 
-    // 2. Delete image from Supabase Storage if exists
-    if (imgSrc) {
-      const filePath = imgSrc.split('/product-images/')[1]; // extract path only
-
-      await supabase.storage
-        .from('product-images')
-        .remove([filePath]);
+      if (filePath) {
+        await supabase.storage
+          .from("product-images")
+          .remove([filePath]);
+      }
     }
 
-    await fetchCategories();
-    toast.success('Category deleted!', { id: toastId });
+    // 2️⃣ Delete DB record
+    await deleteCategory(category.id);
+
+    fetchCategories();
+    toast.success("Category deleted!", { id: toastId });
   } catch (err) {
-    toast.error('Failed to delete category', { id: toastId });
+    console.error(err);
+    toast.error("Failed to delete category", { id: toastId });
   }
 }
+
 
 
 
@@ -351,6 +374,127 @@ async function handleAddProduct({ imageType, file, url }) {
 }
 
 
+async function fetchPortfolio() {
+  const { data, error } = await supabase
+    .from('portfolio')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (!error) setPortfolio(data);
+}
+
+async function handleAddPortfolio() {
+  if (!portfolioFile) return toast.error('Select a video');
+
+  const toastId = toast.loading('Uploading video...');
+
+  try {
+    const fileExt = portfolioFile.name.split('.').pop();
+    const fileName = `portfolio/${Date.now()}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('product-images')
+      .upload(fileName, portfolioFile);
+
+    if (uploadError) throw uploadError;
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('product-images').getPublicUrl(fileName);
+
+    await supabase.from('portfolio').insert({
+      url: publicUrl,
+    });
+
+    setPortfolioFile(null);
+    fetchPortfolio();
+    toast.success('Video added!', { id: toastId });
+  } catch (err) {
+    toast.error('Upload failed', { id: toastId });
+  }
+}
+
+async function handleUpdatePortfolio() {
+  if (!editingPortfolio) return;
+
+  const toastId = toast.loading('Updating video...');
+
+  try {
+    let finalUrl = editingPortfolio.url;
+
+    if (portfolioFile) {
+      const fileExt = portfolioFile.name.split('.').pop();
+      const fileName = `portfolio/${Date.now()}.${fileExt}`;
+
+      await supabase.storage
+        .from('product-images')
+        .upload(fileName, portfolioFile);
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('product-images').getPublicUrl(fileName);
+
+      finalUrl = publicUrl;
+    }
+
+    await supabase
+      .from('portfolio')
+      .update({ url: finalUrl })
+      .eq('id', editingPortfolio.id);
+
+    setEditingPortfolio(null);
+    setPortfolioFile(null);
+    fetchPortfolio();
+
+    toast.success('Updated!', { id: toastId });
+  } catch {
+    toast.error('Update failed', { id: toastId });
+  }
+}
+
+
+function getStoragePathFromUrl(url) {
+  if (!url) return null;
+
+  const marker = "/product-images/";
+  const index = url.indexOf(marker);
+
+  if (index === -1) return null;
+
+  return url.substring(index + marker.length);
+}
+
+
+async function handleDeletePortfolio(item) {
+  if (!confirm("Delete this video?")) return;
+
+  const toastId = toast.loading("Deleting video...");
+
+  try {
+    await supabase.from("portfolio").delete().eq("id", item.id);
+
+    if (item.url) {
+      const filePath = getStoragePathFromUrl(item.url);
+console.log("got this file path",filePath);
+
+      if (filePath) {
+        await supabase.storage
+          .from("product-images")
+          .remove([filePath]);
+      }
+    }
+
+    fetchPortfolio();
+    toast.success("Video deleted!", { id: toastId });
+  } catch (err) {
+    console.error(err);
+    toast.error("Delete failed", { id: toastId });
+  }
+}
+
+
+
+
 
 if (!isAuthenticated) {
   return (
@@ -399,6 +543,19 @@ if (!isAuthenticated) {
     <Package className="w-4 h-4 mr-2" />
     Products
   </button>
+
+  <button
+  onClick={() => setActiveTab('portfolio')}
+  className={`flex items-center px-4 py-2 rounded ${
+    activeTab === 'portfolio'
+      ? 'bg-yellow-500 text-black font-semibold'
+      : 'bg-gray-700 text-white'
+  }`}
+>
+  <Video className="w-4 h-4 mr-2" />
+  Portfolio
+</button>
+
 </div>
 
 
@@ -414,8 +571,9 @@ if (!isAuthenticated) {
     handleAddCategory={handleAddCategory}
     handleUpdateCategory={handleUpdateCategory}
     handleDeleteCategory={handleDeleteCategory}
-       setNewCategory={setNewCategory}          // ✅ ADD THIS
+    setNewCategory={setNewCategory}          // ✅ ADD THIS
     setNewSubcategories={setNewSubcategories} 
+    
 />
 
 )}
@@ -442,8 +600,24 @@ if (!isAuthenticated) {
     handleUpdateProduct={handleUpdateProduct}
     handleDeleteProduct={handleDeleteProduct}
   />
+
+
+
+
 )}
 
+{activeTab === 'portfolio' && (
+  <PortfolioManager
+    portfolio={portfolio}
+    portfolioFile={portfolioFile}
+    setPortfolioFile={setPortfolioFile}
+    editingPortfolio={editingPortfolio}
+    setEditingPortfolio={setEditingPortfolio}
+    handleAddPortfolio={handleAddPortfolio}
+    handleUpdatePortfolio={handleUpdatePortfolio}
+    handleDeletePortfolio={handleDeletePortfolio}
+  />
+)}
 
 
 

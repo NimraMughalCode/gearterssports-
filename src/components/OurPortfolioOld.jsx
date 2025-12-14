@@ -5,14 +5,14 @@ import Slider from "react-slick";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { getPortfolio } from "@/app/utils/api";
+import { getProducts } from "@/app/utils/api";
 import { useRouter } from "next/navigation";
 
 const PORTFOLIO_VIEWED_KEY = "portfolio-section-viewed";
 
 export default function PortfolioSection() {
   const [visible, setVisible] = useState(false);
-  const [portfolioVideos, setPortfolioVideos] = useState([]);
+  const [portfolioProducts, setPortfolioProducts] = useState([]);
   const sliderRef = useRef(null);
   const sectionRef = useRef(null);
   const router = useRouter();
@@ -20,16 +20,20 @@ export default function PortfolioSection() {
   // ----------------------------
   // ⭐ Fetch 10 Random Products
   // ----------------------------
- useEffect(() => {
-  async function loadPortfolio() {
-    const allVideos = await getPortfolio();
+  useEffect(() => {
+    async function loadProducts() {
+      const allProducts = await getProducts();
 
-    setPortfolioVideos(allVideos);
-  }
+      // Shuffle & take 10
+      const random10 = allProducts
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 10);
 
-  loadPortfolio();
-}, []);
+      setPortfolioProducts(random10);
+    }
 
+    loadProducts();
+  }, []);
 
   // ----------------------------
   // ⭐ Intersection Animation
@@ -98,34 +102,25 @@ export default function PortfolioSection() {
   <Slider ref={sliderRef} {...settings}>
 
     {/* Product Slides */}
- {portfolioVideos.map((item) => (
-  <div key={item.id} className="px-2">
-    <div className="aspect-square w-full border rounded-lg border-[#FCA600] overflow-hidden bg-black">
-      <video
-        src={item.url}
-        controls
-        playsInline
-        className="w-full h-full object-cover"
-      />
+    {portfolioProducts.map((product, index) => (
+      <div key={index} className="px-2">
+        <img
+          src={product.img_src}
+          alt={product.title}
+          className="w-full h-96 object-cover border rounded-lg border-[#FCA600]"
+        />
+      </div>
+    ))}
+
+    {/* ⭐ Show All Slide */}
+    <div className="px-2 flex items-center justify-center h-96">
+      <button
+        onClick={() => router.push("/products")}
+        className="w-full h-full flex items-center justify-center border border-[#FCA600] rounded-lg text-xl font-semibold text-black bg-[#FCA600] hover:opacity-90 transition"
+      >
+        Show All Products
+      </button>
     </div>
-  </div>
-))}
-
-
-{/* ⭐ View More Slide (SAME SIZE AS VIDEOS) */}
-<div className="px-2">
-  <div className="aspect-square w-full border border-[#FCA600] rounded-lg overflow-hidden flex items-center justify-center bg-[#FCA600]">
-    <a
-      href="https://www.instagram.com/gearterssports4"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="w-full h-full flex items-center justify-center text-xl font-semibold text-black hover:opacity-90 transition"
-    >
-      View More
-    </a>
-  </div>
-</div>
-
   </Slider>
 
   {/* Arrows */}

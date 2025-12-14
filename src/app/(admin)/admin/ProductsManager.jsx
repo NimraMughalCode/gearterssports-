@@ -33,6 +33,18 @@ export default function ProductsManager({
   const [editingProductImageType, setEditingProductImageType] = useState("file");
   const [editingProductImageUrl, setEditingProductImageUrl] = useState("");
 
+  function getStoragePathFromUrl(url) {
+  if (!url) return null;
+
+  const marker = "/product-images/";
+  const index = url.indexOf(marker);
+
+  if (index === -1) return null;
+
+  return url.substring(index + marker.length);
+}
+
+
   return (
     <>
       {/* Add Product */}
@@ -267,11 +279,14 @@ export default function ProductsManager({
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDeleteProduct(prod.id)}
+                      onClick={() => handleDeleteProduct(prod)}
                       className="text-sm text-red-400 underline"
                     >
                       Delete
                     </button>
+                    
+
+
                   </div>
                 </>
               )}

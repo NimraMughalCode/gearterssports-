@@ -170,7 +170,7 @@ export default function CategoriesManager({
                 </button>
 
                 <button
-                 onClick={() => handleDeleteCategory(cat.id, cat.img_src)}
+                 onClick={() => handleDeleteCategory(cat)}
 
                   className="text-sm text-red-400 underline mt-2"
                 >
