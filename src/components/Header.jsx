@@ -33,7 +33,7 @@ export default function Header() {
   return (
     <header
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-500
-      ${scrolled ? "bg-black/70 backdrop-blur-md shadow-lg h-[70px]" : "bg-black h-[80px]"}
+      ${scrolled ? "bg-black/70 backdrop-blur-md shadow-lg h-[90px]" : "bg-black h-[90px]"}
       text-white py-2 px-4 sm:px-6`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">

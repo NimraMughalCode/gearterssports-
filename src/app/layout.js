@@ -24,7 +24,7 @@ export default function RootLayout({ children }) {
       >
         <Toaster position="top-right" />
         <Header />
-          <main className="mt-20">{children}</main>
+          <main className="mt-[90px]">{children}</main>
         <Footer />
         <FloatingWhatsApp />
       </body>

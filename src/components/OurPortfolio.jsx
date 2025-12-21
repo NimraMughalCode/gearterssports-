@@ -15,6 +15,8 @@ export default function PortfolioSection() {
   const [portfolioVideos, setPortfolioVideos] = useState([]);
   const sliderRef = useRef(null);
   const sectionRef = useRef(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
   const router = useRouter();
 
   // ----------------------------
@@ -62,6 +64,7 @@ export default function PortfolioSection() {
     speed: 100,
     slidesToShow: 3,
     slidesToScroll: 1,
+    afterChange: (index) => setCurrentSlide(index),
     responsive: [
       {
         breakpoint: 1024,
@@ -91,8 +94,21 @@ export default function PortfolioSection() {
         </p>
       </div>
 
-      {/* Slider */}
-     {/* Slider */}
+{/* ⭐ View More Button (only if more than 3 videos) */}
+{currentSlide >= 3 && (
+  <div className="w-full max-w-6xl flex justify-end mb-4">
+    <a
+      href="https://www.instagram.com/gearterssports4"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="border-2 border-[#FCA600] rounded-lg text-[#FCA600] px-6 py-3 hover:bg-[#FCA600] hover:text-black transition font-medium"
+    >
+      View More
+    </a>
+  </div>
+)}
+
+
 {/* Slider */}
 <div className="w-full max-w-6xl relative">
   <Slider ref={sliderRef} {...settings}>
@@ -113,7 +129,7 @@ export default function PortfolioSection() {
 
 
 {/* ⭐ View More Slide (SAME SIZE AS VIDEOS) */}
-<div className="px-2">
+{/* <div className="px-2">
   <div className="aspect-square w-full border border-[#FCA600] rounded-lg overflow-hidden flex items-center justify-center bg-[#FCA600]">
     <a
       href="https://www.instagram.com/gearterssports4"
@@ -124,7 +140,7 @@ export default function PortfolioSection() {
       View More
     </a>
   </div>
-</div>
+</div> */}
 
   </Slider>
 

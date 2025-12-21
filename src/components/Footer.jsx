@@ -38,7 +38,7 @@ export default function Footer() {
         {/* Navigation */}
         <ul className="flex font-extralight flex-wrap justify-center gap-6 text-sm font-medium">
           <li>
-            <a href="/" className="text-[#FCA600] hover:text-white transition-colors">
+            <a href="/" className="hover:text-[#FCA600]  transition-colors">
               Home
             </a>
           </li>

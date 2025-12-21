@@ -47,7 +47,8 @@ export default function About() {
 
   return (
     <section ref={sectionRef} className="bg-black gap-8 flex flex-col text-white py-16   font-sans">
-      <WhyChooseUs />
+     <WhyChooseUs showAboutButton={false} />
+
       <div className="container px-2 md:px-[70px]">
         {/* Section Heading */}
         <div ref={leftRef} className={`transition-all duration-1000 ease-out ${leftVisible ? 'opacity-100 -translate-x-0' : 'opacity-0 -translate-x-16 pointer-events-none'}`}>

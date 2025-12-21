@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 const WHYCHOOSEUS_VIEWED_KEY = "whychooseus-section-viewed";
 
-export default function WhyChooseUs() {
+export default function WhyChooseUs({showAboutButton = true}) {
   const [visible, setVisible] = useState(false);
   const sectionRef = useRef(null);
 
@@ -99,12 +99,15 @@ export default function WhyChooseUs() {
           </ul>
           
 
-             <a
-                    href="/about"
-                    className="mt-6 border-2 w-fit mb-4 rounded-lg border-[#FCA600] text-[#FCA600] px-6 py-3  hover:bg-[#FCA600] hover:text-black font-medium text-small transition"
-                  >
-                    About Us
-                  </a>
+           {showAboutButton && (
+  <a
+    href="/about"
+    className="mt-6 border-2 w-fit mb-4 rounded-lg border-[#FCA600] text-[#FCA600] px-6 py-3 hover:bg-[#FCA600] hover:text-black font-medium text-small transition"
+  >
+    About Us
+  </a>
+)}
+
         </div>
 
         {/* Right Column */}

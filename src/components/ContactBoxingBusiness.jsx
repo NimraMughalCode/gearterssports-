@@ -187,32 +187,66 @@ export default function ContactBoxingBusiness() {
             </button>
           </form>
 
-          {/* ⭐ SOCIAL ICONS (added from Header) */}
-          <div className="flex items-center space-x-6 mt-6">
-            <a
-              href="https://www.facebook.com/share/16oHMtQQQS/?mibextid=wwXIfr"
-              target="_blank"
-            >
-              <Icon
-                icon="logos:facebook"
-                width="34"
-                height="34"
-                className="hover:opacity-80 transition"
-              />
-            </a>
+    
+{/* 📍 CONTACT INFO */}
+<div className="mt-8 space-y-5 flex flex-col  text-sm text-gray-300">
 
-            <a
-              href="https://www.instagram.com/gearterssports4"
-              target="_blank"
-            >
-              <Icon
-                icon="skill-icons:instagram"
-                width="34"
-                height="34"
-                className="hover:opacity-80 transition"
-              />
-            </a>
-          </div>
+  {/* Row 1 — WhatsApp & Phone */}
+  <div className="flex flex-wrap justify-between gap-8">
+    <div className="flex items-center gap-3">
+      <Icon icon="logos:whatsapp-icon" width="26" />
+      <a
+        href="https://wa.me/923279988069"
+        target="_blank"
+        className="hover:text-[#FCA600] transition"
+      >
+        +92 327 9988069
+      </a>
+    </div>
+
+    <div className="flex  items-center gap-3">
+      <Icon icon="mdi:phone" width="26" className="text-[#FCA600]" />
+      <span>+92 327 9988069</span>
+    </div>
+  </div>
+
+  {/* Row 2 — Instagram & Facebook */}
+  <div className="flex flex-wrap justify-between gap-8">
+    <div className="flex items-center gap-3">
+      <Icon icon="skill-icons:instagram" width="26" />
+      <a
+        href="https://www.instagram.com/gearterssports4"
+        target="_blank"
+        className="hover:text-[#FCA600] transition"
+      >
+        @gearterssports4
+      </a>
+    </div>
+
+    <div className="flex items-center gap-3">
+      <Icon icon="logos:facebook" width="26" />
+      <a
+        href="https://www.facebook.com/share/16oHMtQQQS/?mibextid=wwXIfr"
+        target="_blank"
+        className="hover:text-[#FCA600] transition"
+      >
+        Gearters Sports
+      </a>
+    </div>
+  </div>
+
+  {/* Row 3 — Address */}
+  <div className="flex items-start gap-3 max-w-md">
+    <Icon icon="mdi:map-marker" width="26" className="text-[#FCA600] mt-1" />
+    <p className="leading-relaxed">
+      Chenab Rangers, Alrehman Road,  
+      Mirza Street, Sialkot, Pakistan
+    </p>
+  </div>
+
+</div>
+
+
         </div>
       </div>
     </section>

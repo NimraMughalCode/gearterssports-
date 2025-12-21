@@ -52,7 +52,7 @@ export default function CategoriesGrid() {
         Our <span className="text-[#FCA600]">Categories</span>
       </h1>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-10 place-items-center">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-10 place-items-center">
         {categories.map((cat) => (
           <div
             key={cat.id}
@@ -62,7 +62,7 @@ export default function CategoriesGrid() {
               p-6
               rounded-2xl
               w-full
-              max-w-[260px]
+              max-w-[200px]
               flex flex-col
               items-center
               text-center
