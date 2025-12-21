@@ -64,7 +64,7 @@ export default function ProductView() {
     <img
       src="/logo.svg"
       alt="Gearters Watermark"
-      className="w-48 opacity-[0.5]"
+      className="w-full opacity-[0.5]"
     />
   </div>
 </div>
