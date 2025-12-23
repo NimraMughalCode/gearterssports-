@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { getCategories, getProducts } from "@/app/utils/api";
 import { useSearchParams } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
+import { useRouter } from "next/navigation";
 
 import { Suspense } from "react";
 
@@ -18,6 +19,7 @@ export default function ProductsPage() {
 }
 
  function Products() {
+    const router = useRouter();
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -104,9 +106,16 @@ export default function ProductsPage() {
     >
       <main className="w-full px-2 md:px-6">
   
-        
+<div className="flex  items-center justify-between mb-10">
 
-<h1 className="text-center mb-10 text-3xl md:text-4xl font-bold text-white leading-tight">
+                <button
+                     onClick={() => router.push('/')}
+                    className=" border-2 border-[#FCA600] rounded-lg text-[#FCA600] px-6 py-3 hover:bg-[#FCA600] hover:text-black transition font-medium"
+      >
+← Back
+                  </button>
+
+<h1 className="text-center  text-3xl md:text-4xl font-bold text-white leading-tight">
   {urlCategory ? (
     <>
       {selectedCategory?.title || urlCategory}
@@ -119,7 +128,9 @@ export default function ProductsPage() {
   )}
 </h1>
 
-
+ {/* Right: Empty spacer (same width as button) */}
+  <div className="w-[120px]" />
+</div>
 
         {/* Show subcategories ONLY if URL has category */}
         {urlCategory && selectedCategory && (

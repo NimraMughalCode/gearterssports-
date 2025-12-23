@@ -62,7 +62,7 @@ export default function ProductView() {
   {/* Watermark Overlay */}
   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
     <img
-      src="/logo.svg"
+      src="/logo-trans.png"
       alt="Gearters Watermark"
       className="w-full opacity-[0.5]"
     />

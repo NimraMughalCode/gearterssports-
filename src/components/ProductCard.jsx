@@ -34,9 +34,9 @@
   {/* Watermark */}
   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
     <img
-      src="/logo.svg"
+      src="/logo-trans.png"
       alt="Gearters Watermark"
-      className="w-full opacity-[0.2]"
+      className="w-full opacity-[0.15]"
     />
   </div>
 </div>
