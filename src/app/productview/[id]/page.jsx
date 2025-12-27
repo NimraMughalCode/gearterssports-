@@ -19,80 +19,80 @@ export default function ProductView() {
         console.error(error);
       }
     }
-
     loadProduct();
   }, [id]);
 
   if (!product) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        <p>Loading product…</p>
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <p className="text-sm tracking-wide">Loading product…</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-300 text-white   p-6">
- 
+    <div className="min-h-screen bg-black text-white px-4 md:px-10 py-10">
       
-                                    <button
-                     onClick={() => router.back()}
-                    className="mt-6 border-2 border-[#FCA600]  rounded-lg text-black px-6 py-3 hover:bg-[#FCA600] hover:text-black transition font-medium"
-                  >
-← Back
-                  </button>
+      {/* Back Button */}
+      <button
+        onClick={() => router.back()}
+        className="mb-8 border-2 border-[#FCA600] rounded-lg text-[#FCA600] px-6 py-3 hover:bg-[#FCA600] hover:text-black transition font-medium"
+      >
+        ← Back
+      </button>
 
-      <div className="bg-gray-800 p-6 rounded-xl max-w-4xl mx-auto flex flex-col md:flex-row gap-8">
-        {/* <div className="w-full md:w-1/2">
-          <img src={product.img_src} alt={product.name} className="rounded-lg" />
-        </div> */}
+      {/* Card */}
+      <div className="max-w-5xl mx-auto bg-[#0f0f0f] rounded-2xl p-6 md:p-10 flex flex-col md:flex-row gap-10 shadow-lg">
 
+        {/* Image Section */}
         <div
-  className="w-full md:w-1/2 relative select-none"
-  onContextMenu={(e) => e.preventDefault()}
->
-  {/* Product Image */}
-  <img
-    src={product.img_src}
-    alt={product.name}
-    draggable={false}
-    className="rounded-lg w-full pointer-events-none"
-  />
+          className="w-full md:w-1/2 relative select-none"
+          onContextMenu={(e) => e.preventDefault()}
+        >
+          <img
+            src={product.img_src}
+            alt={product.name}
+            draggable={false}
+            className="rounded-xl w-full pointer-events-none"
+          />
 
-  {/* Watermark Overlay */}
-  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-    <img
-      src="/logo-trans.png"
-      alt="Gearters Watermark"
-      className="w-full opacity-[0.5]"
-    />
-  </div>
-</div>
+          {/* Watermark */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <img
+              src="/logo-trans.png"
+              alt="Gearters Watermark"
+              className="w-full opacity-[0.06]"
+            />
+          </div>
+        </div>
 
+        {/* Content Section */}
+        <div className="w-full md:w-1/2 flex flex-col justify-center">
+          <h1 className="text-3xl md:text-4xl font-bold leading-tight">
+            {product.name}
+          </h1>
 
-        <div className="w-full md:w-1/2">
-          <h1 className="text-3xl font-semibold">{product.name}</h1>
-          <p className="text-[#FCA600] text-sm font-medium mt-2">
+          <p className="text-[#FCA600] text-sm font-medium mt-2 tracking-wide">
             Article No: {product.article_no}
           </p>
-          <p className="text-gray-400 text-sm mt-4">{product.description}</p>
 
+          <p className="text-gray-400 text-sm mt-5 leading-relaxed">
+            {product.description}
+          </p>
 
-
-         
-                   <button
-  onClick={() => {
-    const message = `Hello, I'm interested in ${product.name} (Article No: ${product.article_no}).\n\n${product.description}\n\nCheck it out here: https://gearterssports.vercel.app/productview/${product.id}`;
-    window.open(
-      `https://wa.me/923279988069?text=${encodeURIComponent(message)}`,
-      "_blank"
-    );
-  }}
-  className="mt-6 border-2 border-[#FCA600] text-[#FCA600] px-6 py-3 hover:bg-[#FCA600] hover:text-black transition font-medium"
->
-  Inquiry
-</button>
-
+          {/* CTA */}
+          <button
+            onClick={() => {
+              const message = `Hello, I'm interested in ${product.name} (Article No: ${product.article_no}).\n\n${product.description}\n\nCheck it out here: https://gearterssports.vercel.app/productview/${product.id}`;
+              window.open(
+                `https://wa.me/923279988069?text=${encodeURIComponent(message)}`,
+                "_blank"
+              );
+            }}
+            className="mt-8 inline-block border-2 border-[#FCA600] text-[#FCA600] px-8 py-3 rounded-lg hover:bg-[#FCA600] hover:text-black transition font-medium w-fit"
+          >
+            Inquiry
+          </button>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/app/utils/supabaseClient';
 
 // Get all categories
 export async function getCategories() {

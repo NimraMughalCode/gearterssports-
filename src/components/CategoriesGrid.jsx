@@ -2,23 +2,27 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { getCategories } from "@/app/utils/api";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCategories } from "@/ReduxToolkit/CategoriesSlice";
 
 const CATEGORIES_VIEWED_KEY = "categories-grid-viewed";
 
 export default function CategoriesGrid() {
-  const [categories, setCategories] = useState([]);
+    const dispatch = useDispatch()
   const [visible, setVisible] = useState(false);
   const sectionRef = useRef(null);
   const router = useRouter();
 
+
+   const { categories, loading, fetched } = useSelector(
+    (state) => state.categories
+  );
+
   useEffect(() => {
-    async function fetchData() {
-      const data = await getCategories();
-      setCategories(data);
+     if (!fetched) {
+      dispatch(fetchCategories());
     }
-    fetchData();
-  }, []);
+  }, [dispatch, fetched]);
 
   useEffect(() => {
     if (localStorage.getItem(CATEGORIES_VIEWED_KEY) === "true") {
@@ -56,7 +60,7 @@ export default function CategoriesGrid() {
         {categories.map((cat) => (
           <div
             key={cat.id}
-            onClick={() => router.push(`/products?category=${cat.title}`)}
+            onClick={() => router.push(`/categoryproducts?category=${cat.title}`)}
             className="
               bg-[#111]
               p-6

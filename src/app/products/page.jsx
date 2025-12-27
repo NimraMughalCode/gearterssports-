@@ -1,163 +1,248 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { getCategories, getProducts } from "@/app/utils/api";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useSearchParams, useRouter } from "next/navigation";
+
+import { fetchCategories } from "@/ReduxToolkit/CategoriesSlice";
+import { fetchProducts } from "@/ReduxToolkit/ProductsSlice";
+
 import ProductCard from "@/components/ProductCard";
-import { useRouter } from "next/navigation";
 
-import { Suspense } from "react";
-
-const CATEGORIES_VIEWED_KEY = "categories-section-viewed";
-
-export default function ProductsPage() {
-  return (
-    <Suspense fallback={<div className="text-white p-10">Loading...</div>}>
-      <Products />
-    </Suspense>
-  );
-}
-
- function Products() {
-    const router = useRouter();
-  const [categories, setCategories] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
-  const [visible, setVisible] = useState(false);
-
-  const sectionRef = useRef(null);
+export default function AllProductsPage() {
+  const dispatch = useDispatch();
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const urlCategory = searchParams.get("category"); // could be null
 
-  // Load categories & products
+  const urlCategory = searchParams.get("category");
+
+  // ------------------ REDUX STATE ------------------
+  const {
+    categories = [],
+    fetched: categoriesFetched,
+  } = useSelector((state) => state.categories || {});
+
+  const {
+    products = [],
+    fetchedProducts,
+  } = useSelector((state) => state.products || {});
+
+  // ------------------ LOCAL STATE ------------------
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedSubcategory, setSelectedSubcategory] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // ------------------ FETCH DATA ------------------
   useEffect(() => {
-    async function fetchData() {
-      const categoriesData = await getCategories();
-      const productsData = await getProducts();
+    if (!categoriesFetched) {
+      dispatch(fetchCategories());
+    }
+  }, [dispatch, categoriesFetched]);
 
-      setCategories(categoriesData);
-      setProducts(productsData);
+  useEffect(() => {
+    if (!fetchedProducts) {
+      dispatch(fetchProducts());
+    }
+  }, [dispatch, fetchedProducts]);
 
-      // ⚡ If NO category in URL → show ALL products
-      if (!urlCategory) {
-        setSelectedCategory(null);
-        setSelectedSubcategory(null);
-        return;
-      }
+  // ------------------ RESET SUBCATEGORY WHEN CATEGORY CHANGES ------------------
+  useEffect(() => {
+    setSelectedSubcategory("all");
+  }, [selectedCategory, urlCategory]);
 
-      // If category exists → match it
-      let matchedCategory =
-        categoriesData.find(
-          (c) => c.title.toLowerCase() === urlCategory.toLowerCase()
-        ) || null;
+  // ------------------ AVAILABLE SUBCATEGORIES ------------------
+  const availableSubcategories = useMemo(() => {
+    if (!Array.isArray(categories)) return [];
 
-      setSelectedCategory(matchedCategory);
-      setSelectedSubcategory(matchedCategory?.subcategories[0] || null);
+    if (urlCategory) {
+      const cat = categories.find((c) => c.title === urlCategory);
+      return cat?.subcategories ?? [];
     }
 
-    fetchData();
-  }, [urlCategory]);
-
-  // Intersection Animation
-  useEffect(() => {
-    if (localStorage.getItem(CATEGORIES_VIEWED_KEY) === "true") {
-      setVisible(true);
-      return;
+    if (selectedCategory === "all") {
+      return categories.flatMap((c) => c.subcategories ?? []);
     }
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          localStorage.setItem(CATEGORIES_VIEWED_KEY, "true");
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.2 }
+    const matched = categories.find(
+      (c) => c.title === selectedCategory
     );
 
-    if (sectionRef.current) observer.observe(sectionRef.current);
+    return matched?.subcategories ?? [];
+  }, [categories, selectedCategory, urlCategory]);
 
-    return () => observer.disconnect();
-  }, []);
+ const hasActiveFilters =
+  searchTerm.trim() !== "" ||
+  selectedCategory !== "all" ||
+  selectedSubcategory !== "all";
 
-  // --------------------------------------
-  // ⭐ PRODUCT FILTERING LOGIC
-  // --------------------------------------
-  let filteredProducts = [];
 
-  if (!urlCategory) {
-    // No category in URL → show all
-    filteredProducts = products;
-  } else {
-    // Category exists → filter normally
-    filteredProducts = products.filter(
+
+  const clearFilters = () => {
+  setSearchTerm("");
+  setSelectedCategory("all");
+  setSelectedSubcategory("all");
+};
+
+  const filteredProducts = useMemo(() => {
+  let list = Array.isArray(products) ? products : [];
+
+  // 1️⃣ CATEGORY FILTER
+  if (urlCategory) {
+    const category = categories.find(
+      (c) => c.title === urlCategory
+    );
+
+    if (!category) return [];
+
+    list = list.filter((p) =>
+      category.subcategories.includes(p.subcategory)
+    );
+  } else if (selectedCategory !== "all") {
+    const category = categories.find(
+      (c) => c.title === selectedCategory
+    );
+
+    if (!category) return [];
+
+    list = list.filter((p) =>
+      category.subcategories.includes(p.subcategory)
+    );
+  }
+
+  // 2️⃣ SUBCATEGORY FILTER
+  if (selectedSubcategory !== "all") {
+    list = list.filter(
       (p) => p.subcategory === selectedSubcategory
     );
   }
 
+  // 3️⃣ SEARCH FILTER (FINAL)
+  if (searchTerm.trim()) {
+    const term = searchTerm.toLowerCase();
+
+    list = list.filter(
+      (p) =>
+        p.title?.toLowerCase().includes(term) ||
+        p.name?.toLowerCase().includes(term) ||
+        p.description?.toLowerCase().includes(term)
+    );
+  }
+
+  return list;
+}, [
+  products,
+  categories,
+  urlCategory,
+  selectedCategory,
+  selectedSubcategory,
+  searchTerm,
+]);
+
+
+  // ------------------ UI ------------------
   return (
-    <div
-      id="products"
-      ref={sectionRef}
-      className={`bg-black text-white min-h-screen p-2 md:p-[70px] gap-4 font-sans transition-all duration-1000 ease-out
-        ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8 pointer-events-none"}`}
-    >
-      <main className="w-full px-2 md:px-6">
+    <div className="bg-black text-white min-h-screen p-2 md:p-[70px] transition-all duration-1000 ease-out">
+      {/* HEADER */}
+      <div className="flex items-center justify-between mb-10">
+        <button
+          onClick={() => router.push("/")}
+          className="border-2 border-[#FCA600] rounded-lg text-[#FCA600] px-6 py-3 hover:bg-[#FCA600] hover:text-black transition font-medium"
+        >
+          ← Back
+        </button>
+
+        <h1 className="text-3xl md:text-4xl font-bold text-center">
+          {urlCategory ? (
+            <>
+              {urlCategory}
+              <span className="text-[#FCA600]"> Products</span>
+            </>
+          ) : (
+            <>
+              All <span className="text-[#FCA600]">Products</span>
+            </>
+          )}
+        </h1>
+
+        <div className="w-[120px]" />
+      </div>
+
+
+      {/* 🔽 FILTERS (ONLY ON ALL PRODUCTS PAGE) */}
+      {!urlCategory && (
+
+
+       <div className="flex flex-col md:flex-row gap-4 mb-8 items-stretch">
+  {/* 🔍 SEARCH */}
+  <div className="w-full md:max-w-sm">
+    <input
+      type="text"
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      placeholder="Search products..."
+      className="w-full h-[44px] bg-black border border-gray-600 text-white px-4 rounded-md
+                 focus:outline-none focus:border-[#FCA600]"
+    />
+  </div>
+
+  {/* CATEGORY */}
+  <select
+    value={selectedCategory}
+    onChange={(e) => setSelectedCategory(e.target.value)}
+    className="w-full md:w-[220px] h-[44px] bg-black border border-gray-600 text-white px-4 rounded-md
+               focus:outline-none focus:border-[#FCA600]"
+  >
+    <option value="all">All Categories</option>
+    {categories.map((c) => (
+      <option key={c.title} value={c.title}>
+        {c.title}
+      </option>
+    ))}
+  </select>
+
+  {/* SUBCATEGORY */}
+  <select
+    value={selectedSubcategory}
+    onChange={(e) => setSelectedSubcategory(e.target.value)}
+    className="w-full md:w-[220px] h-[44px] bg-black border border-gray-600 text-white px-4 rounded-md
+               focus:outline-none focus:border-[#FCA600]"
+  >
+    <option value="all">All Subcategories</option>
+    {availableSubcategories.map((sub) => (
+      <option key={sub} value={sub}>
+        {sub}
+      </option>
+    ))}
+  </select>
+
+  {hasActiveFilters && (
+  <button
+    onClick={clearFilters}
+    className="h-[44px]  border-2 border-[#FCA600] rounded-lg text-[#FCA600] px-6  hover:bg-[#FCA600] hover:text-black transition font-medium"
+        >
+    ✖ Clear Filters
+  </button>
+)}
   
-<div className="flex  items-center justify-between mb-10">
-
-                <button
-                     onClick={() => router.push('/')}
-                    className=" border-2 border-[#FCA600] rounded-lg text-[#FCA600] px-6 py-3 hover:bg-[#FCA600] hover:text-black transition font-medium"
-      >
-← Back
-                  </button>
-
-<h1 className="text-center  text-3xl md:text-4xl font-bold text-white leading-tight">
-  {urlCategory ? (
-    <>
-      {selectedCategory?.title || urlCategory}
-      <span style={{ color: "#FCA600" }}>'s Products</span>
-    </>
-  ) : (
-    <>
-      All <span style={{ color: "#FCA600" }}>Products</span>
-    </>
-  )}
-</h1>
-
- {/* Right: Empty spacer (same width as button) */}
-  <div className="w-[120px]" />
 </div>
 
-        {/* Show subcategories ONLY if URL has category */}
-        {urlCategory && selectedCategory && (
-          <div className="flex gap-4 mb-8 overflow-x-auto no-scrollbar whitespace-nowrap">
-            {selectedCategory?.subcategories?.map((sub) => (
-              <button
-                key={sub}
-                onClick={() => setSelectedSubcategory(sub)}
-                className={`px-4 py-2 border-b-2 transition text-sm font-medium ${
-                  selectedSubcategory === sub
-                    ? "border-[#FCA600] text-[#FCA600]"
-                    : "border-transparent hover:text-[#FCA600]"
-                }`}
-              >
-                {sub}
-              </button>
-            ))}
-          </div>
-        )}
+      )}
 
-        {/* Products */}
+      {/* PRODUCTS GRID */}
+      {filteredProducts.length === 0 ? (
+        <p className="text-gray-400 text-center mt-20">
+          No products found
+        </p>
+      ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product._id || product.id}
+              product={product}
+            />
           ))}
         </div>
-      </main>
+      )}
     </div>
   );
 }

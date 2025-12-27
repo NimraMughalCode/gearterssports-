@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FloatingWhatsApp from "@/components/WhatsAppFloating";
 import { Toaster } from 'react-hot-toast';
+import ReduxProvider from "@/ReduxToolkit/Provider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -22,11 +23,13 @@ export default function RootLayout({ children }) {
       <body
         className={`${inter.variable} antialiased bg-white`}
       >
+      <ReduxProvider>
         <Toaster position="top-right" />
         <Header />
           <main className="mt-[90px]">{children}</main>
         <Footer />
         <FloatingWhatsApp />
+     </ReduxProvider>
       </body>
     </html>
   );

@@ -52,7 +52,7 @@ export default function Header() {
   </Link>
     <Link
     href="/products"
-    className={`${pathname === "/products" ? "text-[#FCA600]" : "text-white hover:text-[#FCA600]"}`}
+    className={`${pathname === "/products" || pathname === "/categoryproducts"  ? "text-[#FCA600]" : "text-white hover:text-[#FCA600]"}`}
   >
     Products
   </Link>
