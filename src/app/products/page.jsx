@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, Suspense } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -10,6 +10,14 @@ import { fetchProducts } from "@/ReduxToolkit/ProductsSlice";
 import ProductCard from "@/components/ProductCard";
 
 export default function AllProductsPage() {
+return (
+    <Suspense fallback={<div className="text-white p-10">Loading...</div>}>
+      <Products />
+    </Suspense>
+  );
+}
+
+function Products() {
   const dispatch = useDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
