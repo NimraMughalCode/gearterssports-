@@ -22,6 +22,9 @@ export default function ProductsManager({
   setEditingProductFile,
   handleUpdateProduct,
   handleDeleteProduct,
+  otherImages,
+setOtherImages,
+
 }) {
   const [filterSubcategory, setFilterSubcategory] = useState('');
 
@@ -32,6 +35,8 @@ export default function ProductsManager({
   // NEW STATES FOR EDIT PRODUCT MODE
   const [editingProductImageType, setEditingProductImageType] = useState("file");
   const [editingProductImageUrl, setEditingProductImageUrl] = useState("");
+  const [editingOtherImages, setEditingOtherImages] = useState([]);
+
 
   function getStoragePathFromUrl(url) {
   if (!url) return null;
@@ -120,6 +125,43 @@ export default function ProductsManager({
               ))
             )}
           </select>
+
+
+
+<div className="mt-4 space-y-2">
+  <h4 className="text-yellow-300 font-semibold">Other Images (URLs)</h4>
+
+  {otherImages.map((img, index) => (
+    <div key={index} className="flex gap-2">
+      <input
+        value={img}
+        onChange={(e) => {
+          const updated = [...otherImages];
+          updated[index] = e.target.value;
+          setOtherImages(updated);
+        }}
+        placeholder="https://image-url.com"
+        className="p-2 flex-1 bg-gray-800 border border-yellow-500"
+      />
+      <button
+        onClick={() =>
+          setOtherImages(otherImages.filter((_, i) => i !== index))
+        }
+        className="bg-red-600 px-3 text-white"
+      >
+        ✕
+      </button>
+    </div>
+  ))}
+
+  <button
+    onClick={() => setOtherImages([...otherImages, ""])}
+    className="bg-gray-700 px-3 py-1 text-sm text-white rounded"
+  >
+    + Add Image URL
+  </button>
+</div>
+
 
           <button
             onClick={() =>
@@ -236,6 +278,39 @@ export default function ProductsManager({
                     />
                   )}
 
+
+<h4 className="text-yellow-300 font-semibold mt-2">Other Images</h4>
+
+{editingOtherImages.map((img, index) => (
+  <div key={index} className="flex gap-2 mb-2">
+    <input
+      value={img}
+      onChange={(e) => {
+        const updated = [...editingOtherImages];
+        updated[index] = e.target.value;
+        setEditingOtherImages(updated);
+      }}
+      className="p-2 flex-1 bg-gray-800 border border-yellow-500"
+    />
+    <button
+      onClick={() =>
+        setEditingOtherImages(editingOtherImages.filter((_, i) => i !== index))
+      }
+      className="bg-red-600 px-3 text-white"
+    >
+      ✕
+    </button>
+  </div>
+))}
+
+<button
+  onClick={() => setEditingOtherImages([...editingOtherImages, ""])}
+  className="bg-gray-700 px-3 py-1 text-sm text-white rounded"
+>
+  + Add Image
+</button>
+
+
                   <div className="flex gap-2">
                     <button
                       onClick={() =>
@@ -243,6 +318,7 @@ export default function ProductsManager({
                           imageType: editingProductImageType,
                           file: editingProductFile,
                           url: editingProductImageUrl,
+                          otherImages: editingOtherImages,
                         })
                       }
                       className="bg-green-500 px-4 py-1 text-black"
@@ -253,6 +329,9 @@ export default function ProductsManager({
                       onClick={() => {
                         setEditingProduct(null);
                         setEditingProductFile(null);
+                        setEditingOtherImages([]);
+  setEditingProductImageUrl("");
+  setEditingProductImageType("file");
                       }}
                       className="bg-red-600 px-4 py-1 text-white"
                     >
@@ -271,9 +350,23 @@ export default function ProductsManager({
                     alt={prod.name}
                     className="w-32 h-32 object-cover mt-2 border border-yellow-500"
                   />
+
+                  <div className="grid grid-cols-4 gap-3 mt-4">
+  {prod.other_images?.map((img, i) => (
+    <img
+      key={i}
+      src={img}
+      className="h-24 w-full object-cover cursor-pointer border hover:border-yellow-500"
+    />
+  ))}
+</div>
                   <div className="mt-2">
                     <button
-                      onClick={() => setEditingProduct(prod)}
+                      onClick={() => {setEditingProduct(prod)
+                      setEditingProductImageUrl("");
+                      setEditingProductFile(null);
+                      setEditingOtherImages(prod.other_images || []);
+                        }  }
                       className="text-sm text-blue-400 underline mr-4"
                     >
                       Edit

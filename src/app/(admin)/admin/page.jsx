@@ -40,6 +40,7 @@ const [categoryImageFile, setCategoryImageFile] = useState(null);
 const [portfolio, setPortfolio] = useState([]);
 const [portfolioFile, setPortfolioFile] = useState(null);
 const [editingPortfolio, setEditingPortfolio] = useState(null);
+const [otherImages, setOtherImages] = useState([]);
 
 
 
@@ -110,8 +111,9 @@ async function handleDeleteProduct(product) {
   }
 }
 
-async function handleUpdateProduct({ imageType, file, url }) {
-  const { id, name, article_no, description, img_src, subcategory } = editingProduct;
+async function handleUpdateProduct({ imageType, file, url,  otherImages,
+ }) {
+  const { id, name, article_no, description, img_src, subcategory, } = editingProduct;
 
   if (!name || !description || !subcategory) {
     return toast.error('All fields are required');
@@ -151,6 +153,7 @@ async function handleUpdateProduct({ imageType, file, url }) {
       description,
       img_src: finalImageURL,
       subcategory,
+      other_images: otherImages.filter(Boolean),
     });
 
     setEditingProduct(null);
@@ -356,6 +359,7 @@ async function handleAddProduct({ imageType, file, url }) {
       description: productDescription,
       img_src: finalImageURL,
       subcategory: selectedSubcategory,
+      other_images: otherImages.filter(Boolean),
     });
 
     // Reset fields
@@ -364,6 +368,8 @@ async function handleAddProduct({ imageType, file, url }) {
     setProductDescription('');
     setSelectedSubcategory('');
     setProductImageFile(null);
+    setOtherImages([]);
+
 
     toast.success('Product added successfully!', { id: toastId });
     fetchProducts();
@@ -599,6 +605,8 @@ if (!isAuthenticated) {
     setEditingProductFile={setEditingProductFile}
     handleUpdateProduct={handleUpdateProduct}
     handleDeleteProduct={handleDeleteProduct}
+      otherImages={otherImages}
+  setOtherImages={setOtherImages}
   />
 
 

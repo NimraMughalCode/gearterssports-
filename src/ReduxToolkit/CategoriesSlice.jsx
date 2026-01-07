@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getCategories } from "@/app/utils/api";
+import { getCategories } from "@/app/utils/adminAPI";
 
 
 

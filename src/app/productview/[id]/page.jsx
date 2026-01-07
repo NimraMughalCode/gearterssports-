@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { fetchProduct } from "@/app/utils/api";
+import { fetchProduct } from "@/app/utils/adminAPI";
 
 export default function ProductView() {
   const { id } = useParams();
@@ -10,11 +10,15 @@ export default function ProductView() {
 
   const [product, setProduct] = useState(null);
 
+  const [activeImage, setActiveImage] = useState(null);
+
   useEffect(() => {
     async function loadProduct() {
       try {
         const data = await fetchProduct(id);
         setProduct(data);
+        setActiveImage(data.img_src);
+
       } catch (error) {
         console.error(error);
       }
@@ -44,27 +48,54 @@ export default function ProductView() {
       {/* Card */}
       <div className="max-w-5xl mx-auto bg-[#0f0f0f] rounded-2xl p-6 md:p-10 flex flex-col md:flex-row gap-10 shadow-lg">
 
-        {/* Image Section */}
-        <div
-          className="w-full md:w-1/2 relative select-none"
-          onContextMenu={(e) => e.preventDefault()}
-        >
-          <img
-            src={product.img_src}
-            alt={product.name}
-            draggable={false}
-            className="rounded-xl w-full pointer-events-none"
-          />
+    {/* Image Section */}
+<div
+  className="w-full md:w-1/2 select-none"
+  onContextMenu={(e) => e.preventDefault()}
+>
+  {/* Main Image */}
+<div className="relative w-full aspect-square rounded-xl overflow-hidden bg-black border-2 border-[#FCA600]">
+  <img
+    src={activeImage}
+    alt={product.name}
+    draggable={false}
+    className="w-full h-full object-cover pointer-events-none"
+  />
 
-          {/* Watermark */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <img
-              src="/logo-trans.png"
-              alt="Gearters Watermark"
-              className="w-full opacity-[0.06]"
-            />
-          </div>
-        </div>
+  {/* Watermark */}
+  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+    <img
+      src="/logo-trans.png"
+      alt="Gearters Watermark"
+      className="w-full opacity-[0.3]"
+    />
+  </div>
+</div>
+
+
+  {/* Thumbnails */}
+  <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
+    {[product.img_src, ...(product.other_images || [])].map((img, i) => (
+      <button
+        key={i}
+        onClick={() => setActiveImage(img)}
+        className={`flex-shrink-0 border-2 rounded-lg overflow-hidden transition ${
+          activeImage === img
+            ? "border-[#FCA600]"
+            : "border-transparent hover:border-gray-500"
+        }`}
+      >
+        <img
+          src={img}
+          alt={`Thumbnail ${i + 1}`}
+          draggable={false}
+          className="h-20 w-20 object-cover pointer-events-none"
+        />
+      </button>
+    ))}
+  </div>
+</div>
+
 
         {/* Content Section */}
         <div className="w-full md:w-1/2 flex flex-col justify-center">
@@ -98,3 +129,6 @@ export default function ProductView() {
     </div>
   );
 }
+
+
+

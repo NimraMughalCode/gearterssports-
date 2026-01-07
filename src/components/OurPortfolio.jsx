@@ -5,7 +5,7 @@ import Slider from "react-slick";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { getPortfolio } from "@/app/utils/api";
+import { getPortfolio } from "@/app/utils/adminAPI";
 import { useRouter } from "next/navigation";
 
 const PORTFOLIO_VIEWED_KEY = "portfolio-section-viewed";

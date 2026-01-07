@@ -73,6 +73,7 @@ export async function addProduct({
   description,
   img_src,
   subcategory,
+  other_images,
 }) {
   const { error } = await supabase.from("products").insert([
     {
@@ -81,6 +82,7 @@ export async function addProduct({
       description,
       img_src,
       subcategory,
+      other_images,
       created_at: new Date().toISOString(),
     },
   ]);
@@ -103,4 +105,28 @@ export async function deleteProduct(id) {
   const { error } = await supabase.from("products").delete().eq("id", id);
 
   if (error) throw new Error("Failed to delete product: " + error.message);
+}
+
+
+
+export async function fetchProduct(id) {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+
+export async function getPortfolio() {
+  const { data, error } = await supabase
+    .from('portfolio')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data;
 }
