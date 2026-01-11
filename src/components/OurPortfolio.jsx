@@ -95,7 +95,7 @@ export default function PortfolioSection() {
       </div>
 
 {/* ⭐ View More Button (only if more than 3 videos) */}
-{currentSlide >= 3 && (
+{/* {currentSlide >= 3 && ( */}
   <div className="w-full max-w-6xl flex justify-end mb-4">
     <a
       href="https://www.instagram.com/gearterssports4"
@@ -106,7 +106,7 @@ export default function PortfolioSection() {
       View More
     </a>
   </div>
-)}
+{/* )} */}
 
 
 {/* Slider */}

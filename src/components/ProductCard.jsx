@@ -36,7 +36,7 @@
     <img
       src="/logo-trans.png"
       alt="Gearters Watermark"
-      className="w-full opacity-[0.15]"
+      className="w-full opacity-[0.1]"
     />
   </div>
 </div>

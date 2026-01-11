@@ -56,7 +56,7 @@ export default function CategoriesGrid() {
         Our <span className="text-[#FCA600]">Categories</span>
       </h1>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-10 place-items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-10 place-items-center">
         {categories.map((cat) => (
           <div
             key={cat.id}
@@ -66,7 +66,7 @@ export default function CategoriesGrid() {
               p-6
               rounded-2xl
               w-full
-              max-w-[200px]
+              
               flex flex-col
               items-center
               text-center
@@ -80,7 +80,7 @@ export default function CategoriesGrid() {
               cursor-pointer
             "
           >
-            <div className="w-40 h-40 sm:w-44 sm:h-44 rounded-xl overflow-hidden border-2 border-[#FCA600] shadow-md">
+            <div className="max-w-80 h-auto rounded-xl overflow-hidden border-2 border-[#FCA600] shadow-md">
               <img src={cat.img_src} alt={cat.title} className="w-full h-full object-cover" />
             </div>
 

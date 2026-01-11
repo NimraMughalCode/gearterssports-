@@ -43,25 +43,27 @@ export default function Footer() {
             </a>
           </li>
           <li>
-            <button
-              onClick={() => handleScrollTo("products")}
-              className="hover:text-[#FCA600] transition-colors"
-            >
-              Products
-            </button>
+               <Link
+    href="/products"
+    className={`${pathname === "/products" || pathname === "/categoryproducts"  ? "text-[#FCA600]" : "text-white hover:text-[#FCA600]"}`}
+  >
+    Products
+  </Link>
           </li>
+
+          
           <li>
             <a href="/about" className="hover:text-[#FCA600] transition-colors">
               About Us
             </a>
           </li>
           <li>
-            <button
-              onClick={() => handleScrollTo("contact")}
-              className="hover:text-[#FCA600] transition-colors"
-            >
-              Contact Us
-            </button>
+         <Link
+    href="/contact"
+    className={`${pathname === "/contact" ? "text-[#FCA600]" : "text-white hover:text-[#FCA600]"}`}
+  >
+    Contact
+  </Link>
           </li>
         </ul>
 

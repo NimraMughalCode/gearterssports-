@@ -134,7 +134,7 @@ export default function ContactBoxingBusiness() {
                 <input
                   {...register("name", { required: "Name is required" })}
                   type="text"
-                  placeholder="Enter Your Name..."
+                  placeholder="Your Name..."
                   className="w-full  rounded-lg bg-black border border-gray-600 text-white px-4 py-2 placeholder-gray-400 outline-none font-light"
                 />
                 {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name.message}</p>}
@@ -143,7 +143,7 @@ export default function ContactBoxingBusiness() {
                 <input
                   {...register("phone", { required: "Phone number is required" })}
                   type="text"
-                  placeholder="Phone Number..."
+                  placeholder="Your Phone..."
                   className="w-full   rounded-lg bg-black border border-gray-600 text-white px-4 py-2 placeholder-gray-400 outline-none font-light"
                 />
                 {errors.phone && <p className="text-red-400 text-sm mt-1">{errors.phone.message}</p>}
