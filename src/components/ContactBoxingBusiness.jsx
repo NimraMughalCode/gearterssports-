@@ -236,12 +236,18 @@ export default function ContactBoxingBusiness() {
   </div>
 
   {/* Row 3 — Address */}
-  <div className="flex items-start gap-3 max-w-md">
-    <Icon icon="mdi:map-marker" width="26" className="text-[#FCA600] mt-1" />
+  <div className="flex items-start   gap-3 max-w-md">
+    <Icon icon="mdi:map-marker" width="20" className="text-[#FCA600] mt-1" />
     <p className="leading-relaxed">
-      Chenab Rangers, Alrehman Road,  
-      Mirza Street, Sialkot, Pakistan
+      Chenab Rangers, Alrehman Road, Mirza Street, Sialkot, Pakistan
     </p>
+  </div>
+
+    {/* Row 3 — Address */}
+  <div className="flex items-start   gap-3 max-w-md">
+    <Icon icon="mdi:map-marker" width="20" className="text-[#FCA600] mt-1" />
+    <p className="leading-relaxed">
+Opposite Khalifa University, Muroor Road, Signal 21 Area, Abu Dhabi, UAE    </p>
   </div>
 
 </div>
