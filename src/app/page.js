@@ -9,7 +9,9 @@ export default function Home() {
  
     <div className="gap-4 bg-black font-sans">
     <HeroCarousel /> 
-      <CategoriesGrid />
+       <div id="categories">
+        <CategoriesGrid />
+      </div>
   <PortfolioSection />
       <WhyChooseUs />
    

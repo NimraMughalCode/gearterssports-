@@ -206,7 +206,12 @@ export default function ContactBoxingBusiness() {
 
     <div className="flex  items-center gap-3">
       <Icon icon="mdi:phone" width="26" className="text-[#FCA600]" />
-      <span>+92 327 9988069</span>
+      <a
+      href="tel:+923279988069"
+      className="hover:text-[#FCA600] transition"
+    >
+      +92 327 9988069
+    </a>
     </div>
   </div>
 

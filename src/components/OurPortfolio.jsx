@@ -116,14 +116,28 @@ export default function PortfolioSection() {
     {/* Product Slides */}
  {portfolioVideos.map((item) => (
   <div key={item.id} className="px-2">
-    <div className="aspect-square w-full border rounded-lg border-[#FCA600] overflow-hidden bg-black">
+    {/* <div className="aspect-square w-full border rounded-lg border-[#FCA600] overflow-hidden bg-black">
       <video
         src={item.url}
         controls
         playsInline
         className="w-full h-full object-cover"
       />
-    </div>
+    </div> */}
+
+
+    <div className="w-full max-w-[400px] mx-auto aspect-[9/16] bg-black rounded-xl overflow-hidden">
+  <video
+    src={item.url}
+    controls
+    autoPlay
+     loop
+    muted
+    playsInline
+    className="w-full h-full object-cover"
+  />
+</div>
+
   </div>
 ))}
 

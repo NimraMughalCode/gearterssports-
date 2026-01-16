@@ -45,7 +45,7 @@ export default function Footer() {
           <li>
                <Link
     href="/products"
-    className={`${pathname === "/products" || pathname === "/categoryproducts"  ? "text-[#FCA600]" : "text-white hover:text-[#FCA600]"}`}
+    className="text-white hover:text-[#FCA600]"
   >
     Products
   </Link>
@@ -58,12 +58,12 @@ export default function Footer() {
             </a>
           </li>
           <li>
-         <Link
+         <a
     href="/contact"
-    className={`${pathname === "/contact" ? "text-[#FCA600]" : "text-white hover:text-[#FCA600]"}`}
+    className=  "text-white hover:text-[#FCA600]"
   >
     Contact
-  </Link>
+  </a>
           </li>
         </ul>
 

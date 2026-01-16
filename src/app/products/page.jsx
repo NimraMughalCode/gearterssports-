@@ -151,29 +151,32 @@ function Products() {
   return (
     <div className="bg-black text-white min-h-screen p-2 md:p-[70px] transition-all duration-1000 ease-out">
       {/* HEADER */}
-      <div className="flex items-center justify-between mb-10">
-        <button
-          onClick={() => router.push("/")}
-          className="border-2 border-[#FCA600] rounded-lg text-[#FCA600] px-6 py-3 hover:bg-[#FCA600] hover:text-black transition font-medium"
-        >
-          ← Back
-        </button>
+<div className="flex flex-col gap-4 mb-10 md:flex-row md:items-center md:justify-between">
+  {/* Back Button */}
+  <button
+    onClick={() => router.push("/")}
+    className="self-start md:self-auto border-2 border-[#FCA600] rounded-lg text-[#FCA600] px-4 py-2 md:px-6 md:py-3 hover:bg-[#FCA600] hover:text-black transition font-medium"
+  >
+    ← Back
+  </button>
 
-        <h1 className="text-3xl md:text-4xl font-bold text-center">
-          {urlCategory ? (
-            <>
-              {urlCategory}
-              <span className="text-[#FCA600]"> Products</span>
-            </>
-          ) : (
-            <>
-              All <span className="text-[#FCA600]">Products</span>
-            </>
-          )}
-        </h1>
+  {/* Heading */}
+  <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center">
+    {urlCategory ? (
+      <>
+        {urlCategory}
+        <span className="text-[#FCA600]"> Products</span>
+      </>
+    ) : (
+      <>
+        All <span className="text-[#FCA600]">Products</span>
+      </>
+    )}
+  </h1>
 
-        <div className="w-[120px]" />
-      </div>
+  {/* Spacer only for desktop */}
+  <div className="hidden md:block w-[120px]" />
+</div>
 
 
       {/* 🔽 FILTERS (ONLY ON ALL PRODUCTS PAGE) */}

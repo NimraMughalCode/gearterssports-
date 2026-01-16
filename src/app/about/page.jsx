@@ -46,7 +46,7 @@ export default function About() {
   }, [visible]);
 
   return (
-    <section ref={sectionRef} className="bg-black gap-8 flex flex-col text-white py-16   font-sans">
+    <section ref={sectionRef} className="bg-black gap-8 flex flex-col text-white    font-sans">
      <WhyChooseUs showAboutButton={false} />
 
       <div className="container px-2 md:px-[70px]">
