@@ -74,8 +74,8 @@ export default function Hero() {
 
 
   {/* Content */}
-  <div className="relative z-10  bg-black  bg-opacity-10 flex flex-col justify-center px-4 md:px-10 lg:px-20 py-24 min-h-screen">
-  <div className="w-full md:w-1/2 text-center md:text-left items-center md:items-start flex flex-col">
+  <div className="relative z-10  bg-black justify-between bg-opacity-10 flex flex-col justify-center px-4 md:px-10 lg:px-20 py-24 min-h-screen">
+  <div className="w-full   md:w-1/2 text-center md:text-left items-center md:items-start flex flex-col">
 
       <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight">
         YOUR RELIABLE PARTNER IN BOXING GEAR <br />
@@ -89,7 +89,7 @@ export default function Hero() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat on WhatsApp"
-        className="mt-6 border-2 border-[#FCA600] rounded-lg text-[#FCA600] px-6 py-3 hover:bg-[#FCA600] hover:text-black transition font-medium"
+        className="hidden md:block mt-6 border-2 border-[#FCA600] rounded-lg text-[#FCA600] px-6 py-3 hover:bg-[#FCA600] hover:text-black transition font-medium"
       >
         Contact Us
       </a>
@@ -98,24 +98,31 @@ export default function Hero() {
     </div>
 
     {/* Stats */}
-    <div className="mt-12 flex flex-col md:flex-row gap-6 text-white text-center items-center">
-      <div>
-        <p className="text-3xl font-normal text-[#FCA600]">8+</p>
-        <p className="text-sm font-normal">Years of Experience</p>
-      </div>
-
-      <div className="hidden md:block h-12 border-l-2 border-border-white"></div>
-
-      <div>
-        <p className="text-3xl font-normal text-[#FCA600]">100+</p>
-        <p className="text-sm font-normal">Members Join</p>
-      </div>
-
-      <div className="hidden md:block h-12 border-l-2 border-border-white"></div>
-
-      <div>
-        <p className="text-3xl font-normal text-[#FCA600]">88+</p>
-        <p className="text-sm font-normal">Happy Members</p>
+    <div className="flex flex-col gap-2 items-center">
+      <a
+      href="https://wa.me/923279988069"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Chat on WhatsApp"
+        className="block md:hidden mt-6 border-2 border-[#FCA600] rounded-lg text-[#FCA600] px-6 py-3 hover:bg-[#FCA600] hover:text-black transition font-medium"
+      >
+        Contact Us
+      </a>
+      <div className="mt-12 flex flex-row gap-6 text-white text-center justify-center md:justify-start items-center">
+        <div>
+          <p className="text-3xl font-normal text-[#FCA600]">8+</p>
+          <p className="text-sm font-normal">Years of Experience</p>
+        </div>
+        <div className="hidden md:block h-12 border-l-2 border-border-white"></div>
+        <div>
+          <p className="text-3xl font-normal text-[#FCA600]">100+</p>
+          <p className="text-sm font-normal">Members Join</p>
+        </div>
+        <div className="hidden md:block h-12 border-l-2 border-border-white"></div>
+        <div>
+          <p className="text-3xl font-normal text-[#FCA600]">88+</p>
+          <p className="text-sm font-normal">Happy Members</p>
+        </div>
       </div>
     </div>
   </div>
