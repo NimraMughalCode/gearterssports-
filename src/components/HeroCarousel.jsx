@@ -98,7 +98,7 @@ export default function Hero() {
     </div>
 
     {/* Stats */}
-    <div className="flex flex-col gap-2 items-center">
+    <div className="flex flex-col gap-2 items-center md:items-start">
       <a
       href="https://wa.me/923279988069"
       target="_blank"
