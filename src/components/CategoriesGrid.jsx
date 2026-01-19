@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories } from "@/ReduxToolkit/CategoriesSlice";
+import Image from "next/image";
 
 const CATEGORIES_VIEWED_KEY = "categories-grid-viewed";
 
@@ -56,14 +57,15 @@ export default function CategoriesGrid() {
         Our <span className="text-[#FCA600]">Categories</span>
       </h1>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-10 place-items-center">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4  gap-4 md:gap-10 place-items-center">
         {categories.map((cat) => (
           <div
             key={cat.id}
             onClick={() => router.push(`/categoryproducts?category=${cat.title}`)}
             className="
               bg-[#111]
-              p-6
+              p-2
+              md:p-6
               rounded-2xl
               w-full
               h-full
@@ -80,11 +82,42 @@ export default function CategoriesGrid() {
               cursor-pointer
             "
           >
-            <div className="max-w-80 h-auto rounded-xl overflow-hidden border-2 border-[#FCA600] shadow-md">
+            {/* <div className="max-w-80 h-auto rounded-xl overflow-hidden border-2 border-[#FCA600] shadow-md">
               <img src={cat.img_src} alt={cat.title} className="w-full h-full object-cover" />
-            </div>
+            </div> */}
 
-            <p className="mt-4 text-lg sm:text-xl font-semibold">{cat.title}</p>
+
+
+
+
+
+<div className="relative  rounded-xl overflow-hidden border-2 border-[#FCA600] shadow-md">
+  {/* Main Image */}
+  <img
+    src={cat.img_src}
+    alt={cat.title}
+    className="w-full h-full object-cover"
+  />
+
+  {/* Watermark */}
+  <Image
+    src="/logo.svg"
+    alt="Gearters Logo"
+    width={50}
+    height={50}
+    className="
+      absolute
+      bottom-0
+      right-1
+      w-[5%]
+      min-w-[22px]
+      right-[-1px]
+      pointer-events-none
+    "
+  />
+</div>
+
+            <p className="mt-4 text-sm   sm:text-xl font-semibold">{cat.title}</p>
           </div>
         ))}
       </div>

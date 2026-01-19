@@ -2,6 +2,10 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+
+
+
+
 export async function POST(req) {
   try {
     const { name, email, message, phone
@@ -17,7 +21,7 @@ export async function POST(req) {
     console.log("Sending email with:", { name, email, message, phone });
 
     const response = await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: "sportsgearters@gmail.com",
       to: "progrumar@gmail.com",
       subject: `New Message from ${name}`,
       text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\n\nMessage:\n${message}`,

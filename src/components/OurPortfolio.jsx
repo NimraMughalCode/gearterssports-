@@ -142,19 +142,7 @@ export default function PortfolioSection() {
 ))}
 
 
-{/* ⭐ View More Slide (SAME SIZE AS VIDEOS) */}
-{/* <div className="px-2">
-  <div className="aspect-square w-full border border-[#FCA600] rounded-lg overflow-hidden flex items-center justify-center bg-[#FCA600]">
-    <a
-      href="https://www.instagram.com/gearterssports4"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="w-full h-full flex items-center justify-center text-xl font-semibold text-black hover:opacity-90 transition"
-    >
-      View More
-    </a>
-  </div>
-</div> */}
+
 
   </Slider>
 
