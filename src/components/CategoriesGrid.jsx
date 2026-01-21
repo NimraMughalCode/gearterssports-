@@ -96,25 +96,33 @@ export default function CategoriesGrid() {
   <img
     src={cat.img_src}
     alt={cat.title}
-    className="w-full h-full object-cover"
+    className="w-full h-full object-cover         pointer-events-none"
   />
 
   {/* Watermark */}
-  <Image
-    src="/logo.svg"
-    alt="Gearters Logo"
-    width={50}
-    height={50}
-    className="
-      absolute
-      bottom-0
-      right-1
-      w-[5%]
-      min-w-[22px]
-      right-[-1px]
-      pointer-events-none
-    "
-  />
+  <div     className="
+        absolute
+        bottom-1
+    right-1
+        w-[12%]
+        h-[12%]
+        min-w-[22px]
+        rounded-md
+        p-1
+        pointer-events-none
+    bg-black  "
+    >
+    <Image
+      src="/logo-trans.png"
+      alt="Gearters Logo"
+      width={80}
+      height={80}
+      className="
+
+        pointer-events-none
+      "
+    />
+  </div>
 </div>
 
             <p className="mt-4 text-sm   sm:text-xl font-semibold">{cat.title}</p>

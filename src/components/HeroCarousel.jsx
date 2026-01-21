@@ -55,15 +55,11 @@ export default function Hero() {
   };
 
   return (
-    <section className=" w-full bg-black overflow-hidden font-sans">
+    <section className=" w-full overflow-hidden font-sans">
       <Slider ref={sliderRef} {...settings} className="h-full">
         {slides.map((slide, index) => (
-      <div key={index} className="relative w-full min-h-screen">
-  {/* Background Image */}
-  {/* <div
-    className="absolute inset-0 bg-cover bg-center"
-    style={{ backgroundImage: `url(${slide.image})` }}
-  /> */}
+      <div key={index} className="relative w-full  min-h-screen">
+
 
 <img
   src={slide.image}
@@ -74,7 +70,7 @@ export default function Hero() {
 
 
   {/* Content */}
-  <div className="relative z-10  bg-black justify-between bg-opacity-10 flex flex-col justify-center px-4 md:px-10 lg:px-20 py-24 min-h-screen">
+  <div className="relative z-10  bg-black justify-between bg-opacity-10 flex flex-col justify-center px-4 md:px-10 lg:px-20 p-4 md:py-24 min-h-screen">
   <div className="w-full   md:w-1/2 text-center md:text-left items-center md:items-start flex flex-col">
 
       <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight">

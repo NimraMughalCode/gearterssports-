@@ -89,13 +89,13 @@ useEffect(() => {
   return (
     <div
       ref={sectionRef}
-      className={`relative flex flex-col items-center justify-center w-full max-w-full px-2 md:px-[70px] py-10 md:py-20 text-white bg-[#121212] font-sans overflow-x-hidden transition-all duration-1000 ease-out
+      className={`relative flex flex-col items  -center justify-center w-full max-w-full p-6 md:p-16 text-white bg-[#121212] font-sans overflow-x-hidden transition-all duration-1000 ease-out
       ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8 pointer-events-none"}`}
     >
 
 
 <div className="flex flex-col mb-10">
-  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+  <div className="flex gap-4  md:items-center justify-between">
   
   
     {/* Spacer only for desktop */}
@@ -113,11 +113,19 @@ useEffect(() => {
       href="https://www.instagram.com/gearterssports4"
         target="_blank"
         rel="noopener noreferrer"
-        className="border-2 border-[#FCA600]  w-fit self-center rounded-lg text-[#FCA600] px-6 py-3 hover:bg-[#FCA600] hover:text-black transition font-medium"
+        className="border-2 border-[#FCA600] hidden md:block  w-fit self-center rounded-lg text-[#FCA600] px-6 py-3 hover:bg-[#FCA600] hover:text-black transition font-medium"
     >
        View More
     </a>
   
+    <a
+      href="https://www.instagram.com/gearterssports4"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block md:hidden  w-fit  rounded-lg text-[#FCA600] px-6 py-3  font-medium"
+    >
+       View More
+    </a>
   
   </div>
   
