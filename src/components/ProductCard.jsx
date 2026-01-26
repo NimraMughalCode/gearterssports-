@@ -9,15 +9,7 @@
     };
 
     return (
-      <div  onClick={handleCardClick} className="bg-black border rounded-lg cursor-pointer border-[#FCA600] text-white w-full max-w-md shadow-lg flex flex-col   overflow-hidden">
-        {/* Square Image */}
-        {/* <div className="bg-white w-full aspect-square overflow-hidden">
-          <img
-            src={product.img_src}
-            alt={product.name}
-            className="w-full h-full object-contain"
-          />
-        </div> */}
+      <div  onClick={handleCardClick} className="bg-black border rounded-lg cursor-pointer border-[#FCA600] text-white w-full max-w-full shadow-lg flex flex-col   overflow-hidden">
 
 <div
   className="bg-white w-full aspect-square overflow-hidden relative select-none"
@@ -43,11 +35,11 @@
 
 
         {/* Content */}
-        <div className="p-5 flex flex-col flex-1">
+        <div className="p-2 flex flex-col flex-1">
           <h3 className="text-[#FCA600] text-md  uppercase font-semibold">
             {product.name}
           </h3>
-          <p className="text-[12px] text-gray-300 mt-2 leading-relaxed">
+          <p className="text-[12px] text-gray-300 leading-relaxed">
             {product.description}
           </p>
         </div>

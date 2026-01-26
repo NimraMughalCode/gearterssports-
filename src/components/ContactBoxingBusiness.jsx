@@ -105,10 +105,12 @@ export default function ContactBoxingBusiness() {
         >
           <Image
             // src="https://thumbs.dreamstime.com/b/photo-rear-view-strong-boxer-boxing-ring-under-spotlights-depicting-determination-vertical-mobile-wallpaper-316567530.jpg"
-         src="https://uwvgebfrmlofrvcywmwj.supabase.co/storage/v1/object/public/product-images/products/1761408354103.jpg"
+        src="/contact.jpg"
+
             alt="Boxer"
             fill
-            className="object-contain"
+            className="object-contain 
+"
           />
         </div>
 
