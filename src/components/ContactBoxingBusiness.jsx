@@ -4,7 +4,8 @@ import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { toast, Toaster } from "react-hot-toast";
-import { Icon } from "@iconify/react"; // ⬅️ Added Iconify here
+import { Icon } from "@iconify/react";
+import ReCAPTCHA from "react-google-recaptcha"; // ⬅️ 1. Import reCAPTCHA
 
 const CONTACTBUSINESS_VIEWED_KEY = 'contactbusiness-section-viewed';
 
@@ -17,6 +18,7 @@ export default function ContactBoxingBusiness() {
   } = useForm();
 
   const [loading, setLoading] = useState(false);
+  const recaptchaRef = useRef(null); // ⬅️ 2. Create a reference for the reCAPTCHA instance
 
   // Animation state for left/right columns
   const [visible, setVisible] = useState(false);
@@ -67,12 +69,21 @@ export default function ContactBoxingBusiness() {
   }, [visible]);
 
   const onSubmit = async (data) => {
+    // ⬅️ 3. Get token from reCAPTCHA
+    const token = recaptchaRef.current?.getValue();
+    
+    if (!token) {
+      toast.error("Please complete the reCAPTCHA verification!");
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await fetch("/api/sendEmail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        // ⬅️ 4. Pass the token over to your back-end handler
+        body: JSON.stringify({ ...data, gRecaptchaToken: token }), 
       });
 
       const result = await response.json();
@@ -80,11 +91,14 @@ export default function ContactBoxingBusiness() {
       if (response.ok) {
         toast.success("Email sent successfully!");
         reset();
+        recaptchaRef.current?.reset(); // ⬅️ 5. Reset captcha on success
       } else {
         toast.error(result.error || "Something went wrong!");
+        recaptchaRef.current?.reset(); // Reset on error so they can retry
       }
     } catch (error) {
       toast.error("Something went wrong!");
+      recaptchaRef.current?.reset();
     }
     setLoading(false);
   };
@@ -104,13 +118,10 @@ export default function ContactBoxingBusiness() {
             ${leftVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-16 pointer-events-none'}`}
         >
           <Image
-            // src="https://thumbs.dreamstime.com/b/photo-rear-view-strong-boxer-boxing-ring-under-spotlights-depicting-determination-vertical-mobile-wallpaper-316567530.jpg"
-        src="/contact.jpg"
-
+            src="/contact.jpg"
             alt="Boxer"
             fill
-            className="object-contain 
-"
+            className="object-contain"
           />
         </div>
 
@@ -120,12 +131,10 @@ export default function ContactBoxingBusiness() {
           className={`md:w-1/2 bg-black  md:px-8  py-2 flex flex-col justify-center skew-x-0 md:skew-x-6 transition-all duration-1000 ease-out
             ${rightVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-16 pointer-events-none'}`}
         >
-      
-
-           <h1 className="  text-3xl md:text-4xl font-bold text-white leading-tight">
-                     Let’s Talk
-                    <span style={{ color: "#FCA600" }}> Boxing Business</span>
-                  </h1>
+          <h1 className="  text-3xl md:text-4xl font-bold text-white leading-tight">
+            Let’s Talk
+            <span style={{ color: "#FCA600" }}> Boxing Business</span>
+          </h1>
           <p className="text-gray-300 my-4 text-sm tracking-wide font-medium">
             Export Worldwide | Premium Quality | Custom Orders
           </p>
@@ -180,85 +189,72 @@ export default function ContactBoxingBusiness() {
               )}
             </div>
 
+            {/* ⬅️ 6. Insert the reCAPTCHA Component right before the submit button */}
+            <div className="my-2 overflow-hidden rounded-lg">
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                theme="dark" // Matches your black layout perfectly
+                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} 
+              />
+            </div>
+
             <button
               type="submit"
               disabled={loading}
-              className="mt-6 border-2  rounded-lg border-[#FCA600] text-[#FCA600] px-6 py-3  hover:bg-[#FCA600] hover:text-black font-medium text-small transition"
+              className="mt-2 border-2  rounded-lg border-[#FCA600] text-[#FCA600] px-6 py-3  hover:bg-[#FCA600] hover:text-black font-medium text-small transition"
             >
               {loading ? "Sending..." : "Submit"}
             </button>
           </form>
 
-    
-{/* 📍 CONTACT INFO */}
-<div className="mt-8 space-y-5 flex flex-col  text-sm text-gray-300">
+          {/* 📍 CONTACT INFO */}
+          <div className="mt-8 space-y-5 flex flex-col  text-sm text-gray-300">
+            {/* Row 1 — WhatsApp & Phone */}
+            <div className="flex flex-wrap justify-between gap-8">
+              <div className="flex items-center gap-3">
+                <Icon icon="logos:whatsapp-icon" width="26" />
+                <a href="https://wa.me/923279988069" target="_blank" className="hover:text-[#FCA600] transition">
+                  +92 327 9988069
+                </a>
+              </div>
+              <div className="flex  items-center gap-3">
+                <Icon icon="mdi:phone" width="26" className="text-[#FCA600]" />
+                <a href="tel:+923279988069" className="hover:text-[#FCA600] transition">
+                  +92 327 9988069
+                </a>
+              </div>
+            </div>
 
-  {/* Row 1 — WhatsApp & Phone */}
-  <div className="flex flex-wrap justify-between gap-8">
-    <div className="flex items-center gap-3">
-      <Icon icon="logos:whatsapp-icon" width="26" />
-      <a
-        href="https://wa.me/923279988069"
-        target="_blank"
-        className="hover:text-[#FCA600] transition"
-      >
-        +92 327 9988069
-      </a>
-    </div>
+            {/* Row 2 — Instagram & Facebook */}
+            <div className="flex flex-wrap justify-between gap-8">
+              <div className="flex items-center gap-3">
+                <Icon icon="skill-icons:instagram" width="26" />
+                <a href="https://www.instagram.com/gearterssports4" target="_blank" className="hover:text-[#FCA600] transition">
+                  @gearterssports4
+                </a>
+              </div>
+              <div className="flex items-center gap-3">
+                <Icon icon="logos:facebook" width="26" />
+                <a href="https://www.facebook.com/share/16oHMtQQQS/?mibextid=wwXIfr" target="_blank" className="hover:text-[#FCA600] transition">
+                  Gearters Sports
+                </a>
+              </div>
+            </div>
 
-    <div className="flex  items-center gap-3">
-      <Icon icon="mdi:phone" width="26" className="text-[#FCA600]" />
-      <a
-      href="tel:+923279988069"
-      className="hover:text-[#FCA600] transition"
-    >
-      +92 327 9988069
-    </a>
-    </div>
-  </div>
-
-  {/* Row 2 — Instagram & Facebook */}
-  <div className="flex flex-wrap justify-between gap-8">
-    <div className="flex items-center gap-3">
-      <Icon icon="skill-icons:instagram" width="26" />
-      <a
-        href="https://www.instagram.com/gearterssports4"
-        target="_blank"
-        className="hover:text-[#FCA600] transition"
-      >
-        @gearterssports4
-      </a>
-    </div>
-
-    <div className="flex items-center gap-3">
-      <Icon icon="logos:facebook" width="26" />
-      <a
-        href="https://www.facebook.com/share/16oHMtQQQS/?mibextid=wwXIfr"
-        target="_blank"
-        className="hover:text-[#FCA600] transition"
-      >
-        Gearters Sports
-      </a>
-    </div>
-  </div>
-
-  {/* Row 3 — Address */}
-  <div className="flex items-start   gap-3 max-w-md">
-    <Icon icon="mdi:map-marker" width="20" className="text-[#FCA600] mt-1" />
-    <p className="leading-relaxed">
-      Chenab Rangers, Alrehman Road, Mirza Street, Sialkot, Pakistan
-    </p>
-  </div>
-
-    {/* Row 3 — Address */}
-  <div className="flex items-start   gap-3 max-w-md">
-    <Icon icon="mdi:map-marker" width="20" className="text-[#FCA600] mt-1" />
-    <p className="leading-relaxed">
-Opposite Khalifa University, Muroor Road, Signal 21 Area, Abu Dhabi, UAE    </p>
-  </div>
-
-</div>
-
+            {/* Row 3 — Addresses */}
+            <div className="flex items-start   gap-3 max-w-md">
+              <Icon icon="mdi:map-marker" width="20" className="text-[#FCA600] mt-1" />
+              <p className="leading-relaxed">
+                Chenab Rangers, Alrehman Road, Mirza Street, Sialkot, Pakistan
+              </p>
+            </div>
+            <div className="flex items-start   gap-3 max-w-md">
+              <Icon icon="mdi:map-marker" width="20" className="text-[#FCA600] mt-1" />
+              <p className="leading-relaxed">
+                Opposite Khalifa University, Muroor Road, Signal 21 Area, Abu Dhabi, UAE
+              </p>
+            </div>
+          </div>
 
         </div>
       </div>

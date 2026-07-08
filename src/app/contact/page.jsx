@@ -23,7 +23,7 @@ export default function Contact() {
       ([entry]) => {
         if (entry.isIntersecting) {
           setVisible(true);
-          localStorage.setItem(ABOUT_VIEWED_KEY, "true");
+          localStorage.setItem(CONTACT_VIEWED_KEY, "true");
           observer.disconnect();
         }
       },
