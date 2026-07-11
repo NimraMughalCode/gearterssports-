@@ -70,7 +70,7 @@ useEffect(() => {
     dots: true,
     infinite: false,
     speed: 100,
-    slidesToShow: 3,
+    slidesToShow: 4,
     slidesToScroll: 1,
     afterChange: (index) => setCurrentSlide(index),
     responsive: [
@@ -145,7 +145,7 @@ useEffect(() => {
 
 
  <div
-  className="w-full max-w-[200px] mx-auto aspect-[9/16] bg-black rounded-xl overflow-hidden cursor-pointer"
+  className="w-full max-w-[300px]  mx-auto aspect-[9/16] bg-black rounded-xl overflow-hidden cursor-pointer"
   onClick={() => setActiveVideo(item.url)}
 >
   <video
