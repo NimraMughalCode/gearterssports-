@@ -1,11 +1,21 @@
-import Head from "next/head";
+export const metadata = {
+  title: "Terms and Conditions",
+  description: "Read the Terms and Conditions of Gearters Sports. Understand the usage agreements, ordering, shipping, and return policies from the best manufacturer of gloves and sports equipment.",
+  keywords: [
+    "best manufacturers of gloves",
+    "best manufacturer of sports",
+    "terms and conditions gearters sports",
+    "sports gear ordering terms",
+    "boxing gloves shipping policies"
+  ],
+  alternates: {
+    canonical: "/terms",
+  },
+};
 
 export default function Terms() {
   return (
     <>
-      <Head>
-        <title>Terms and Conditions | Gearters Sports</title>
-      </Head>
 
       <div className="bg-black text-white mx-auto px-16 py-12 font-sans">
         <h1 className="text-4xl font-bold text-primary mb-6">Terms and Conditions</h1>

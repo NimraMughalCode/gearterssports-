@@ -67,6 +67,22 @@ export default function Footer() {
           </li>
         </ul>
 
+        {/* Contact Emails */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-sm font-light text-gray-300">
+          <div className="flex items-center gap-2">
+            <Icon icon="mdi:email" width="20" className="text-[#FCA600]" />
+            <a href="mailto:Info@gearterssports.com" className="hover:text-[#FCA600] transition">
+              Info@gearterssports.com
+            </a>
+          </div>
+          <div className="flex items-center gap-2">
+            <Icon icon="mdi:email" width="20" className="text-[#FCA600]" />
+            <a href="mailto:Sportsgearters@gmail.com" className="hover:text-[#FCA600] transition">
+              Sportsgearters@gmail.com
+            </a>
+          </div>
+        </div>
+
         {/* ⭐ Social Icons */}
         <div className="flex items-center space-x-6 pt-2">
           <Link

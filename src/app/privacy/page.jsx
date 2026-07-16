@@ -1,3 +1,18 @@
+export const metadata = {
+  title: "Privacy Policy",
+  description: "Read the Gearters Sports privacy policy. Learn how we handle and protect customer information when browsing products from the best manufacturer of gloves and sports equipment.",
+  keywords: [
+    "best manufacturers of gloves",
+    "best manufacturer of sports",
+    "privacy policy gearters sports",
+    "data security",
+    "customer information protection"
+  ],
+  alternates: {
+    canonical: "/privacy",
+  },
+};
+
 export default function PrivacyPolicy() {
   return (
     <section className="bg-white py-16 px-6 md:px-12 lg:px-20">

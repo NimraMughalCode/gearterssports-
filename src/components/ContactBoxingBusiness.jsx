@@ -241,7 +241,23 @@ export default function ContactBoxingBusiness() {
               </div>
             </div>
 
-            {/* Row 3 — Addresses */}
+            {/* Row 3 — Emails */}
+            <div className="flex flex-wrap justify-between gap-8">
+              <div className="flex items-center gap-3">
+                <Icon icon="mdi:email" width="26" className="text-[#FCA600]" />
+                <a href="mailto:Info@gearterssports.com" className="hover:text-[#FCA600] transition">
+                  Info@gearterssports.com
+                </a>
+              </div>
+              <div className="flex items-center gap-3">
+                <Icon icon="mdi:email" width="26" className="text-[#FCA600]" />
+                <a href="mailto:Sportsgearters@gmail.com" className="hover:text-[#FCA600] transition">
+                  Sportsgearters@gmail.com
+                </a>
+              </div>
+            </div>
+
+            {/* Row 4 — Addresses */}
             <div className="flex items-start   gap-3 max-w-md">
               <Icon icon="mdi:map-marker" width="20" className="text-[#FCA600] mt-1" />
               <p className="leading-relaxed">
