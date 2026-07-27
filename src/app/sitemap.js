@@ -1,7 +1,7 @@
 import { getProducts } from "@/app/utils/adminAPI";
 
 export default async function sitemap() {
-  const baseUrl = 'https://gearterssports.com';
+  const baseUrl = 'https://www.gearterssports.com';
 
   // 1. Static Routes (Explicitly configured for optimal indexing)
   const staticRoutes = [

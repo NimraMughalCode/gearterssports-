@@ -13,7 +13,7 @@ const inter = Inter({
 });
 
 export const metadata = {
-  metadataBase: new URL("https://gearterssports.com"),
+  metadataBase: new URL("https://www.gearterssports.com"),
   title: {
     default: "Gearters Sports | Best Manufacturer of Gloves & Sports Gear",
     template: "%s | Gearters Sports - Best Manufacturer of Gloves",
@@ -35,7 +35,7 @@ export const metadata = {
   openGraph: {
     title: "Gearters Sports | Best Manufacturer of Gloves & Sports Gear",
     description: "Gearters Sports is recognized among the best manufacturers of gloves, custom combat gear, and high-quality sports accessories.",
-    url: "https://gearterssports.com",
+    url: "https://www.gearterssports.com",
     siteName: "Gearters Sports",
     locale: "en_US",
     type: "website",
