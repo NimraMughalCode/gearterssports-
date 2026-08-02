@@ -13,11 +13,12 @@ import {
   deleteProduct
 
 } from '@/app/utils/adminAPI';
-import { Folder, Package, Video } from 'lucide-react'; // 
+import { Folder, Package, Video, Mail } from 'lucide-react'; // 
 import CategoriesManager from './CategoriesManagr';
 import ProductsManager from './ProductsManager';
 import toast from 'react-hot-toast';
 import PortfolioManager from './PortfolioMager';
+import CampaignsManager from './CampaignsManager';
 
 
 export default function AdminPage() {
@@ -562,6 +563,18 @@ if (!isAuthenticated) {
   Portfolio
 </button>
 
+  <button
+  onClick={() => setActiveTab('campaigns')}
+  className={`flex items-center px-4 py-2 rounded ${
+    activeTab === 'campaigns'
+      ? 'bg-yellow-500 text-black font-semibold'
+      : 'bg-gray-700 text-white'
+  }`}
+>
+  <Mail className="w-4 h-4 mr-2" />
+  Campaigns
+</button>
+
 </div>
 
 
@@ -625,6 +638,10 @@ if (!isAuthenticated) {
     handleUpdatePortfolio={handleUpdatePortfolio}
     handleDeletePortfolio={handleDeletePortfolio}
   />
+)}
+
+{activeTab === 'campaigns' && (
+  <CampaignsManager />
 )}
 
 
