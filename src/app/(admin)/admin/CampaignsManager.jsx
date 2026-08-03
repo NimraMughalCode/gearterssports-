@@ -15,7 +15,7 @@ export default function CampaignsManager() {
   const [isCreating, setIsCreating] = useState(false);
   const [campaignName, setCampaignName] = useState("");
   const [subject, setSubject] = useState("");
-  const [selectedTemplateId, setSelectedTemplateId] = useState("newsletter");
+  const [selectedTemplateId, setSelectedTemplateId] = useState("standard");
   const [headingText, setHeadingText] = useState("");
   const [bodyText, setBodyText] = useState("");
   const [btnText, setBtnText] = useState("");
@@ -180,9 +180,13 @@ export default function CampaignsManager() {
 
     // Get the HTML blueprint from template file
     const selectedTemplate = templates.find(t => t.id === selectedTemplateId) || templates[0];
+    const compiledBody = selectedTemplateId === "custom_html" 
+      ? bodyText 
+      : bodyText.replace(/\n/g, "<br>");
+
     const compiledBaseHtml = selectedTemplate.getHtml({
       subject,
-      bodyHtml: bodyText.replace(/\n/g, "<br>"),
+      bodyHtml: compiledBody,
       buttonText: btnText,
       buttonUrl: btnUrl,
       promoImageUrl: promoImgUrl
@@ -526,198 +530,252 @@ export default function CampaignsManager() {
 
   // Create Campaign modal/panel view
   if (isCreating) {
+    const getPreviewHtml = () => {
+      const selectedTemplate = templates.find(t => t.id === selectedTemplateId) || templates[0];
+      let previewBody = bodyText;
+      
+      // If standard template, convert newlines to <br> to preview correctly
+      if (selectedTemplateId === "standard") {
+        previewBody = bodyText.replace(/\n/g, "<br>");
+      }
+      
+      const rawHtml = selectedTemplate.getHtml({
+        subject: subject || "Gearters Sports Update",
+        bodyHtml: previewBody,
+        buttonText: btnText,
+        buttonUrl: btnUrl,
+        promoImageUrl: promoImgUrl
+      });
+      
+      // Replace merge tags for preview
+      return rawHtml
+        .replace(/{{first_name}}/g, "John")
+        .replace(/{{last_name}}/g, "Doe")
+        .replace(/{{email}}/g, "john.doe@example.com");
+    };
+
     return (
-      <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 space-y-6 max-w-4xl mx-auto">
-        <div className="flex justify-between items-center pb-4 border-b border-gray-800">
-          <h2 className="text-xl font-bold text-yellow-400">Create New Email Campaign</h2>
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="flex justify-between items-center pb-4 border-b border-gray-850">
+          <div>
+            <h2 className="text-xl font-bold text-yellow-400">Create New Email Campaign</h2>
+            <p className="text-xs text-gray-500 mt-1">Configure your message and preview how it will appear to recipients.</p>
+          </div>
           <button
             onClick={() => setIsCreating(false)}
-            className="p-2 text-gray-400 hover:text-white rounded-lg border border-gray-800 hover:border-gray-600 transition"
+            className="px-4 py-2 text-gray-400 hover:text-white rounded-lg border border-gray-800 hover:border-gray-650 transition text-xs font-semibold"
           >
-            Cancel
+            Cancel & Exit
           </button>
         </div>
 
-        <form onSubmit={handleCreateCampaign} className="space-y-6 text-sm text-gray-300">
-          {/* Main info row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="block text-gray-400 font-medium">Campaign Name (Internal reference)</label>
-              <input
-                type="text"
-                placeholder="e.g. Boxing Gloves Promo August 2026"
-                value={campaignName}
-                onChange={(e) => setCampaignName(e.target.value)}
-                className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none text-white focus:border-yellow-400 transition"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="block text-gray-400 font-medium">Subject Line (What customer sees)</label>
-              <input
-                type="text"
-                placeholder="e.g. World Class Boxing Gloves - 20% Off This Week!"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none text-white focus:border-yellow-400 transition"
-              />
-            </div>
-          </div>
-
-          {/* Template Selection */}
-          <div className="space-y-2">
-            <label className="block text-gray-400 font-medium font-semibold">Select Email Layout Template</label>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {templates.map((t) => (
-                <div
-                  key={t.id}
-                  onClick={() => setSelectedTemplateId(t.id)}
-                  className={`p-4 rounded-lg border cursor-pointer transition flex flex-col justify-between ${
-                    selectedTemplateId === t.id
-                      ? "bg-yellow-500/10 border-yellow-500 text-white"
-                      : "bg-black/40 border-gray-800 hover:border-gray-700 text-gray-400"
-                  }`}
-                >
-                  <div>
-                    <h4 className="font-bold text-white mb-1">{t.name}</h4>
-                    <p className="text-xs text-gray-400 leading-relaxed">{t.description}</p>
-                  </div>
-                  <div className="mt-3 flex items-center justify-end">
-                    <span className={`text-xs px-2 py-0.5 rounded font-bold uppercase ${
-                      selectedTemplateId === t.id ? "bg-yellow-500 text-black" : "bg-gray-800 text-gray-400"
-                    }`}>
-                      {selectedTemplateId === t.id ? "Active" : "Select"}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Template personalization fields */}
-          <div className="bg-black/30 p-6 rounded-xl border border-gray-800 space-y-4">
-            <h3 className="text-white font-bold pb-2 border-b border-gray-850 flex items-center gap-2">
-              <Icon icon="mdi:lead-pencil" className="text-yellow-400" /> Customize Template Content
-            </h3>
-            
-            <div className="space-y-2">
-              <label className="block text-gray-400">Email Body Text (Supports HTML, inserts <code>&lt;br&gt;</code> automatically for enters)</label>
-              <textarea
-                placeholder="Write your email body content here..."
-                rows="6"
-                value={bodyText}
-                onChange={(e) => setBodyText(e.target.value)}
-                className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none text-white focus:border-yellow-400 transition"
-              ></textarea>
-              <p className="text-xs text-gray-500">Use merge tag <strong><code>{"{{first_name}}"}</code></strong> to personalize greeting (e.g. <code>{"Hello {{first_name}},"}</code>)</p>
-            </div>
-
-            {/* Custom CTA options */}
-            {selectedTemplateId !== "rich_text" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left Column: Form (Col-span 7) */}
+          <form onSubmit={handleCreateCampaign} className="lg:col-span-7 space-y-6 text-sm text-gray-300">
+            {/* Main info row */}
+            <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="block text-gray-400">Button Label (Optional)</label>
+                  <label className="block text-gray-400 font-medium">Campaign Name (Internal reference)</label>
                   <input
                     type="text"
-                    placeholder="e.g. Buy Now / View Catalog"
-                    value={btnText}
-                    onChange={(e) => setBtnText(e.target.value)}
+                    required
+                    placeholder="e.g. Boxing Gloves Promo August 2026"
+                    value={campaignName}
+                    onChange={(e) => setCampaignName(e.target.value)}
                     className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none text-white focus:border-yellow-400 transition"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-gray-400">Button Redirect Link (URL)</label>
+                  <label className="block text-gray-400 font-medium">Subject Line (What customer sees)</label>
                   <input
-                    type="url"
-                    placeholder="e.g. https://www.gearterssports.com/products"
-                    value={btnUrl}
-                    onChange={(e) => setBtnUrl(e.target.value)}
+                    type="text"
+                    required
+                    placeholder="e.g. World Class Boxing Gloves - 20% Off This Week!"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
                     className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none text-white focus:border-yellow-400 transition"
                   />
                 </div>
-                {selectedTemplateId === "product_showcase" && (
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="block text-gray-400">Promotion Image Banner Link (URL)</label>
+              </div>
+
+              {/* Template Selection */}
+              <div className="space-y-2">
+                <label className="block text-gray-400 font-medium font-semibold">Select Email Layout Template</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {templates.map((t) => (
+                    <div
+                      key={t.id}
+                      onClick={() => setSelectedTemplateId(t.id)}
+                      className={`p-4 rounded-lg border cursor-pointer transition flex flex-col justify-between ${
+                        selectedTemplateId === t.id
+                          ? "bg-yellow-500/10 border-yellow-500 text-white"
+                          : "bg-black/40 border-gray-800 hover:border-gray-700 text-gray-400"
+                      }`}
+                    >
+                      <div>
+                        <h4 className="font-bold text-white mb-1">{t.name}</h4>
+                        <p className="text-xs text-gray-400 leading-relaxed">{t.description}</p>
+                      </div>
+                      <div className="mt-3 flex items-center justify-end">
+                        <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${
+                          selectedTemplateId === t.id ? "bg-yellow-500 text-black" : "bg-gray-800 text-gray-400"
+                        }`}>
+                          {selectedTemplateId === t.id ? "Active" : "Select"}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Template personalization fields */}
+            <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 space-y-4">
+              <h3 className="text-white font-bold pb-2 border-b border-gray-850 flex items-center gap-2">
+                <Icon icon="mdi:lead-pencil" className="text-yellow-400" /> Customize Template Content
+              </h3>
+              
+              <div className="space-y-2">
+                <label className="block text-gray-400">Email Body Text {selectedTemplateId === "custom_html" ? "(Paste your entire responsive HTML here)" : "(Supports HTML, inserts <br> automatically)"}</label>
+                <textarea
+                  required
+                  placeholder={selectedTemplateId === "custom_html" ? "Paste raw custom HTML email code here..." : "Write your email body content here..."}
+                  rows="8"
+                  value={bodyText}
+                  onChange={(e) => setBodyText(e.target.value)}
+                  className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none text-white focus:border-yellow-400 transition font-mono text-xs"
+                ></textarea>
+                <p className="text-xs text-gray-500">Use merge tag <strong><code>{"{{first_name}}"}</code></strong> to personalize greeting (e.g. <code>{"Hello {{first_name}},"}</code>)</p>
+              </div>
+
+              {/* Custom CTA options */}
+              {selectedTemplateId !== "custom_html" && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="block text-gray-400">Button Label (Optional)</label>
                     <input
-                      type="url"
-                      placeholder="e.g. https://gearterssports.com/banners/boxing-gloves-show.jpg"
-                      value={promoImgUrl}
-                      onChange={(e) => setPromoImgUrl(e.target.value)}
+                      type="text"
+                      placeholder="e.g. Buy Now / View Catalog"
+                      value={btnText}
+                      onChange={(e) => setBtnText(e.target.value)}
                       className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none text-white focus:border-yellow-400 transition"
                     />
                   </div>
-                )}
-              </div>
-            )}
-          </div>
+                  <div className="space-y-2">
+                    <label className="block text-gray-400">Button Redirect Link (URL)</label>
+                    <input
+                      type="url"
+                      placeholder="e.g. https://www.gearterssports.com/products"
+                      value={btnUrl}
+                      onChange={(e) => setBtnUrl(e.target.value)}
+                      className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none text-white focus:border-yellow-400 transition"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
 
-          {/* List import / CSV options */}
-          <div className="bg-black/30 p-6 rounded-xl border border-gray-800 space-y-4">
-            <h3 className="text-white font-bold pb-2 border-b border-gray-850 flex items-center gap-2">
-              <Icon icon="mdi:file-upload" className="text-yellow-400" /> Recipients List Upload
-            </h3>
+            {/* List import / CSV options */}
+            <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 space-y-4">
+              <h3 className="text-white font-bold pb-2 border-b border-gray-850 flex items-center gap-2">
+                <Icon icon="mdi:file-upload" className="text-yellow-400" /> Recipients List Upload
+              </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* CSV Upload */}
-              <div className="space-y-3 p-4 bg-gray-850 rounded-lg border border-gray-800">
-                <h4 className="font-semibold text-white">Option A: Drag-and-drop CSV File</h4>
-                <p className="text-xs text-gray-400 leading-relaxed">
-                  Upload a CSV file containing an <code>email</code> column, and optionally <code>first name</code> / <code>last name</code> columns.
-                </p>
-                <div className="relative border-2 border-dashed border-gray-700 hover:border-yellow-500 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer transition">
-                  <input
-                    type="file"
-                    accept=".csv"
-                    onChange={handleCsvChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  />
-                  <Icon icon="mdi:file-delimited-outline" width="36" className="text-gray-500 mb-2" />
-                  <span className="text-xs font-semibold text-yellow-500">
-                    {csvFile ? csvFile.name : "Select CSV File"}
-                  </span>
-                  {csvFile && <span className="text-[10px] text-gray-400 mt-1">{importCount} recipients loaded</span>}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {/* CSV Upload */}
+                <div className="space-y-3 p-4 bg-black/40 rounded-lg border border-gray-800">
+                  <h4 className="font-semibold text-white">Option A: Drag-and-drop CSV File</h4>
+                  <p className="text-xs text-gray-400 leading-relaxed">
+                    Upload a CSV file containing an <code>email</code> column.
+                  </p>
+                  <div className="relative border-2 border-dashed border-gray-700 hover:border-yellow-500 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer transition">
+                    <input
+                      type="file"
+                      accept=".csv"
+                      onChange={handleCsvChange}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <Icon icon="mdi:file-delimited-outline" width="36" className="text-gray-500 mb-2" />
+                    <span className="text-xs font-semibold text-yellow-500">
+                      {csvFile ? csvFile.name : "Select CSV File"}
+                    </span>
+                    {csvFile && <span className="text-[10px] text-gray-400 mt-1">{importCount} recipients loaded</span>}
+                  </div>
+                </div>
+
+                {/* Manual Email List */}
+                <div className="space-y-3 p-4 bg-black/40 rounded-lg border border-gray-800 flex flex-col">
+                  <h4 className="font-semibold text-white">Option B: Write Email Addresses Manually</h4>
+                  <p className="text-xs text-gray-400 leading-relaxed">
+                    Type or paste a list of emails directly (comma/space separated).
+                  </p>
+                  <textarea
+                    placeholder="e.g. customer1@gmail.com, customer2@yahoo.com"
+                    rows="4"
+                    value={manualEmails}
+                    onChange={(e) => {
+                      setManualEmails(e.target.value);
+                      if (csvFile) {
+                        setCsvFile(null);
+                        setCsvRecipients([]);
+                      }
+                    }}
+                    disabled={csvFile !== null}
+                    className="w-full bg-black border border-gray-700 rounded-lg p-2.5 outline-none text-white text-xs focus:border-yellow-400 transition resize-none flex-grow"
+                  ></textarea>
                 </div>
               </div>
+            </div>
 
-              {/* Manual Email List */}
-              <div className="space-y-3 p-4 bg-gray-850 rounded-lg border border-gray-800 flex flex-col">
-                <h4 className="font-semibold text-white">Option B: Write Email Addresses Manually</h4>
-                <p className="text-xs text-gray-400 leading-relaxed">
-                  Type or paste a list of emails directly (we will automatically parse valid email addresses from text).
-                </p>
-                <textarea
-                  placeholder="e.g. customer1@gmail.com, customer2@yahoo.com"
-                  rows="4"
-                  value={manualEmails}
-                  onChange={(e) => {
-                    setManualEmails(e.target.value);
-                    if (csvFile) {
-                      setCsvFile(null);
-                      setCsvRecipients([]);
-                    }
-                  }}
-                  disabled={csvFile !== null}
-                  className="w-full bg-black border border-gray-700 rounded-lg p-2.5 outline-none text-white text-xs focus:border-yellow-400 transition resize-none flex-grow"
-                ></textarea>
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-800">
+              <button
+                type="button"
+                onClick={() => setIsCreating(false)}
+                className="px-6 py-3 bg-gray-850 hover:bg-gray-800 text-white font-medium rounded-lg transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-lg shadow-lg shadow-yellow-500/10 transition"
+              >
+                Save Campaign Draft
+              </button>
+            </div>
+          </form>
+
+          {/* Right Column: Live Email Preview (Col-span 5) */}
+          <div className="lg:col-span-5 lg:sticky lg:top-6 space-y-4">
+            <div className="bg-gray-900 p-4 rounded-xl border border-gray-800 flex flex-col space-y-4">
+              <div className="flex items-center justify-between pb-2 border-b border-gray-800">
+                <h3 className="text-white font-bold flex items-center gap-2">
+                  <Icon icon="mdi:eye-outline" className="text-yellow-400" /> Live Email Preview
+                </h3>
+                <span className="text-[10px] px-2.5 py-0.5 bg-green-500/15 text-green-400 rounded-full font-bold border border-green-500/25">
+                  Real-time Sync
+                </span>
+              </div>
+              
+              <div className="text-xs text-gray-400 bg-black/40 p-3 rounded-lg space-y-1">
+                <div><strong>Subject:</strong> {subject || "(No Subject)"}</div>
+                <div><strong>From:</strong> info@gearterssports.com</div>
+              </div>
+
+              <div className="relative border border-gray-800 rounded-lg overflow-hidden bg-white shadow-inner" style={{ height: "550px" }}>
+                <iframe
+                  title="Email Preview"
+                  srcDoc={getPreviewHtml()}
+                  className="w-full h-full border-0 bg-white"
+                />
+              </div>
+              
+              <div className="text-[10px] text-gray-500 text-center leading-relaxed">
+                This renders a direct preview of the email HTML. Merge tags (like <code>{"{{first_name}}"}</code>) are compiled with placeholder data.
               </div>
             </div>
           </div>
-
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-800">
-            <button
-              type="button"
-              onClick={() => setIsCreating(false)}
-              className="px-6 py-3 bg-gray-800 hover:bg-gray-750 text-white font-medium rounded-lg transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-lg shadow-lg shadow-yellow-500/10 transition"
-            >
-              Save Campaign Draft
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
     );
   }
