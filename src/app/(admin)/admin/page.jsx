@@ -42,6 +42,7 @@ const [portfolio, setPortfolio] = useState([]);
 const [portfolioFile, setPortfolioFile] = useState(null);
 const [editingPortfolio, setEditingPortfolio] = useState(null);
 const [otherImages, setOtherImages] = useState([]);
+const [otherImageFiles, setOtherImageFiles] = useState([]);
 
 
 
@@ -90,7 +91,7 @@ async function handleDeleteProduct(product) {
   const toastId = toast.loading("Deleting product...");
 
   try {
-    // 1️⃣ Delete product image from storage
+    // 1️⃣ Delete main product image from storage if in product-images bucket
     if (product.img_src) {
       const filePath = getStoragePathFromUrl(product.img_src);
 
@@ -101,7 +102,20 @@ async function handleDeleteProduct(product) {
       }
     }
 
-    // 2️⃣ Delete product from DB
+    // 2️⃣ Delete additional other_images from storage if hosted in product-images bucket
+    if (product.other_images && Array.isArray(product.other_images)) {
+      const otherPaths = product.other_images
+        .map(getStoragePathFromUrl)
+        .filter(Boolean);
+
+      if (otherPaths.length > 0) {
+        await supabase.storage
+          .from("product-images")
+          .remove(otherPaths);
+      }
+    }
+
+    // 3️⃣ Delete product from DB
     await deleteProduct(product.id);
 
     fetchProducts();
@@ -112,9 +126,14 @@ async function handleDeleteProduct(product) {
   }
 }
 
-async function handleUpdateProduct({ imageType, file, url,  otherImages,
- }) {
-  const { id, name, article_no, description, img_src, subcategory, } = editingProduct;
+async function handleUpdateProduct({
+  imageType,
+  file,
+  url,
+  otherImages = [],
+  newOtherImageFiles = [],
+}) {
+  const { id, name, article_no, description, img_src, subcategory } = editingProduct;
 
   if (!name || !description || !subcategory) {
     return toast.error('All fields are required');
@@ -147,6 +166,38 @@ async function handleUpdateProduct({ imageType, file, url,  otherImages,
       finalImageURL = url; // Replace with URL
     }
 
+    // Loop through new direct image files and upload each to Supabase storage
+    const uploadedNewOtherUrls = [];
+    if (newOtherImageFiles && newOtherImageFiles.length > 0) {
+      for (let i = 0; i < newOtherImageFiles.length; i++) {
+        const fileItem = newOtherImageFiles[i];
+        toast.loading(`Uploading image ${i + 1} of ${newOtherImageFiles.length}...`, { id: toastId });
+
+        const fileExt = fileItem.name.split('.').pop();
+        const safeName = fileItem.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const fileName = `products/other/${Date.now()}-${i}-${safeName}`;
+
+        const { error: uploadErr } = await supabase.storage
+          .from('product-images')
+          .upload(fileName, fileItem);
+
+        if (uploadErr) {
+          throw new Error(`Failed to upload ${fileItem.name}: ${uploadErr.message}`);
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(fileName);
+
+        uploadedNewOtherUrls.push(publicUrl);
+      }
+    }
+
+    const finalOtherImages = [
+      ...otherImages.filter(Boolean),
+      ...uploadedNewOtherUrls,
+    ];
+
     await updateProduct({
       id,
       name,
@@ -154,7 +205,7 @@ async function handleUpdateProduct({ imageType, file, url,  otherImages,
       description,
       img_src: finalImageURL,
       subcategory,
-      other_images: otherImages.filter(Boolean),
+      other_images: finalOtherImages,
     });
 
     setEditingProduct(null);
@@ -320,7 +371,7 @@ async function handleDeleteCategory(category) {
 
 
 
-async function handleAddProduct({ imageType, file, url }) {
+async function handleAddProduct({ imageType, file, url, otherImageFiles = [] }) {
   if (!productName || !productDescription || !selectedSubcategory) {
     return toast.error('All product fields are required');
   }
@@ -331,7 +382,7 @@ async function handleAddProduct({ imageType, file, url }) {
     let finalImageURL = '';
 
     if (imageType === "file") {
-      if (!file) return toast.error("Please select an image file.");
+      if (!file) return toast.error("Please select a main image file.");
 
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
@@ -354,13 +405,45 @@ async function handleAddProduct({ imageType, file, url }) {
       finalImageURL = url;
     }
 
+    // Loop through direct image files for other images and upload to Supabase storage
+    const uploadedOtherUrls = [];
+    if (otherImageFiles && otherImageFiles.length > 0) {
+      for (let i = 0; i < otherImageFiles.length; i++) {
+        const fileItem = otherImageFiles[i];
+        toast.loading(`Uploading additional image ${i + 1} of ${otherImageFiles.length}...`, { id: toastId });
+
+        const fileExt = fileItem.name.split('.').pop();
+        const safeName = fileItem.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const fileName = `products/other/${Date.now()}-${i}-${safeName}`;
+
+        const { error: uploadErr } = await supabase.storage
+          .from('product-images')
+          .upload(fileName, fileItem);
+
+        if (uploadErr) {
+          throw new Error(`Failed to upload ${fileItem.name}: ${uploadErr.message}`);
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(fileName);
+
+        uploadedOtherUrls.push(publicUrl);
+      }
+    }
+
+    const allOtherImages = [
+      ...otherImages.filter(Boolean),
+      ...uploadedOtherUrls,
+    ];
+
     await addProduct({
       name: productName,
       article_no: articleNo,
       description: productDescription,
       img_src: finalImageURL,
       subcategory: selectedSubcategory,
-      other_images: otherImages.filter(Boolean),
+      other_images: allOtherImages,
     });
 
     // Reset fields
@@ -370,7 +453,7 @@ async function handleAddProduct({ imageType, file, url }) {
     setSelectedSubcategory('');
     setProductImageFile(null);
     setOtherImages([]);
-
+    setOtherImageFiles([]);
 
     toast.success('Product added successfully!', { id: toastId });
     fetchProducts();
@@ -619,7 +702,9 @@ if (!isAuthenticated) {
     handleUpdateProduct={handleUpdateProduct}
     handleDeleteProduct={handleDeleteProduct}
       otherImages={otherImages}
-  setOtherImages={setOtherImages}
+      setOtherImages={setOtherImages}
+      otherImageFiles={otherImageFiles}
+      setOtherImageFiles={setOtherImageFiles}
   />
 
 

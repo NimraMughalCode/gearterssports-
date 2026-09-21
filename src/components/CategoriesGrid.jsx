@@ -9,18 +9,18 @@ import Image from "next/image";
 const CATEGORIES_VIEWED_KEY = "categories-grid-viewed";
 
 export default function CategoriesGrid() {
-    const dispatch = useDispatch()
+  const dispatch = useDispatch()
   const [visible, setVisible] = useState(false);
   const sectionRef = useRef(null);
   const router = useRouter();
 
 
-   const { categories, loading, fetched } = useSelector(
+  const { categories, loading, fetched } = useSelector(
     (state) => state.categories
   );
 
   useEffect(() => {
-     if (!fetched) {
+    if (!fetched) {
       dispatch(fetchCategories());
     }
   }, [dispatch, fetched]);
@@ -67,6 +67,8 @@ export default function CategoriesGrid() {
               p-2
               md:p-6
               rounded-2xl
+              min-w-[96px]
+              min-h-[110px]
               w-full
               h-full
               flex flex-col
@@ -82,25 +84,23 @@ export default function CategoriesGrid() {
               cursor-pointer
             "
           >
-            {/* <div className="max-w-80 h-auto rounded-xl overflow-hidden border-2 border-[#FCA600] shadow-md">
-              <img src={cat.img_src} alt={cat.title} className="w-full h-full object-cover" />
-            </div> */}
 
 
 
 
 
 
-<div className="relative  rounded-xl overflow-hidden border-2 border-[#FCA600] shadow-md">
-  {/* Main Image */}
-  <img
-    src={cat.img_src}
-    alt={cat.title}
-    className="w-full h-full object-cover         pointer-events-none"
-  />
 
-  {/* Watermark */}
-  <div     className="
+            <div className="relative  rounded-xl overflow-hidden border-2 border-[#FCA600] shadow-md">
+              {/* Main Image */}
+              <img
+                src={cat.img_src}
+                alt={cat.title}
+                className="w-full h-full object-cover         pointer-events-none"
+              />
+
+              {/* Watermark */}
+              <div className="
         absolute
         bottom-1
     right-1
@@ -111,19 +111,19 @@ export default function CategoriesGrid() {
         p-1
         pointer-events-none
     bg-black  "
-    >
-    <Image
-      src="/logo-trans.png"
-      alt="Gearters Logo"
-      width={80}
-      height={80}
-      className="
+              >
+                <Image
+                  src="/logo-trans.png"
+                  alt="Gearters Logo"
+                  width={80}
+                  height={80}
+                  className="
 
         pointer-events-none
       "
-    />
-  </div>
-</div>
+                />
+              </div>
+            </div>
 
             <p className="mt-4 text-sm   sm:text-xl font-semibold">{cat.title}</p>
           </div>
