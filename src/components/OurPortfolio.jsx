@@ -89,7 +89,7 @@ useEffect(() => {
   return (
     <div
       ref={sectionRef}
-      className={`relative flex flex-col items  -center justify-center w-full max-w-full p-6 md:p-16 text-white bg-[#121212] font-sans overflow-x-hidden transition-all duration-1000 ease-out
+      className={`relative flex flex-col items-center justify-center w-full max-w-full p-6 md:p-16 text-current dark:bg-[#121212] bg-[#F4EFE6] font-sans overflow-x-hidden transition-colors duration-300
       ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8 pointer-events-none"}`}
     >
 

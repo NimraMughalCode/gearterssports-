@@ -22,7 +22,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-black text-white py-[72px] px-6 font-sans font-medium">
+    <footer className="dark:bg-black bg-[#F3ECE1] text-current py-[72px] px-6 font-sans font-medium border-t border-[#FCA600]/20 transition-colors duration-300">
       <div className="max-w-7xl mx-auto flex flex-col items-center space-y-6">
         
         {/* Logo */}
@@ -38,32 +38,30 @@ export default function Footer() {
         {/* Navigation */}
         <ul className="flex font-extralight flex-wrap justify-center gap-6 text-sm font-medium">
           <li>
-            <a href="/" className="hover:text-[#FCA600]  transition-colors">
+            <a href="/" className="hover:text-[#FCA600] transition-colors">
               Home
             </a>
           </li>
           <li>
-               <Link
-    href="/products"
-    className="text-white hover:text-[#FCA600]"
-  >
-    Products
-  </Link>
+            <Link
+              href="/products"
+              className="hover:text-[#FCA600] transition-colors"
+            >
+              Products
+            </Link>
           </li>
-
-          
           <li>
             <a href="/about" className="hover:text-[#FCA600] transition-colors">
               About Us
             </a>
           </li>
           <li>
-         <a
-    href="/contact"
-    className=  "text-white hover:text-[#FCA600]"
-  >
-    Contact
-  </a>
+            <a
+              href="/contact"
+              className="hover:text-[#FCA600] transition-colors"
+            >
+              Contact
+            </a>
           </li>
         </ul>
 

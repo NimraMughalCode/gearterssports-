@@ -588,7 +588,7 @@ console.log("got this file path",filePath);
 
 if (!isAuthenticated) {
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
+    <div className="admin-container dark min-h-screen bg-gray-900 text-white p-8">
       <h1 className="text-2xl font-bold text-red-500">Access Denied</h1>
     </div>
   );
@@ -596,7 +596,7 @@ if (!isAuthenticated) {
 
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8 space-y-12">
+    <div className="admin-container dark min-h-screen bg-gray-900 text-white p-8 space-y-12">
 <div className="flex justify-between items-center mb-8">
   <h1 className="text-3xl font-bold text-yellow-400">Admin Panel</h1>
   <button

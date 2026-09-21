@@ -71,7 +71,7 @@ export default function ContactBoxingBusiness() {
   const onSubmit = async (data) => {
     // ⬅️ 3. Get token from reCAPTCHA
     const token = recaptchaRef.current?.getValue();
-    
+
     if (!token) {
       toast.error("Please complete the reCAPTCHA verification!");
       return;
@@ -83,7 +83,7 @@ export default function ContactBoxingBusiness() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // ⬅️ 4. Pass the token over to your back-end handler
-        body: JSON.stringify({ ...data, gRecaptchaToken: token }), 
+        body: JSON.stringify({ ...data, gRecaptchaToken: token }),
       });
 
       const result = await response.json();
@@ -107,7 +107,7 @@ export default function ContactBoxingBusiness() {
     <section
       id="contact"
       ref={sectionRef}
-      className="bg-black text-white  flex justify-center items-center"
+      className="dark:bg-black bg-transparent text-current flex justify-center items-center overflow-hidden transition-colors duration-300"
     >
       <Toaster position="top-right" />
       <div className="max-w-6xl w-full flex flex-col md:flex-row p-4 md:p-0 transform md:-skew-x-6">
@@ -117,25 +117,37 @@ export default function ContactBoxingBusiness() {
           className={`md:w-1/2 skew-x-0 md:skew-x-6 aspect-[3/2] relative transition-all duration-1000 ease-out
             ${leftVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-16 pointer-events-none'}`}
         >
-          <Image
-            src="/contact.jpg"
-            alt="Boxer"
-            fill
-            className="object-contain"
-          />
+          {/* Dark theme contact image */}
+          <div className="hidden dark:block w-full h-full relative">
+            <Image
+              src="/contact.jpg"
+              alt="Boxer Contact"
+              fill
+              className="object-contain"
+            />
+          </div>
+          {/* Light theme contact image */}
+          <div className="block dark:hidden w-full h-full relative">
+            <Image
+              src="/contact-light.jpg"
+              alt="Combat Sports Contact"
+              fill
+              className="object-contain drop-shadow-[0_15px_30px_rgba(198,125,0,0.15)]"
+            />
+          </div>
         </div>
 
         {/* Right Side Form */}
         <div
           ref={rightRef}
-          className={`md:w-1/2 bg-black  md:px-8  py-2 flex flex-col justify-center skew-x-0 md:skew-x-6 transition-all duration-1000 ease-out
+          className={`md:w-1/2 dark:bg-black bg-transparent md:px-8 py-2 flex flex-col justify-center skew-x-0 md:skew-x-6 transition-all duration-1000 ease-out
             ${rightVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-16 pointer-events-none'}`}
         >
-          <h1 className="  text-3xl md:text-4xl font-bold text-white leading-tight">
+          <h1 className="text-3xl md:text-4xl font-bold dark:text-white text-[#18181B] leading-tight">
             Let’s Talk
             <span style={{ color: "#FCA600" }}> Boxing Business</span>
           </h1>
-          <p className="text-gray-300 my-4 text-sm tracking-wide font-medium">
+          <p className="dark:text-gray-300 text-[#494540] my-4 text-sm tracking-wide font-medium">
             Export Worldwide | Premium Quality | Custom Orders
           </p>
 
@@ -146,7 +158,7 @@ export default function ContactBoxingBusiness() {
                   {...register("name", { required: "Name is required" })}
                   type="text"
                   placeholder="Your Name..."
-                  className="w-full  rounded-lg bg-black border border-gray-600 text-white px-4 py-2 placeholder-gray-400 outline-none font-light"
+                  className="w-full rounded-lg dark:bg-black bg-white border dark:border-gray-600 border-[#C67D00]/30 dark:text-white text-[#18181B] px-4 py-2 placeholder-gray-400 outline-none font-light shadow-sm focus:border-[#FCA600]"
                 />
                 {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name.message}</p>}
               </div>
@@ -155,7 +167,7 @@ export default function ContactBoxingBusiness() {
                   {...register("phone", { required: "Phone number is required" })}
                   type="text"
                   placeholder="Your Phone..."
-                  className="w-full   rounded-lg bg-black border border-gray-600 text-white px-4 py-2 placeholder-gray-400 outline-none font-light"
+                  className="w-full rounded-lg dark:bg-black bg-white border dark:border-gray-600 border-[#C67D00]/30 dark:text-white text-[#18181B] px-4 py-2 placeholder-gray-400 outline-none font-light shadow-sm focus:border-[#FCA600]"
                 />
                 {errors.phone && <p className="text-red-400 text-sm mt-1">{errors.phone.message}</p>}
               </div>
@@ -172,7 +184,7 @@ export default function ContactBoxingBusiness() {
                 })}
                 type="email"
                 placeholder="Your Email Address..."
-                className="w-full rounded-lg  bg-black border border-gray-600 text-white px-4 py-2 placeholder-gray-400 outline-none font-light"
+                className="w-full rounded-lg dark:bg-black bg-white border dark:border-gray-600 border-[#C67D00]/30 dark:text-white text-[#18181B] px-4 py-2 placeholder-gray-400 outline-none font-light shadow-sm focus:border-[#FCA600]"
               />
               {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>}
             </div>
@@ -182,7 +194,7 @@ export default function ContactBoxingBusiness() {
                 {...register("message", { required: "Message is required" })}
                 placeholder="Write here..."
                 rows={4}
-                className="w-full  rounded-lg bg-black border border-gray-600 text-white px-4 py-2 placeholder-gray-400 outline-none resize-none font-light"
+                className="w-full rounded-lg dark:bg-black bg-white border dark:border-gray-600 border-[#C67D00]/30 dark:text-white text-[#18181B] px-4 py-2 placeholder-gray-400 outline-none resize-none font-light shadow-sm focus:border-[#FCA600]"
               ></textarea>
               {errors.message && (
                 <p className="text-red-400 text-sm mt-1">{errors.message.message}</p>
@@ -194,7 +206,7 @@ export default function ContactBoxingBusiness() {
               <ReCAPTCHA
                 ref={recaptchaRef}
                 theme="dark" // Matches your black layout perfectly
-                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} 
+                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
               />
             </div>
 

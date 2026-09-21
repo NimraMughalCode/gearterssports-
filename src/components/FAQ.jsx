@@ -92,13 +92,13 @@ export default function FAQs() {
     <div
       id="faq"
       ref={sectionRef}
-      className={`bg-black text-white px-4 py-16 font-sans transition-all duration-1000 ease-out
+      className={`dark:bg-black bg-transparent text-current px-4 py-16 font-sans transition-colors duration-300
         ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}
     >
       <div className="max-w-4xl mx-auto">
    
 
-         <h1 className="text-center  mb-10 text-3xl md:text-4xl font-bold text-white leading-tight">
+         <h1 className="text-center mb-10 text-3xl md:text-4xl font-bold leading-tight">
                     Frequently Asked
                     <span style={{ color: "#FCA600" }}> Questions</span>
                   </h1>
@@ -106,14 +106,14 @@ export default function FAQs() {
           <div
             key={faq.question}
             ref={itemRefs.current[idx]}
-            className={`mb-6 border-b border-gray-700 pb-4 transition-all duration-700 ease-out
+            className={`mb-6 border-b dark:border-gray-700 border-[#C67D00]/20 pb-4 transition-all duration-700 ease-out
               ${itemVis[idx] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}
           >
             <button
               className="flex items-center justify-between w-full text-left focus:outline-none"
               onClick={() => toggleIndex(idx)}
             >
-              <span className=" font-medium text-sm text-white">
+              <span className="font-semibold text-sm md:text-base text-current">
                 {faq.question}
               </span>
               <span className="ml-4">

@@ -2,20 +2,125 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---------------------------------------------------- */
+/* 🌟 LUXURY CHAMPAGNE & OBSIDIAN THEME DESIGN TOKENS 🌟 */
+/* ---------------------------------------------------- */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* LIGHT MODE: Warm Champagne & Pearl Ivory Luxe */
+  --bg-page: #FAF7F2;
+  --bg-card: #FFFFFF;
+  --bg-card-subtle: #F4EFE6;
+  --bg-header: rgba(250, 247, 242, 0.88);
+  --bg-header-scrolled: rgba(250, 247, 242, 0.96);
+  --bg-footer: #F3ECE1;
+  --text-primary: #18181B;
+  --text-secondary: #494540;
+  --text-muted: #78716C;
+  --accent-gold: #C67D00;
+  --accent-gold-hover: #A76900;
+  --accent-gold-light: rgba(198, 125, 0, 0.12);
+  --border-gold: rgba(198, 125, 0, 0.45);
+  --border-card: rgba(198, 125, 0, 0.20);
+  --shadow-card: 0 10px 25px -3px rgba(198, 125, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark {
+  /* DARK MODE: Obsidian Black & Amber Gold */
+  --bg-page: #000000;
+  --bg-card: #111111;
+  --bg-card-subtle: #161616;
+  --bg-header: rgba(0, 0, 0, 0.70);
+  --bg-header-scrolled: rgba(0, 0, 0, 0.90);
+  --bg-footer: #000000;
+  --text-primary: #FFFFFF;
+  --text-secondary: #D1D5DB;
+  --text-muted: #9CA3AF;
+  --accent-gold: #FCA600;
+  --accent-gold-hover: #E59500;
+  --accent-gold-light: rgba(252, 166, 0, 0.15);
+  --border-gold: rgba(252, 166, 0, 0.45);
+  --border-card: rgba(252, 166, 0, 0.20);
+  --shadow-card: 0 10px 30px -5px rgba(252, 166, 0, 0.12);
+}
+
+html {
+  overflow-x: hidden;
+  max-width: 100%;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  overflow-x: hidden;
+  max-width: 100%;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ------------------------------------------------------------------ */
+/* ⚜️ USER-FACING LIGHT THEME ADAPTATIONS (Champagne & Pearl Luxe) ⚜️ */
+/* ------------------------------------------------------------------ */
+
+/* Convert dark black backgrounds to warm champagne on user-facing pages */
+html:not(.dark) main,
+html:not(.dark) .bg-black:not(.admin-container *) {
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+}
+
+/* Elevated Pearl White Cards with Golden Shadows */
+html:not(.dark) .bg-\[\#111\]:not(.admin-container *),
+html:not(.dark) .bg-\[\#0f0f0f\]:not(.admin-container *) {
+  background-color: var(--bg-card);
+  box-shadow: var(--shadow-card);
+  border-color: var(--border-card);
+}
+
+/* Light mode text contrast */
+html:not(.dark) .text-white:not(.admin-container *):not(.keep-white) {
+  color: var(--text-primary);
+}
+
+html:not(.dark) .text-gray-300:not(.admin-container *),
+html:not(.dark) .text-gray-400:not(.admin-container *) {
+  color: var(--text-secondary);
+}
+
+/* Deep burnished gold accents for AAA contrast */
+html:not(.dark) .text-\[\#FCA600\]:not(.admin-container *) {
+  color: var(--accent-gold);
+}
+
+html:not(.dark) .border-\[\#FCA600\]:not(.admin-container *) {
+  border-color: var(--accent-gold);
+}
+
+html:not(.dark) .border-\[\#FCA600\]\/20:not(.admin-container *) {
+  border-color: var(--border-card);
+}
+
+/* Header & Navigation in Light Mode */
+html:not(.dark) header:not(.admin-container *) {
+  background-color: var(--bg-header-scrolled) !important;
+  border-bottom: 1px solid var(--border-card);
+  box-shadow: 0 4px 20px -2px rgba(198, 125, 0, 0.07);
+}
+
+/* Footer in Light Mode */
+html:not(.dark) footer:not(.admin-container *) {
+  background-color: var(--bg-footer) !important;
+  border-top: 1px solid var(--border-card);
+}
+
+/* Buttons with gold borders or fills */
+html:not(.dark) .hover\:bg-\[\#FCA600\]:hover:not(.admin-container *) {
+  background-color: var(--accent-gold) !important;
+  color: #FFFFFF !important;
+}
+
+html:not(.dark) .bg-\[\#FCA600\]:not(.admin-container *) {
+  background-color: var(--accent-gold) !important;
+  color: #FFFFFF !important;
 }

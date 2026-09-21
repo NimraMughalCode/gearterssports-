@@ -114,7 +114,7 @@ function Products() {
   return (
     <div
       ref={sectionRef}
-      className={`bg-black text-white min-h-screen p-2 md:p-[70px] transition-all duration-1000 ease-out
+      className={`dark:bg-black bg-transparent text-current min-h-screen p-2 md:p-[70px] transition-colors duration-300
         ${
           visible
             ? "opacity-100 translate-y-0"

@@ -149,7 +149,7 @@ function Products() {
 
   // ------------------ UI ------------------
   return (
-    <div className="bg-black text-white min-h-screen p-2 md:p-[70px] transition-all duration-1000 ease-out">
+    <div className="dark:bg-black bg-transparent text-current min-h-screen p-2 md:p-[70px] transition-colors duration-300">
       {/* HEADER */}
 <div className="flex flex-col gap-4 mb-10 md:flex-row md:items-center md:justify-between">
   {/* Back Button */}
@@ -191,8 +191,8 @@ function Products() {
       value={searchTerm}
       onChange={(e) => setSearchTerm(e.target.value)}
       placeholder="Search products..."
-      className="w-full h-[44px] bg-black border border-gray-600 text-white px-4 rounded-md
-                 focus:outline-none focus:border-[#FCA600]"
+      className="w-full h-[44px] dark:bg-black bg-white border dark:border-gray-600 border-[#C67D00]/30 dark:text-white text-[#18181B] px-4 rounded-md
+                 focus:outline-none focus:border-[#FCA600] shadow-sm"
     />
   </div>
 
@@ -200,8 +200,8 @@ function Products() {
   <select
     value={selectedCategory}
     onChange={(e) => setSelectedCategory(e.target.value)}
-    className="w-full md:w-[220px] h-[44px] bg-black border border-gray-600 text-white px-4 rounded-md
-               focus:outline-none focus:border-[#FCA600]"
+    className="w-full md:w-[220px] h-[44px] dark:bg-black bg-white border dark:border-gray-600 border-[#C67D00]/30 dark:text-white text-[#18181B] px-4 rounded-md
+               focus:outline-none focus:border-[#FCA600] shadow-sm"
   >
     <option value="all">All Categories</option>
     {categories.map((c) => (
@@ -215,8 +215,8 @@ function Products() {
   <select
     value={selectedSubcategory}
     onChange={(e) => setSelectedSubcategory(e.target.value)}
-    className="w-full md:w-[220px] h-[44px] bg-black border border-gray-600 text-white px-4 rounded-md
-               focus:outline-none focus:border-[#FCA600]"
+    className="w-full md:w-[220px] h-[44px] dark:bg-black bg-white border dark:border-gray-600 border-[#C67D00]/30 dark:text-white text-[#18181B] px-4 rounded-md
+               focus:outline-none focus:border-[#FCA600] shadow-sm"
   >
     <option value="all">All Subcategories</option>
     {availableSubcategories.map((sub) => (

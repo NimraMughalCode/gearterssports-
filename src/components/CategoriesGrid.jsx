@@ -50,20 +50,21 @@ export default function CategoriesGrid() {
   return (
     <div
       ref={sectionRef}
-      className={`bg-black text-white p-6 md:p-16 transition-all duration-1000 ease-out
+      className={`dark:bg-black bg-transparent text-current p-6 md:p-16 transition-all duration-1000 ease-out
       ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
     >
-      <h1 className="text-center mb-10 text-3xl md:text-4xl font-bold text-white leading-tight">
+      <h1 className="text-center mb-10 text-3xl md:text-4xl font-bold leading-tight">
         Our <span className="text-[#FCA600]">Categories</span>
       </h1>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4  gap-4 md:gap-10 place-items-center">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-10 place-items-center">
         {categories.map((cat) => (
           <div
             key={cat.id}
             onClick={() => router.push(`/categoryproducts?category=${cat.title}`)}
             className="
-              bg-[#111]
+              dark:bg-[#111]
+              bg-white
               p-2
               md:p-6
               rounded-2xl
@@ -75,9 +76,10 @@ export default function CategoriesGrid() {
               items-center
               text-center
               shadow-lg
-              border border-[#FCA600]/20
+              border border-[#FCA600]/30
               hover:border-[#FCA600]
-              hover:shadow-[#FCA600]/40
+              dark:hover:shadow-[#FCA600]/40
+              hover:shadow-[0_10px_25px_rgba(198,125,0,0.18)]
               hover:scale-[1.05]
               transition
               duration-300

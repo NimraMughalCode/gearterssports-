@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import FloatingWhatsApp from "@/components/WhatsAppFloating";
 import { Toaster } from 'react-hot-toast';
 import ReduxProvider from "@/ReduxToolkit/Provider";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -45,17 +46,39 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning className="dark">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var savedTheme = localStorage.getItem('gearters-theme');
+                  if (savedTheme === 'light') {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.classList.add('light');
+                  } else {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.classList.remove('light');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body
-        className={`${inter.variable} antialiased bg-white`}
+        className={`${inter.variable} antialiased`}
       >
       <ReduxProvider>
-        <Toaster position="top-right" />
-        <Header />
-          <main className="mt-[90px]">{children}</main>
-        <Footer />
-        <FloatingWhatsApp />
-     </ReduxProvider>
+        <ThemeProvider>
+          <Toaster position="top-right" />
+          <Header />
+          <main className="mt-[90px] w-full overflow-x-hidden">{children}</main>
+          <Footer />
+          <FloatingWhatsApp />
+        </ThemeProvider>
+      </ReduxProvider>
       </body>
     </html>
   );

@@ -8,18 +8,18 @@ export default function ProductViewClient({ product }) {
   const [activeImage, setActiveImage] = useState(product.img_src);
 
   return (
-    <div className="min-h-screen bg-black text-white px-4 md:px-10 py-10">
+    <div className="min-h-screen dark:bg-black bg-transparent text-current px-4 md:px-10 py-10 transition-colors duration-300">
       
       {/* Back Button */}
       <button
         onClick={() => router.back()}
-        className="mb-8 border-2 border-[#FCA600] rounded-lg text-[#FCA600] px-6 py-3 hover:bg-[#FCA600] hover:text-black transition font-medium"
+        className="mb-8 border-2 border-[#FCA600] rounded-lg text-[#FCA600] px-6 py-3 hover:bg-[#FCA600] hover:text-black transition font-medium shadow-sm"
       >
         ← Back
       </button>
 
       {/* Card */}
-      <div className="max-w-5xl mx-auto bg-[#0f0f0f] rounded-2xl p-6 md:p-10 flex flex-col md:flex-row gap-10 shadow-lg">
+      <div className="max-w-5xl mx-auto dark:bg-[#0f0f0f] bg-white rounded-2xl p-6 md:p-10 flex flex-col md:flex-row gap-10 shadow-lg border border-[#FCA600]/20">
 
         {/* Image Section */}
         <div
@@ -27,7 +27,7 @@ export default function ProductViewClient({ product }) {
           onContextMenu={(e) => e.preventDefault()}
         >
           {/* Main Image */}
-          <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-black border-2 border-[#FCA600]">
+          <div className="relative w-full aspect-square rounded-xl overflow-hidden dark:bg-black bg-white border-2 border-[#FCA600] shadow-md">
             <img
               src={activeImage}
               alt={product.name}

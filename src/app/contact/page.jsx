@@ -55,7 +55,7 @@ export default function Contact() {
   return (
     <section
       ref={sectionRef}
-      className="bg-black text-white py-16 flex flex-col gap-8 font-sans"
+      className="dark:bg-black bg-transparent text-current py-16 flex flex-col gap-8 font-sans transition-colors duration-300"
     >
       <div className="container px-2 md:px-[70px]">
         <div
