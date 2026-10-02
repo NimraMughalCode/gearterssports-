@@ -155,18 +155,26 @@ export async function POST(req, { params }) {
         .eq("id", recipientId)
         .single();
 
-      if (recError) throw recError;
-
       // Compile content
       const htmlContent = compileTemplate(campaign.template_html, recipient);
+      const isDirectMode = campaign.template_html?.includes("DIRECT_OUTREACH");
 
       try {
-        const { data: sendData, error: sendError } = await resend.emails.send({
-          from: "info@gearterssports.com",
+        const emailPayload = {
+          from: "Gearters Sports <info@gearterssports.com>",
           to: recipient.email,
           subject: campaign.subject,
           html: htmlContent,
-        });
+        };
+
+        if (!isDirectMode) {
+          emailPayload.headers = {
+            "List-Unsubscribe": `<https://www.gearterssports.com/api/campaigns/unsubscribe?email=${encodeURIComponent(recipient.email)}>`,
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+          };
+        }
+
+        const { data: sendData, error: sendError } = await resend.emails.send(emailPayload);
 
         if (sendError || !sendData?.id) {
           throw new Error(sendError?.message || "Failed to dispatch email");
@@ -245,13 +253,24 @@ export async function POST(req, { params }) {
         .update({ status: "processing" })
         .eq("id", id);
 
+      const isDirectMode = campaign.template_html?.includes("DIRECT_OUTREACH");
+
       // Prepare batch emails
-      const batchPayload = recipients.map((r) => ({
-        from: "info@gearterssports.com",
-        to: r.email,
-        subject: campaign.subject,
-        html: compileTemplate(campaign.template_html, r),
-      }));
+      const batchPayload = recipients.map((r) => {
+        const item = {
+          from: "Gearters Sports <info@gearterssports.com>",
+          to: r.email,
+          subject: campaign.subject,
+          html: compileTemplate(campaign.template_html, r),
+        };
+        if (!isDirectMode) {
+          item.headers = {
+            "List-Unsubscribe": `<https://www.gearterssports.com/api/campaigns/unsubscribe?email=${encodeURIComponent(r.email)}>`,
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+          };
+        }
+        return item;
+      });
 
       console.log("Resend API Key loaded:", process.env.RESEND_API_KEY ? `${process.env.RESEND_API_KEY.substring(0, 7)}...` : "NOT FOUND");
       console.log("Preparing Resend Batch Send. Recipient count:", batchPayload.length);

@@ -56,3 +56,37 @@ export async function GET(req) {
     return new Response("An error occurred while unsubscribing.", { status: 500 });
   }
 }
+
+// POST /api/campaigns/unsubscribe - Handles RFC 8058 One-Click Unsubscribe requests from mail clients
+export async function POST(req) {
+  try {
+    const url = new URL(req.url);
+    const email = url.searchParams.get("email");
+
+    if (!email) {
+      return new Response(JSON.stringify({ error: "Missing email parameter" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    const { error } = await supabase
+      .from("email_suppressions")
+      .upsert([{ email: email.toLowerCase(), reason: "one_click_unsubscribe" }], {
+        onConflict: "email",
+      });
+
+    if (error) throw error;
+
+    return new Response(JSON.stringify({ success: true, unsubscribed: email }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" }
+    });
+  } catch (error) {
+    console.error("One-click unsubscribe error:", error);
+    return new Response(JSON.stringify({ error: "Error processing unsubscribe" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+}

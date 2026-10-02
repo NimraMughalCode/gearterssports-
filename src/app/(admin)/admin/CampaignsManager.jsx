@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Icon } from "@iconify/react";
 import toast from "react-hot-toast";
-import { templates } from "@/app/utils/emailTemplates";
+import { renderGeartersEmail } from "@/app/utils/emailTemplates";
 
 export default function CampaignsManager() {
   const [campaigns, setCampaigns] = useState([]);
@@ -13,14 +13,10 @@ export default function CampaignsManager() {
   
   // Form states for creating campaign
   const [isCreating, setIsCreating] = useState(false);
+  const [emailMode, setEmailMode] = useState("direct"); // "direct" = Primary Tab Outreach, "branded" = Official Visual Template
   const [campaignName, setCampaignName] = useState("");
   const [subject, setSubject] = useState("");
-  const [selectedTemplateId, setSelectedTemplateId] = useState("standard");
-  const [headingText, setHeadingText] = useState("");
   const [bodyText, setBodyText] = useState("");
-  const [btnText, setBtnText] = useState("");
-  const [btnUrl, setBtnUrl] = useState("");
-  const [promoImgUrl, setPromoImgUrl] = useState("");
   
   // CSV / List Upload states
   const [manualEmails, setManualEmails] = useState("");
@@ -111,7 +107,8 @@ export default function CampaignsManager() {
 
     const headers = lines[0].split(",").map(h => h.trim().toLowerCase().replace(/["']/g, ''));
     const emailIdx = headers.findIndex(h => h.includes("email") || h.includes("mail"));
-    const firstNameIdx = headers.findIndex(h => h.includes("first") || (h.includes("name") && !h.includes("last")));
+    const nameIdx = headers.findIndex(h => h === "name" || h.includes("contact") || h.includes("full") || (h.includes("name") && !h.includes("first") && !h.includes("last")));
+    const firstNameIdx = headers.findIndex(h => h.includes("first"));
     const lastNameIdx = headers.findIndex(h => h.includes("last"));
 
     if (emailIdx === -1) {
@@ -126,12 +123,22 @@ export default function CampaignsManager() {
       const email = row[emailIdx];
       if (!email) continue;
 
-      const firstName = firstNameIdx !== -1 && row[firstNameIdx] ? row[firstNameIdx] : "Customer";
+      let name = "";
+      if (nameIdx !== -1 && row[nameIdx]) {
+        name = row[nameIdx];
+      } else if (firstNameIdx !== -1 && row[firstNameIdx]) {
+        name = row[firstNameIdx] + (lastNameIdx !== -1 && row[lastNameIdx] ? ` ${row[lastNameIdx]}` : "");
+      } else {
+        name = "Customer";
+      }
+
+      const firstName = firstNameIdx !== -1 && row[firstNameIdx] ? row[firstNameIdx] : name.split(" ")[0] || "Customer";
       const lastName = lastNameIdx !== -1 && row[lastNameIdx] ? row[lastNameIdx] : "";
 
       result.push({
         email: email,
         metadata: {
+          name: name,
           first_name: firstName,
           last_name: lastName
         }
@@ -144,13 +151,14 @@ export default function CampaignsManager() {
   const handleManualEmailsParse = () => {
     if (!manualEmails.trim()) return [];
     
-    // Match line-by-line emails
+    // Match line-by-line or comma-separated emails
     const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
     const matches = manualEmails.match(emailRegex) || [];
     
     const parsed = matches.map(email => ({
       email: email.trim().toLowerCase(),
       metadata: {
+        name: "Customer",
         first_name: "Customer",
         last_name: ""
       }
@@ -162,7 +170,7 @@ export default function CampaignsManager() {
   const handleCreateCampaign = async (e) => {
     e.preventDefault();
     if (!campaignName || !subject || !bodyText) {
-      return toast.error("Please fill in campaign name, subject, and content.");
+      return toast.error("Please fill in campaign name, subject, and email content.");
     }
 
     let finalRecipients = [];
@@ -178,18 +186,11 @@ export default function CampaignsManager() {
       return toast.error("Please upload a CSV or write manual emails in the list.");
     }
 
-    // Get the HTML blueprint from template file
-    const selectedTemplate = templates.find(t => t.id === selectedTemplateId) || templates[0];
-    const compiledBody = selectedTemplateId === "custom_html" 
-      ? bodyText 
-      : bodyText.replace(/\n/g, "<br>");
-
-    const compiledBaseHtml = selectedTemplate.getHtml({
-      subject,
-      bodyHtml: compiledBody,
-      buttonText: btnText,
-      buttonUrl: btnUrl,
-      promoImageUrl: promoImgUrl
+    // Render the base template with the user's content (leaves {{{name}}} and {{{email}}} for recipient compilation)
+    const compiledBaseHtml = renderGeartersEmail({
+      mode: emailMode,
+      content: bodyText,
+      subject: subject
     });
 
     const loadingId = toast.loading("Saving campaign and processing recipient list...");
@@ -212,9 +213,6 @@ export default function CampaignsManager() {
         setCampaignName("");
         setSubject("");
         setBodyText("");
-        setBtnText("");
-        setBtnUrl("");
-        setPromoImgUrl("");
         setManualEmails("");
         setCsvFile(null);
         setCsvRecipients([]);
@@ -267,7 +265,7 @@ export default function CampaignsManager() {
         remaining = data.remaining;
         setSendProgress({ sent, total, remaining });
         
-        // Introduce small 1.5s delay to keep inside rate limits safely
+        // Delay to respect rate limits safely
         await new Promise(resolve => setTimeout(resolve, 1500));
       } catch (err) {
         console.error(err);
@@ -460,7 +458,7 @@ export default function CampaignsManager() {
               <thead className="bg-gray-850 text-gray-300 text-left font-semibold">
                 <tr>
                   <th className="px-6 py-4">Email</th>
-                  <th className="px-6 py-4">First Name</th>
+                  <th className="px-6 py-4">Name</th>
                   <th className="px-6 py-4">Status</th>
                   <th className="px-6 py-4">Sent At</th>
                   <th className="px-6 py-4">Delivered At</th>
@@ -479,7 +477,7 @@ export default function CampaignsManager() {
                   recipients.map((rec) => (
                     <tr key={rec.id} className="hover:bg-gray-850/40">
                       <td className="px-6 py-4 font-medium text-white">{rec.email}</td>
-                      <td className="px-6 py-4">{rec.metadata?.first_name || "—"}</td>
+                      <td className="px-6 py-4">{rec.metadata?.name || rec.metadata?.first_name || "—"}</td>
                       <td className="px-6 py-4">
                         <span className={`text-[10px] px-2 py-0.5 rounded uppercase font-bold ${getStatusColor(rec.status)}`}>
                           {rec.status}
@@ -528,30 +526,18 @@ export default function CampaignsManager() {
     );
   }
 
-  // Create Campaign modal/panel view
+  // Create Campaign view
   if (isCreating) {
     const getPreviewHtml = () => {
-      const selectedTemplate = templates.find(t => t.id === selectedTemplateId) || templates[0];
-      let previewBody = bodyText;
-      
-      // If standard template, convert newlines to <br> to preview correctly
-      if (selectedTemplateId === "standard") {
-        previewBody = bodyText.replace(/\n/g, "<br>");
-      }
-      
-      const rawHtml = selectedTemplate.getHtml({
-        subject: subject || "Gearters Sports Update",
-        bodyHtml: previewBody,
-        buttonText: btnText,
-        buttonUrl: btnUrl,
-        promoImageUrl: promoImgUrl
+      return renderGeartersEmail({
+        mode: emailMode,
+        name: "Coach Mike",
+        email: "coach.mike@example.com",
+        content: bodyText || (emailMode === "direct" 
+          ? "Hope you're having a good week.\n\nI wanted to reach out directly to check who handles boxing equipment orders for your club. We manufacture professional gloves and gear directly out of Sialkot, Pakistan.\n\nWould you be open to checking out a sample pair for your trainers to test?"
+          : "We are pleased to introduce our export department's premier catalog of world-class boxing gloves, training equipment, and custom apparel manufactured in Sialkot, Pakistan.\n\nReply directly to this email or contact us via WhatsApp to request wholesale pricing."),
+        subject: subject || (emailMode === "direct" ? "quick question for your gym" : "Gearters Sports - World Class Boxing Gear")
       });
-      
-      // Replace merge tags for preview
-      return rawHtml
-        .replace(/{{first_name}}/g, "John")
-        .replace(/{{last_name}}/g, "Doe")
-        .replace(/{{email}}/g, "john.doe@example.com");
     };
 
     return (
@@ -572,114 +558,130 @@ export default function CampaignsManager() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Form (Col-span 7) */}
           <form onSubmit={handleCreateCampaign} className="lg:col-span-7 space-y-6 text-sm text-gray-300">
+            
+            {/* Delivery Mode Selector (Option A vs Option B) */}
+            <div className="bg-gray-900 p-5 rounded-xl border border-gray-800 space-y-3">
+              <label className="block text-gray-400 font-semibold text-xs uppercase tracking-wider">
+                Select Delivery Mode & Layout
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Option A: Direct B2B Outreach */}
+                <div
+                  onClick={() => setEmailMode("direct")}
+                  className={`p-4 rounded-xl border cursor-pointer transition flex flex-col justify-between ${
+                    emailMode === "direct"
+                      ? "bg-yellow-500/10 border-yellow-500 text-white shadow-lg shadow-yellow-500/5"
+                      : "bg-black/40 border-gray-800 hover:border-gray-700 text-gray-400"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="font-bold text-white flex items-center gap-1.5 text-sm">
+                        <Icon icon="mdi:email-fast-outline" className="text-yellow-400" /> Option A: Direct Outreach
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-green-500/20 text-green-400 border border-green-500/30">
+                        Primary Tab
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-400 leading-relaxed">
+                      Sends as a direct 1-on-1 business email without promotional headers. Maximizes delivery into Gmail's <strong>Primary inbox</strong>.
+                    </p>
+                  </div>
+                  <div className="mt-3 text-[11px] font-semibold text-yellow-400">
+                    {emailMode === "direct" ? "✓ Selected (Primary Delivery)" : "Select Option A"}
+                  </div>
+                </div>
+
+                {/* Option B: Official Branded Template */}
+                <div
+                  onClick={() => setEmailMode("branded")}
+                  className={`p-4 rounded-xl border cursor-pointer transition flex flex-col justify-between ${
+                    emailMode === "branded"
+                      ? "bg-yellow-500/10 border-yellow-500 text-white shadow-lg shadow-yellow-500/5"
+                      : "bg-black/40 border-gray-800 hover:border-gray-700 text-gray-400"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="font-bold text-white flex items-center gap-1.5 text-sm">
+                        <Icon icon="mdi:card-account-mail-outline" className="text-yellow-400" /> Option B: Branded Template
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                        Promotions
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-400 leading-relaxed">
+                      Your full Export Dept header, gold accents, and social footer. Best for official announcements, product catalogs, and newsletters.
+                    </p>
+                  </div>
+                  <div className="mt-3 text-[11px] font-semibold text-yellow-400">
+                    {emailMode === "branded" ? "✓ Selected (Branded Card)" : "Select Option B"}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Main info row */}
-            <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-2">
                   <label className="block text-gray-400 font-medium">Campaign Name (Internal reference)</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Boxing Gloves Promo August 2026"
+                    placeholder="e.g. Boxing Equipment Wholesale Outreach"
                     value={campaignName}
                     onChange={(e) => setCampaignName(e.target.value)}
                     className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none text-white focus:border-yellow-400 transition"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-gray-400 font-medium">Subject Line (What customer sees)</label>
+                  <label className="block text-gray-400 font-medium">Subject Line (What recipient sees)</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. World Class Boxing Gloves - 20% Off This Week!"
+                    placeholder={emailMode === "direct" ? "e.g. quick question for your gym" : "e.g. Custom Boxing Gear & Wholesale Catalog - Gearters Sports"}
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none text-white focus:border-yellow-400 transition"
                   />
                 </div>
               </div>
-
-              {/* Template Selection */}
-              <div className="space-y-2">
-                <label className="block text-gray-400 font-medium font-semibold">Select Email Layout Template</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {templates.map((t) => (
-                    <div
-                      key={t.id}
-                      onClick={() => setSelectedTemplateId(t.id)}
-                      className={`p-4 rounded-lg border cursor-pointer transition flex flex-col justify-between ${
-                        selectedTemplateId === t.id
-                          ? "bg-yellow-500/10 border-yellow-500 text-white"
-                          : "bg-black/40 border-gray-800 hover:border-gray-700 text-gray-400"
-                      }`}
-                    >
-                      <div>
-                        <h4 className="font-bold text-white mb-1">{t.name}</h4>
-                        <p className="text-xs text-gray-400 leading-relaxed">{t.description}</p>
-                      </div>
-                      <div className="mt-3 flex items-center justify-end">
-                        <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${
-                          selectedTemplateId === t.id ? "bg-yellow-500 text-black" : "bg-gray-800 text-gray-400"
-                        }`}>
-                          {selectedTemplateId === t.id ? "Active" : "Select"}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
 
-            {/* Template personalization fields */}
+            {/* Content Field */}
             <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 space-y-4">
-              <h3 className="text-white font-bold pb-2 border-b border-gray-850 flex items-center gap-2">
-                <Icon icon="mdi:lead-pencil" className="text-yellow-400" /> Customize Template Content
-              </h3>
+              <div className="flex items-center justify-between pb-2 border-b border-gray-850">
+                <h3 className="text-white font-bold flex items-center gap-2">
+                  <Icon icon="mdi:lead-pencil" className="text-yellow-400" /> Email Message Content
+                </h3>
+                <span className="text-[11px] text-gray-400">
+                  Starts with <strong>Hello &#123;&#123;&#123;name&#125;&#125;&#125;,</strong>
+                </span>
+              </div>
               
               <div className="space-y-2">
-                <label className="block text-gray-400">Email Body Text {selectedTemplateId === "custom_html" ? "(Paste your entire responsive HTML here)" : "(Supports HTML, inserts <br> automatically)"}</label>
+                <label className="block text-gray-400">Write Message Body (Paragraphs formatted automatically)</label>
                 <textarea
                   required
-                  placeholder={selectedTemplateId === "custom_html" ? "Paste raw custom HTML email code here..." : "Write your email body content here..."}
-                  rows="8"
+                  placeholder={emailMode === "direct" 
+                    ? "Write your direct 1-on-1 message here...&#10;&#10;Leave a blank line between paragraphs for clean spacing." 
+                    : "Write your email body content here...&#10;&#10;Leave a blank line between paragraphs for clean spacing."}
+                  rows="9"
                   value={bodyText}
                   onChange={(e) => setBodyText(e.target.value)}
-                  className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none text-white focus:border-yellow-400 transition font-mono text-xs"
+                  className="w-full bg-black border border-gray-700 rounded-lg p-3.5 outline-none text-white focus:border-yellow-400 transition text-sm leading-relaxed"
                 ></textarea>
-                <p className="text-xs text-gray-500">Use merge tag <strong><code>{"{{first_name}}"}</code></strong> to personalize greeting (e.g. <code>{"Hello {{first_name}},"}</code>)</p>
+                <p className="text-xs text-gray-500">
+                  Tip: Recipient's name and email address are automatically mapped to each recipient when dispatched.
+                </p>
               </div>
-
-              {/* Custom CTA options */}
-              {selectedTemplateId !== "custom_html" && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="block text-gray-400">Button Label (Optional)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Buy Now / View Catalog"
-                      value={btnText}
-                      onChange={(e) => setBtnText(e.target.value)}
-                      className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none text-white focus:border-yellow-400 transition"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-gray-400">Button Redirect Link (URL)</label>
-                    <input
-                      type="url"
-                      placeholder="e.g. https://www.gearterssports.com/products"
-                      value={btnUrl}
-                      onChange={(e) => setBtnUrl(e.target.value)}
-                      className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none text-white focus:border-yellow-400 transition"
-                    />
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* List import / CSV options */}
             <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 space-y-4">
               <h3 className="text-white font-bold pb-2 border-b border-gray-850 flex items-center gap-2">
-                <Icon icon="mdi:file-upload" className="text-yellow-400" /> Recipients List Upload
+                <Icon icon="mdi:file-upload" className="text-yellow-400" /> Recipients List
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -687,7 +689,7 @@ export default function CampaignsManager() {
                 <div className="space-y-3 p-4 bg-black/40 rounded-lg border border-gray-800">
                   <h4 className="font-semibold text-white">Option A: Drag-and-drop CSV File</h4>
                   <p className="text-xs text-gray-400 leading-relaxed">
-                    Upload a CSV file containing an <code>email</code> column.
+                    Upload CSV with <code>email</code> and optional <code>name</code> columns.
                   </p>
                   <div className="relative border-2 border-dashed border-gray-700 hover:border-yellow-500 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer transition">
                     <input
@@ -708,10 +710,10 @@ export default function CampaignsManager() {
                 <div className="space-y-3 p-4 bg-black/40 rounded-lg border border-gray-800 flex flex-col">
                   <h4 className="font-semibold text-white">Option B: Write Email Addresses Manually</h4>
                   <p className="text-xs text-gray-400 leading-relaxed">
-                    Type or paste a list of emails directly (comma/space separated).
+                    Type or paste emails separated by commas or lines.
                   </p>
                   <textarea
-                    placeholder="e.g. customer1@gmail.com, customer2@yahoo.com"
+                    placeholder="e.g. buyer1@example.com, buyer2@example.com"
                     rows="4"
                     value={manualEmails}
                     onChange={(e) => {
@@ -752,17 +754,21 @@ export default function CampaignsManager() {
                 <h3 className="text-white font-bold flex items-center gap-2">
                   <Icon icon="mdi:eye-outline" className="text-yellow-400" /> Live Email Preview
                 </h3>
-                <span className="text-[10px] px-2.5 py-0.5 bg-green-500/15 text-green-400 rounded-full font-bold border border-green-500/25">
-                  Real-time Sync
+                <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold border ${
+                  emailMode === "direct"
+                    ? "bg-green-500/15 text-green-400 border-green-500/25"
+                    : "bg-blue-500/15 text-blue-400 border-blue-500/25"
+                }`}>
+                  {emailMode === "direct" ? "Option A: Primary Mode" : "Option B: Branded Mode"}
                 </span>
               </div>
               
               <div className="text-xs text-gray-400 bg-black/40 p-3 rounded-lg space-y-1">
-                <div><strong>Subject:</strong> {subject || "(No Subject)"}</div>
-                <div><strong>From:</strong> info@gearterssports.com</div>
+                <div><strong>Subject:</strong> {subject || (emailMode === "direct" ? "quick question for your gym" : "Gearters Sports - World Class Boxing Gear")}</div>
+                <div><strong>From:</strong> Gearters Sports &lt;info@gearterssports.com&gt;</div>
               </div>
 
-              <div className="relative border border-gray-800 rounded-lg overflow-hidden bg-white shadow-inner" style={{ height: "550px" }}>
+              <div className="relative border border-gray-800 rounded-lg overflow-hidden bg-white shadow-inner" style={{ height: "540px" }}>
                 <iframe
                   title="Email Preview"
                   srcDoc={getPreviewHtml()}
@@ -771,7 +777,9 @@ export default function CampaignsManager() {
               </div>
               
               <div className="text-[10px] text-gray-500 text-center leading-relaxed">
-                This renders a direct preview of the email HTML. Merge tags (like <code>{"{{first_name}}"}</code>) are compiled with placeholder data.
+                {emailMode === "direct"
+                  ? "Live preview of Direct B2B Outreach. Sent without bulk marketing headers to maximize Primary tab delivery."
+                  : "Live preview of the official Gearters Sports Export template with header banner and gold brand accents."}
               </div>
             </div>
           </div>
@@ -809,12 +817,12 @@ export default function CampaignsManager() {
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-16 text-center text-gray-500 space-y-4">
           <Icon icon="mdi:email-outline" width="48" className="mx-auto text-gray-600" />
           <h3 className="text-lg font-bold text-white">No campaigns found</h3>
-          <p className="text-sm max-w-sm mx-auto">Build your first email list campaign and draft custom newsletters with branding colors.</p>
+          <p className="text-sm max-w-sm mx-auto">Create your first campaign to reach boxing gyms, retailers, and distributors.</p>
           <button
             onClick={() => setIsCreating(true)}
             className="mt-4 px-5 py-2.5 border border-yellow-500 hover:bg-yellow-500 hover:text-black text-yellow-500 font-semibold text-sm rounded-lg transition"
           >
-            Create First Draft
+            Create First Campaign
           </button>
         </div>
       ) : (
