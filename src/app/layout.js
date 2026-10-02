@@ -6,6 +6,7 @@ import FloatingWhatsApp from "@/components/WhatsAppFloating";
 import { Toaster } from 'react-hot-toast';
 import ReduxProvider from "@/ReduxToolkit/Provider";
 import { ThemeProvider } from "@/context/ThemeContext";
+import MainWrapper from "@/components/MainWrapper";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -74,7 +75,7 @@ export default function RootLayout({ children }) {
         <ThemeProvider>
           <Toaster position="top-right" />
           <Header />
-          <main className="mt-[90px] w-full overflow-x-hidden">{children}</main>
+          <MainWrapper>{children}</MainWrapper>
           <Footer />
           <FloatingWhatsApp />
         </ThemeProvider>

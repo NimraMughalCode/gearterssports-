@@ -6,10 +6,13 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Icon } from "@iconify/react";
 import toast from "react-hot-toast";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -18,6 +21,18 @@ export default function AdminLayout({ children }) {
   const [usernameInput, setUsernameInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
+
+  // Automatically enforce Dark Theme whenever on Admin portal
+  useEffect(() => {
+    if (theme !== "dark") {
+      setTheme("dark");
+    }
+    document.documentElement.classList.add("dark");
+    document.documentElement.classList.remove("light");
+    try {
+      localStorage.setItem("gearters-theme", "dark");
+    } catch {}
+  }, [theme, setTheme]);
 
   useEffect(() => {
     const storedAuth = localStorage.getItem("admin-auth");
@@ -93,7 +108,7 @@ export default function AdminLayout({ children }) {
   // 1. Initial Auth Check Loader
   if (isCheckingAuth) {
     return (
-      <div className="-mt-[90px] min-h-screen bg-[#0E1117] flex items-center justify-center text-yellow-400">
+      <div className="min-h-screen bg-[#0E1117] flex items-center justify-center text-yellow-400 py-12">
         <div className="flex flex-col items-center gap-3">
           <Icon icon="line-md:loading-loop" width="40" />
           <p className="text-sm font-semibold text-gray-400">Verifying administrator credentials...</p>
@@ -105,7 +120,7 @@ export default function AdminLayout({ children }) {
   // 2. Unauthenticated State: Sleek Login Card
   if (!isAuthenticated) {
     return (
-      <div className="-mt-[90px] min-h-screen bg-[#0A0C10] flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="min-h-screen bg-[#0A0C10] flex items-center justify-center p-6 sm:p-10 relative overflow-hidden">
         {/* Glow backdrop effects */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -176,7 +191,7 @@ export default function AdminLayout({ children }) {
 
   // 3. Authenticated State: Persistent Sidebar + Header + Page Content
   return (
-    <div className="-mt-[90px] min-h-screen bg-[#0E1117] flex flex-col lg:flex-row text-gray-200">
+    <div className="dark min-h-screen bg-[#0E1117] flex flex-col lg:flex-row text-gray-200">
       {/* Mobile Top Header */}
       <div className="lg:hidden flex items-center justify-between p-4 bg-[#0B0D13] border-b border-gray-800 sticky top-0 z-40">
         <div className="flex items-center gap-3">
@@ -271,8 +286,8 @@ export default function AdminLayout({ children }) {
         ></div>
       )}
 
-      {/* Main Page Area */}
-      <main className="flex-1 p-5 sm:p-8 lg:p-10 max-w-7xl mx-auto w-full overflow-y-auto">
+      {/* Main Page Area with generous top/bottom padding so content is never cut off */}
+      <main className="flex-1 px-5 sm:px-8 lg:px-12 pt-8 sm:pt-10 lg:pt-12 pb-24 max-w-7xl mx-auto w-full overflow-y-auto">
         {children}
       </main>
     </div>
