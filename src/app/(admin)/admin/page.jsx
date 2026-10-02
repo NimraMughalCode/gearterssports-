@@ -1,738 +1,285 @@
-'use client';
+"use client";
 
-import { supabase } from '@/app/utils/supabaseClient';
-import { useEffect, useState } from 'react';
-import {
-  getCategories,
-  addCategory,
-  updateCategory,
-  deleteCategory,
-  addProduct,
-  getProducts,
-  updateProduct,
-  deleteProduct
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { supabase } from "@/app/utils/supabaseClient";
+import { getCategories, getProducts } from "@/app/utils/adminAPI";
+import { Icon } from "@iconify/react";
 
-} from '@/app/utils/adminAPI';
-import { Folder, Package, Video, Mail } from 'lucide-react'; // 
-import CategoriesManager from './CategoriesManagr';
-import ProductsManager from './ProductsManager';
-import toast from 'react-hot-toast';
-import PortfolioManager from './PortfolioMager';
-import CampaignsManager from './CampaignsManager';
+export default function AdminDashboardPage() {
+  const [stats, setStats] = useState({
+    categoriesCount: 0,
+    productsCount: 0,
+    portfolioCount: 0,
+    campaignsCount: 0,
+    totalEmailsSent: 0,
+    avgOpenRate: 0,
+  });
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    loadDashboardMetrics();
+  }, []);
 
-export default function AdminPage() {
-  const [categories, setCategories] = useState([]);
-  const [newCategory, setNewCategory] = useState('');
-  const [newSubcategories, setNewSubcategories] = useState('');
-  const [editingCategory, setEditingCategory] = useState(null);
-  const [productName, setProductName] = useState('');
-  const [articleNo, setArticleNo] = useState('');
-  const [productDescription, setProductDescription] = useState('');
-  const [selectedSubcategory, setSelectedSubcategory] = useState('');
-  const [products, setProducts] = useState([]);
-  const [editingProduct, setEditingProduct] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState('categories');
-  const [productImageFile, setProductImageFile] = useState(null);
-  const [editingProductFile, setEditingProductFile] = useState(null);
-  const [categoryImageUrl, setCategoryImageUrl] = useState("");
-const [categoryImageFile, setCategoryImageFile] = useState(null);
-const [portfolio, setPortfolio] = useState([]);
-const [portfolioFile, setPortfolioFile] = useState(null);
-const [editingPortfolio, setEditingPortfolio] = useState(null);
-const [otherImages, setOtherImages] = useState([]);
-const [otherImageFiles, setOtherImageFiles] = useState([]);
+  async function loadDashboardMetrics() {
+    setLoading(true);
+    try {
+      const [cats, prods, portfolioRes, campaignsRes] = await Promise.all([
+        getCategories(),
+        getProducts(),
+        supabase.from("portfolio").select("id", { count: "exact", head: true }),
+        supabase.from("campaigns").select("id, sent_count, opened_count"),
+      ]);
 
+      const campaigns = campaignsRes.data || [];
+      const totalSent = campaigns.reduce((acc, c) => acc + (c.sent_count || 0), 0);
+      const totalOpens = campaigns.reduce((acc, c) => acc + (c.opened_count || 0), 0);
+      const avgOpenRate = totalSent > 0 ? Math.round((totalOpens / totalSent) * 100) : 0;
 
-
-
-useEffect(() => {
-  const storedAuth = localStorage.getItem('admin-auth');
-  if (storedAuth === 'true') {
-    setIsAuthenticated(true);
-    fetchCategories();
-    fetchProducts();
-        fetchPortfolio(); 
-  } else {
-    const username = prompt('Enter admin username:');
-    const password = prompt('Enter admin password:');
-    
-  const envUsername = process.env.NEXT_PUBLIC_ADMIN_USERNAME;
-    const envPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
-
-
-    // Replace with your desired username and password
-    if (username === envUsername && password === envPassword) {
-      localStorage.setItem('admin-auth', 'true');
-      setIsAuthenticated(true);
-      fetchCategories();
-      fetchProducts();
-    } else {
-      alert('Unauthorized');
+      setStats({
+        categoriesCount: cats?.length || 0,
+        productsCount: prods?.length || 0,
+        portfolioCount: portfolioRes?.count || 0,
+        campaignsCount: campaigns.length,
+        totalEmailsSent: totalSent,
+        avgOpenRate: avgOpenRate,
+      });
+    } catch (err) {
+      console.error("Failed to load dashboard metrics:", err);
+    } finally {
+      setLoading(false);
     }
   }
-}, []);
 
-
-  async function fetchCategories() {
-    const data = await getCategories();
-    setCategories(data);
-  }
-  async function fetchProducts() {
-  const data = await getProducts();
-  setProducts(data);
-}
-
-
-async function handleDeleteProduct(product) {
-  if (!confirm("Delete this product?")) return;
-
-  const toastId = toast.loading("Deleting product...");
-
-  try {
-    // 1️⃣ Delete main product image from storage if in product-images bucket
-    if (product.img_src) {
-      const filePath = getStoragePathFromUrl(product.img_src);
-
-      if (filePath) {
-        await supabase.storage
-          .from("product-images")
-          .remove([filePath]);
-      }
-    }
-
-    // 2️⃣ Delete additional other_images from storage if hosted in product-images bucket
-    if (product.other_images && Array.isArray(product.other_images)) {
-      const otherPaths = product.other_images
-        .map(getStoragePathFromUrl)
-        .filter(Boolean);
-
-      if (otherPaths.length > 0) {
-        await supabase.storage
-          .from("product-images")
-          .remove(otherPaths);
-      }
-    }
-
-    // 3️⃣ Delete product from DB
-    await deleteProduct(product.id);
-
-    fetchProducts();
-    toast.success("Product deleted!", { id: toastId });
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to delete product", { id: toastId });
-  }
-}
-
-async function handleUpdateProduct({
-  imageType,
-  file,
-  url,
-  otherImages = [],
-  newOtherImageFiles = [],
-}) {
-  const { id, name, article_no, description, img_src, subcategory } = editingProduct;
-
-  if (!name || !description || !subcategory) {
-    return toast.error('All fields are required');
-  }
-
-  const toastId = toast.loading('Updating product...');
-
-  try {
-    let finalImageURL = img_src; // Keep old one by default
-
-    if (imageType === "file" && file) {
-      // Upload new file
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `products/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(filePath, file);
-
-      if (uploadError) throw new Error('Image upload failed: ' + uploadError.message);
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(filePath);
-
-      finalImageURL = publicUrl;
-
-    } else if (imageType === "url" && url) {
-      finalImageURL = url; // Replace with URL
-    }
-
-    // Loop through new direct image files and upload each to Supabase storage
-    const uploadedNewOtherUrls = [];
-    if (newOtherImageFiles && newOtherImageFiles.length > 0) {
-      for (let i = 0; i < newOtherImageFiles.length; i++) {
-        const fileItem = newOtherImageFiles[i];
-        toast.loading(`Uploading image ${i + 1} of ${newOtherImageFiles.length}...`, { id: toastId });
-
-        const fileExt = fileItem.name.split('.').pop();
-        const safeName = fileItem.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-        const fileName = `products/other/${Date.now()}-${i}-${safeName}`;
-
-        const { error: uploadErr } = await supabase.storage
-          .from('product-images')
-          .upload(fileName, fileItem);
-
-        if (uploadErr) {
-          throw new Error(`Failed to upload ${fileItem.name}: ${uploadErr.message}`);
-        }
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('product-images')
-          .getPublicUrl(fileName);
-
-        uploadedNewOtherUrls.push(publicUrl);
-      }
-    }
-
-    const finalOtherImages = [
-      ...otherImages.filter(Boolean),
-      ...uploadedNewOtherUrls,
-    ];
-
-    await updateProduct({
-      id,
-      name,
-      article_no,
-      description,
-      img_src: finalImageURL,
-      subcategory,
-      other_images: finalOtherImages,
-    });
-
-    setEditingProduct(null);
-    setEditingProductFile(null);
-    fetchProducts();
-
-    toast.success('Product updated successfully!', { id: toastId });
-
-  } catch (err) {
-    toast.error(err.message || 'Failed to update product', { id: toastId });
-  }
-}
-
-
-
-async function handleCategoryImageUpload() {
-  if (!categoryImageFile) return categoryImageUrl || "";
-
-  const fileName = `${Date.now()}-${categoryImageFile.name}`;
-
-  const { data, error } = await supabase.storage
-    .from("product-images")
-    .upload(fileName, categoryImageFile);
-
-  if (error) {
-    console.error("Image upload failed:", error);
-    return categoryImageUrl || "";
-  }
-
-  const { data: publicUrlData } = supabase.storage
-    .from("product-images")
-    .getPublicUrl(fileName);
-
-  return publicUrlData.publicUrl;
-}
-
-
-
-async function handleAddCategory() {
-  if (!newCategory || !newSubcategories)
-    return toast.error("All fields required");
-
-  const toastId = toast.loading("Adding category...");
-
-  try {
-    // Upload image (if provided)
-    let finalImageUrl = "";
-    if (categoryImageFile) {
-      const fileName = `categories/${Date.now()}-${categoryImageFile.name}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("product-images")
-        .upload(fileName, categoryImageFile);
-
-      if (uploadError) throw new Error(uploadError.message);
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("product-images").getPublicUrl(fileName);
-
-      finalImageUrl = publicUrl;
-    }
-
-    await addCategory({
-      title: newCategory,
-      subcategories: newSubcategories.split(",").map((s) => s.trim()),
-      img_src: finalImageUrl,
-    });
-
-    setNewCategory("");
-    setNewSubcategories("");
-    setCategoryImageFile(null);
-
-    await fetchCategories();
-    toast.success("Category added!", { id: toastId });
-
-  } catch (err) {
-    toast.error("Failed to add category: " + err.message, { id: toastId });
-  }
-}
-
-
-
-
-
-async function handleUpdateCategory() {
-  if (!editingCategory.title || !editingCategory.subcategories.length)
-    return toast.error("Fields cannot be empty");
-
-  const toastId = toast.loading("Updating category...");
-
-  try {
-    let finalImageUrl = editingCategory.img_src;
-
-    // Only upload new file if user selected a new one
-    if (categoryImageFile) {
-      const fileName = `categories/${Date.now()}-${categoryImageFile.name}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("product-images")
-        .upload(fileName, categoryImageFile);
-
-      if (uploadError) throw new Error(uploadError.message);
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("product-images").getPublicUrl(fileName);
-
-      finalImageUrl = publicUrl;
-    }
-
-    await updateCategory({
-      id: editingCategory.id,
-      title: editingCategory.title,
-      subcategories: editingCategory.subcategories,
-      img_src: finalImageUrl,
-    });
-
-    setEditingCategory(null);
-    setCategoryImageFile(null);
-
-    await fetchCategories();
-    toast.success("Category updated!", { id: toastId });
-
-  } catch (err) {
-    toast.error("Failed to update category", { id: toastId });
-  }
-}
-
-
-
-
-async function handleDeleteCategory(category) {
-  if (!confirm("Delete this category?")) return;
-
-  const toastId = toast.loading("Deleting category...");
-
-  try {
-    // 1️⃣ Delete image from storage
-    if (category.img_src) {
-      const filePath = getStoragePathFromUrl(category.img_src);
-
-      if (filePath) {
-        await supabase.storage
-          .from("product-images")
-          .remove([filePath]);
-      }
-    }
-
-    // 2️⃣ Delete DB record
-    await deleteCategory(category.id);
-
-    fetchCategories();
-    toast.success("Category deleted!", { id: toastId });
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to delete category", { id: toastId });
-  }
-}
-
-
-
-
-
-
-async function handleAddProduct({ imageType, file, url, otherImageFiles = [] }) {
-  if (!productName || !productDescription || !selectedSubcategory) {
-    return toast.error('All product fields are required');
-  }
-
-  const toastId = toast.loading('Saving product...');
-
-  try {
-    let finalImageURL = '';
-
-    if (imageType === "file") {
-      if (!file) return toast.error("Please select a main image file.");
-
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `products/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(filePath, file);
-
-      if (uploadError) throw new Error('Image upload failed: ' + uploadError.message);
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from('product-images').getPublicUrl(filePath);
-
-      finalImageURL = publicUrl;
-
-    } else if (imageType === "url") {
-      if (!url) return toast.error("Please enter an image URL.");
-      finalImageURL = url;
-    }
-
-    // Loop through direct image files for other images and upload to Supabase storage
-    const uploadedOtherUrls = [];
-    if (otherImageFiles && otherImageFiles.length > 0) {
-      for (let i = 0; i < otherImageFiles.length; i++) {
-        const fileItem = otherImageFiles[i];
-        toast.loading(`Uploading additional image ${i + 1} of ${otherImageFiles.length}...`, { id: toastId });
-
-        const fileExt = fileItem.name.split('.').pop();
-        const safeName = fileItem.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-        const fileName = `products/other/${Date.now()}-${i}-${safeName}`;
-
-        const { error: uploadErr } = await supabase.storage
-          .from('product-images')
-          .upload(fileName, fileItem);
-
-        if (uploadErr) {
-          throw new Error(`Failed to upload ${fileItem.name}: ${uploadErr.message}`);
-        }
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('product-images')
-          .getPublicUrl(fileName);
-
-        uploadedOtherUrls.push(publicUrl);
-      }
-    }
-
-    const allOtherImages = [
-      ...otherImages.filter(Boolean),
-      ...uploadedOtherUrls,
-    ];
-
-    await addProduct({
-      name: productName,
-      article_no: articleNo,
-      description: productDescription,
-      img_src: finalImageURL,
-      subcategory: selectedSubcategory,
-      other_images: allOtherImages,
-    });
-
-    // Reset fields
-    setProductName('');
-    setArticleNo('');
-    setProductDescription('');
-    setSelectedSubcategory('');
-    setProductImageFile(null);
-    setOtherImages([]);
-    setOtherImageFiles([]);
-
-    toast.success('Product added successfully!', { id: toastId });
-    fetchProducts();
-
-  } catch (err) {
-    toast.error(err.message || 'Failed to add product', { id: toastId });
-  }
-}
-
-
-async function fetchPortfolio() {
-  const { data, error } = await supabase
-    .from('portfolio')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (!error) setPortfolio(data);
-}
-
-async function handleAddPortfolio() {
-  if (!portfolioFile) return toast.error('Select a video');
-
-  const toastId = toast.loading('Uploading video...');
-
-  try {
-    const fileExt = portfolioFile.name.split('.').pop();
-    const fileName = `portfolio/${Date.now()}.${fileExt}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from('product-images')
-      .upload(fileName, portfolioFile);
-
-    if (uploadError) throw uploadError;
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from('product-images').getPublicUrl(fileName);
-
-    await supabase.from('portfolio').insert({
-      url: publicUrl,
-    });
-
-    setPortfolioFile(null);
-    fetchPortfolio();
-    toast.success('Video added!', { id: toastId });
-  } catch (err) {
-    toast.error('Upload failed', { id: toastId });
-  }
-}
-
-async function handleUpdatePortfolio() {
-  if (!editingPortfolio) return;
-
-  const toastId = toast.loading('Updating video...');
-
-  try {
-    let finalUrl = editingPortfolio.url;
-
-    if (portfolioFile) {
-      const fileExt = portfolioFile.name.split('.').pop();
-      const fileName = `portfolio/${Date.now()}.${fileExt}`;
-
-      await supabase.storage
-        .from('product-images')
-        .upload(fileName, portfolioFile);
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from('product-images').getPublicUrl(fileName);
-
-      finalUrl = publicUrl;
-    }
-
-    await supabase
-      .from('portfolio')
-      .update({ url: finalUrl })
-      .eq('id', editingPortfolio.id);
-
-    setEditingPortfolio(null);
-    setPortfolioFile(null);
-    fetchPortfolio();
-
-    toast.success('Updated!', { id: toastId });
-  } catch {
-    toast.error('Update failed', { id: toastId });
-  }
-}
-
-
-function getStoragePathFromUrl(url) {
-  if (!url) return null;
-
-  const marker = "/product-images/";
-  const index = url.indexOf(marker);
-
-  if (index === -1) return null;
-
-  return url.substring(index + marker.length);
-}
-
-
-async function handleDeletePortfolio(item) {
-  if (!confirm("Delete this video?")) return;
-
-  const toastId = toast.loading("Deleting video...");
-
-  try {
-    await supabase.from("portfolio").delete().eq("id", item.id);
-
-    if (item.url) {
-      const filePath = getStoragePathFromUrl(item.url);
-console.log("got this file path",filePath);
-
-      if (filePath) {
-        await supabase.storage
-          .from("product-images")
-          .remove([filePath]);
-      }
-    }
-
-    fetchPortfolio();
-    toast.success("Video deleted!", { id: toastId });
-  } catch (err) {
-    console.error(err);
-    toast.error("Delete failed", { id: toastId });
-  }
-}
-
-
-
-
-
-if (!isAuthenticated) {
-  return (
-    <div className="admin-container dark min-h-screen bg-gray-900 text-white p-8">
-      <h1 className="text-2xl font-bold text-red-500">Access Denied</h1>
-    </div>
-  );
-}
-
+  const metricCards = [
+    {
+      title: "Total Categories",
+      count: stats.categoriesCount,
+      subtitle: "Active catalog groups",
+      icon: "solar:folder-with-files-bold",
+      href: "/admin/categories",
+      color: "from-amber-500/20 to-yellow-500/10 text-yellow-400 border-yellow-500/30",
+    },
+    {
+      title: "Total Products",
+      count: stats.productsCount,
+      subtitle: "Boxing gear & equipment",
+      icon: "solar:box-minimalistic-bold",
+      href: "/admin/products",
+      color: "from-blue-500/20 to-cyan-500/10 text-cyan-400 border-cyan-500/30",
+    },
+    {
+      title: "Portfolio Videos",
+      count: stats.portfolioCount,
+      subtitle: "Showcases & sparring reels",
+      icon: "solar:clapperboard-play-bold",
+      href: "/admin/portfolio",
+      color: "from-purple-500/20 to-pink-500/10 text-purple-400 border-purple-500/30",
+    },
+    {
+      title: "Email Campaigns",
+      count: stats.campaignsCount,
+      subtitle: `${stats.totalEmailsSent} emails sent (${stats.avgOpenRate}% open rate)`,
+      icon: "solar:letter-bold",
+      href: "/admin/campaigns",
+      color: "from-emerald-500/20 to-green-500/10 text-emerald-400 border-emerald-500/30",
+    },
+  ];
 
   return (
-    <div className="admin-container dark min-h-screen bg-gray-900 text-white p-8 space-y-12">
-<div className="flex justify-between items-center mb-8">
-  <h1 className="text-3xl font-bold text-yellow-400">Admin Panel</h1>
-  <button
-    onClick={() => {
-      localStorage.removeItem('admin-auth');
-      window.location.reload();
-    }}
-    className="text-sm px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded"
-  >
-    Log Out
-  </button>
-</div>
+    <div className="space-y-8">
+      {/* Welcome Banner */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-[#171B26] via-[#12151E] to-[#0D1017] p-8 rounded-2xl border border-gray-800 shadow-xl">
+        <div className="relative z-10 flex flex-col md:flex-row justify-between md:items-center gap-6">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-yellow-500/15 border border-yellow-500/30 rounded-full text-xs font-bold text-yellow-400 uppercase tracking-widest">
+              <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span> Control Center
+            </div>
+            <h1 className="text-3xl font-extrabold text-white tracking-tight">
+              Gearters Sports <span className="text-yellow-400">Admin Dashboard</span>
+            </h1>
+            <p className="text-sm text-gray-400 max-w-xl">
+              Welcome back! Manage your products, digital catalog, production media, and B2B email marketing all in one place.
+            </p>
+          </div>
 
-<div className="flex space-x-4 mb-8">
-  <button
-    onClick={() => setActiveTab('categories')}
-    className={`flex items-center px-4 py-2 rounded ${
-      activeTab === 'categories'
-        ? 'bg-yellow-500 text-black font-semibold'
-        : 'bg-gray-700 text-white'
-    }`}
-  >
-    <Folder className="w-4 h-4 mr-2" />
-    Categories
-  </button>
-  <button
-    onClick={() => setActiveTab('products')}
-    className={`flex items-center px-4 py-2 rounded ${
-      activeTab === 'products'
-        ? 'bg-yellow-500 text-black font-semibold'
-        : 'bg-gray-700 text-white'
-    }`}
-  >
-    <Package className="w-4 h-4 mr-2" />
-    Products
-  </button>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/admin/products"
+              className="flex items-center gap-2 px-4 py-2.5 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-xl transition text-xs shadow-lg shadow-yellow-500/20"
+            >
+              <Icon icon="solar:add-circle-bold" width="16" /> Add Product
+            </Link>
+            <Link
+              href="/admin/campaigns"
+              className="flex items-center gap-2 px-4 py-2.5 bg-gray-800 hover:bg-gray-700 text-white font-semibold rounded-xl border border-gray-700 transition text-xs"
+            >
+              <Icon icon="solar:letter-bold" width="16" /> New Campaign
+            </Link>
+          </div>
+        </div>
+      </div>
 
-  <button
-  onClick={() => setActiveTab('portfolio')}
-  className={`flex items-center px-4 py-2 rounded ${
-    activeTab === 'portfolio'
-      ? 'bg-yellow-500 text-black font-semibold'
-      : 'bg-gray-700 text-white'
-  }`}
->
-  <Video className="w-4 h-4 mr-2" />
-  Portfolio
-</button>
+      {/* Metrics Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {metricCards.map((card) => (
+          <Link
+            key={card.title}
+            href={card.href}
+            className={`p-6 rounded-2xl border bg-gradient-to-br transition hover:scale-[1.02] shadow-lg group ${card.color}`}
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{card.title}</p>
+                <div className="text-3xl font-black text-white mt-2">
+                  {loading ? (
+                    <Icon icon="line-md:loading-loop" width="28" />
+                  ) : (
+                    card.count
+                  )}
+                </div>
+                <p className="text-xs text-gray-400 mt-2">{card.subtitle}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-black/40 border border-white/5 group-hover:border-yellow-400/40 transition">
+                <Icon icon={card.icon} width="24" />
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
 
-  <button
-  onClick={() => setActiveTab('campaigns')}
-  className={`flex items-center px-4 py-2 rounded ${
-    activeTab === 'campaigns'
-      ? 'bg-yellow-500 text-black font-semibold'
-      : 'bg-gray-700 text-white'
-  }`}
->
-  <Mail className="w-4 h-4 mr-2" />
-  Campaigns
-</button>
+      {/* Quick Navigation Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Module Fast Links */}
+        <div className="bg-[#11141D] border border-gray-800/80 rounded-2xl p-6 space-y-4">
+          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <Icon icon="solar:compass-bold" className="text-yellow-400" /> Admin Modules
+          </h2>
+          <div className="divide-y divide-gray-800/80">
+            <Link
+              href="/admin/categories"
+              className="flex items-center justify-between py-3.5 px-2 hover:bg-gray-850/50 rounded-xl transition group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">
+                  <Icon icon="solar:folder-with-files-bold" width="18" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white group-hover:text-yellow-400 transition">Categories</h3>
+                  <p className="text-xs text-gray-500">Add or edit equipment categories & subcategories</p>
+                </div>
+              </div>
+              <Icon icon="solar:arrow-right-linear" width="18" className="text-gray-600 group-hover:text-white transition" />
+            </Link>
 
-</div>
+            <Link
+              href="/admin/products"
+              className="flex items-center justify-between py-3.5 px-2 hover:bg-gray-850/50 rounded-xl transition group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                  <Icon icon="solar:box-minimalistic-bold" width="18" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white group-hover:text-yellow-400 transition">Products & Inventory</h3>
+                  <p className="text-xs text-gray-500">Catalog items, article numbers & multi-angle images</p>
+                </div>
+              </div>
+              <Icon icon="solar:arrow-right-linear" width="18" className="text-gray-600 group-hover:text-white transition" />
+            </Link>
 
+            <Link
+              href="/admin/portfolio"
+              className="flex items-center justify-between py-3.5 px-2 hover:bg-gray-850/50 rounded-xl transition group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                  <Icon icon="solar:clapperboard-play-bold" width="18" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white group-hover:text-yellow-400 transition">Portfolio Videos</h3>
+                  <p className="text-xs text-gray-500">Showcase factory manufacturing & sparring videos</p>
+                </div>
+              </div>
+              <Icon icon="solar:arrow-right-linear" width="18" className="text-gray-600 group-hover:text-white transition" />
+            </Link>
 
-{activeTab === 'categories' && (
-<CategoriesManager
-    categories={categories}
-    newCategory={newCategory}
-    newSubcategories={newSubcategories}
-    categoryImageFile={categoryImageFile}
-    setCategoryImageFile={setCategoryImageFile}
-    editingCategory={editingCategory}
-    setEditingCategory={setEditingCategory}
-    handleAddCategory={handleAddCategory}
-    handleUpdateCategory={handleUpdateCategory}
-    handleDeleteCategory={handleDeleteCategory}
-    setNewCategory={setNewCategory}          // ✅ ADD THIS
-    setNewSubcategories={setNewSubcategories} 
-    
-/>
+            <Link
+              href="/admin/campaigns"
+              className="flex items-center justify-between py-3.5 px-2 hover:bg-gray-850/50 rounded-xl transition group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <Icon icon="solar:letter-bold" width="18" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white group-hover:text-yellow-400 transition">Email Campaigns</h3>
+                  <p className="text-xs text-gray-500">B2B outreach, newsletter broadcasts & live metrics</p>
+                </div>
+              </div>
+              <Icon icon="solar:arrow-right-linear" width="18" className="text-gray-600 group-hover:text-white transition" />
+            </Link>
+          </div>
+        </div>
 
-)}
+        {/* System & Integrations Status */}
+        <div className="bg-[#11141D] border border-gray-800/80 rounded-2xl p-6 space-y-4 flex flex-col justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <Icon icon="solar:server-bold" className="text-yellow-400" /> Infrastructure Status
+            </h2>
+            <p className="text-xs text-gray-400 mt-1">Live status of your connected backend services.</p>
 
-{activeTab === 'products' && (
-  <ProductsManager
-    categories={categories}
-    products={products}
-    productName={productName}
-    articleNo={articleNo}
-    productDescription={productDescription}
-    selectedSubcategory={selectedSubcategory}
-    productImageFile={productImageFile}
-    setProductName={setProductName}
-    setArticleNo={setArticleNo}
-    setProductDescription={setProductDescription}
-    setSelectedSubcategory={setSelectedSubcategory}
-    setProductImageFile={setProductImageFile}
-    handleAddProduct={handleAddProduct}
-    editingProduct={editingProduct}
-    setEditingProduct={setEditingProduct}
-    editingProductFile={editingProductFile}
-    setEditingProductFile={setEditingProductFile}
-    handleUpdateProduct={handleUpdateProduct}
-    handleDeleteProduct={handleDeleteProduct}
-      otherImages={otherImages}
-      setOtherImages={setOtherImages}
-      otherImageFiles={otherImageFiles}
-      setOtherImageFiles={setOtherImageFiles}
-  />
+            <div className="space-y-3 mt-4">
+              <div className="flex items-center justify-between p-3.5 rounded-xl bg-black/40 border border-gray-800">
+                <div className="flex items-center gap-3">
+                  <Icon icon="logos:supabase-icon" width="20" />
+                  <div>
+                    <div className="text-xs font-bold text-white">Supabase Database</div>
+                    <div className="text-[11px] text-gray-500">Connected to gearterssports database</div>
+                  </div>
+                </div>
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-green-500/15 text-green-400 border border-green-500/25">
+                  Connected
+                </span>
+              </div>
 
+              <div className="flex items-center justify-between p-3.5 rounded-xl bg-black/40 border border-gray-800">
+                <div className="flex items-center gap-3">
+                  <Icon icon="solar:letter-bold" width="20" className="text-yellow-400" />
+                  <div>
+                    <div className="text-xs font-bold text-white">Resend Dispatch API</div>
+                    <div className="text-[11px] text-gray-500">Primary & Branded B2B sending ready</div>
+                  </div>
+                </div>
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-green-500/15 text-green-400 border border-green-500/25">
+                  Operational
+                </span>
+              </div>
 
+              <div className="flex items-center justify-between p-3.5 rounded-xl bg-black/40 border border-gray-800">
+                <div className="flex items-center gap-3">
+                  <Icon icon="solar:gallery-bold" width="20" className="text-cyan-400" />
+                  <div>
+                    <div className="text-xs font-bold text-white">Media Storage Bucket</div>
+                    <div className="text-[11px] text-gray-500">product-images bucket ready</div>
+                  </div>
+                </div>
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-green-500/15 text-green-400 border border-green-500/25">
+                  Active
+                </span>
+              </div>
+            </div>
+          </div>
 
-
-)}
-
-{activeTab === 'portfolio' && (
-  <PortfolioManager
-    portfolio={portfolio}
-    portfolioFile={portfolioFile}
-    setPortfolioFile={setPortfolioFile}
-    editingPortfolio={editingPortfolio}
-    setEditingPortfolio={setEditingPortfolio}
-    handleAddPortfolio={handleAddPortfolio}
-    handleUpdatePortfolio={handleUpdatePortfolio}
-    handleDeletePortfolio={handleDeletePortfolio}
-  />
-)}
-
-{activeTab === 'campaigns' && (
-  <CampaignsManager />
-)}
-
-
-
-   
-
+          <div className="pt-4 border-t border-gray-850 flex items-center justify-between text-xs text-gray-500">
+            <span>Gearters Sports v2.0</span>
+            <Link href="/" target="_blank" className="hover:text-yellow-400 transition flex items-center gap-1">
+              gearterssports.com <Icon icon="mdi:open-in-new" width="12" />
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

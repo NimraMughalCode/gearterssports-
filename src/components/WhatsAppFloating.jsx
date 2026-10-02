@@ -1,14 +1,20 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { MessageCircle } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export default function FloatingWhatsApp() {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    if (pathname?.startsWith("/admin")) return;
     // Animate in after mount
-    setTimeout(() => setVisible(true), 300);
-  }, []);
+    const timer = setTimeout(() => setVisible(true), 300);
+    return () => clearTimeout(timer);
+  }, [pathname]);
+
+  if (pathname?.startsWith("/admin")) return null;
 
   return (
     <a

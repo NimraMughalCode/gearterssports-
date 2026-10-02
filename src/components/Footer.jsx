@@ -10,6 +10,8 @@ export default function Footer() {
   const router = useRouter();
   const pathname = usePathname();
 
+  if (pathname?.startsWith("/admin")) return null;
+
   const handleScrollTo = (sectionId) => {
     if (pathname === "/") {
       const section = document.getElementById(sectionId);
