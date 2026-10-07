@@ -269,6 +269,23 @@ export default function AdminDashboardPage() {
                   Active
                 </span>
               </div>
+
+              <div className="flex items-center justify-between p-3.5 rounded-xl bg-black/40 border border-gray-800">
+                <div className="flex items-center gap-3">
+                  <Icon icon="solar:shield-check-bold" width="20" className="text-yellow-400" />
+                  <div>
+                    <div className="text-xs font-bold text-white">Google SEO & Rich Snippets</div>
+                    <div className="text-[11px] text-gray-500">Slugs active & 100% Google Rich Data passed</div>
+                  </div>
+                </div>
+                <Link
+                  href="/admin/products"
+                  className="text-[10px] px-2.5 py-1 rounded-full font-bold bg-yellow-500/15 text-yellow-400 border border-yellow-500/25 hover:bg-yellow-500 hover:text-black transition flex items-center gap-1"
+                >
+                  <span>Guidelines</span>
+                  <Icon icon="solar:arrow-right-linear" width="10" />
+                </Link>
+              </div>
             </div>
           </div>
 

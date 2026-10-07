@@ -10,6 +10,7 @@ import {
   deleteProduct,
 } from "@/app/utils/adminAPI";
 import ProductsManager from "../ProductsManager";
+import AdminSeoGuideline from "@/components/AdminSeoGuideline";
 import toast from "react-hot-toast";
 import { Icon } from "@iconify/react";
 
@@ -288,6 +289,9 @@ export default function AdminProductsPage() {
           {products.length} Products Cataloged
         </div>
       </div>
+
+      {/* Interactive SEO & Product Upload Guidelines Card */}
+      <AdminSeoGuideline />
 
       {loading ? (
         <div className="text-center py-16 text-gray-500 flex flex-col items-center justify-center gap-2">
