@@ -46,9 +46,43 @@ export const metadata = {
 
 
 export default function RootLayout({ children }) {
+  const orgSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Gearters Sports",
+    url: "https://www.gearterssports.com",
+    logo: "https://www.gearterssports.com/logo-trans.png",
+    description: "Gearters Sports is a premier manufacturer and exporter of custom boxing gloves, combat sports equipment, and athletic gear.",
+    sameAs: [
+      "https://www.instagram.com/gearterssports",
+      "https://www.facebook.com/gearterssports"
+    ],
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: "+923279988069",
+      contactType: "sales",
+      availableLanguage: ["English", "Urdu"]
+    }
+  };
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Gearters Sports",
+    url: "https://www.gearterssports.com"
+  };
+
   return (
     <html lang="en" suppressHydrationWarning className="dark">
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `

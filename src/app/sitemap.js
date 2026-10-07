@@ -1,5 +1,7 @@
 import { getProducts } from "@/app/utils/adminAPI";
 
+export const revalidate = 3600; // Regenerate sitemap periodically
+
 export default async function sitemap() {
   const baseUrl = 'https://www.gearterssports.com';
 
@@ -15,13 +17,13 @@ export default async function sitemap() {
     { url: `${baseUrl}/terms`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
   ];
 
-  // 2. Dynamic Product Routes (Querying database at build time)
+  // 2. Dynamic Product Routes with SEO Slugs
   let productRoutes = [];
   try {
     const products = await getProducts();
     if (products && Array.isArray(products)) {
       productRoutes = products.map((product) => ({
-        url: `${baseUrl}/productview/${product.id}`,
+        url: `${baseUrl}/products/${product.slug || product.id}`,
         lastModified: product.created_at ? new Date(product.created_at) : new Date(),
         changeFrequency: 'weekly',
         priority: 0.8,
