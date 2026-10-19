@@ -73,7 +73,7 @@ export default function RootLayout({ children }) {
   };
 
   return (
-    <html lang="en" suppressHydrationWarning className="dark">
+    <html lang="en" suppressHydrationWarning className="light">
       <head>
         <script
           type="application/ld+json"
@@ -89,12 +89,12 @@ export default function RootLayout({ children }) {
               (function() {
                 try {
                   var savedTheme = localStorage.getItem('gearters-theme');
-                  if (savedTheme === 'light') {
-                    document.documentElement.classList.remove('dark');
-                    document.documentElement.classList.add('light');
-                  } else {
+                  if (savedTheme === 'dark') {
                     document.documentElement.classList.add('dark');
                     document.documentElement.classList.remove('light');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.classList.add('light');
                   }
                 } catch (e) {}
               })();
@@ -105,15 +105,15 @@ export default function RootLayout({ children }) {
       <body
         className={`${inter.variable} antialiased`}
       >
-      <ReduxProvider>
-        <ThemeProvider>
-          <Toaster position="top-right" />
-          <Header />
-          <MainWrapper>{children}</MainWrapper>
-          <Footer />
-          <FloatingWhatsApp />
-        </ThemeProvider>
-      </ReduxProvider>
+        <ReduxProvider>
+          <ThemeProvider>
+            <Toaster position="top-right" />
+            <Header />
+            <MainWrapper>{children}</MainWrapper>
+            <Footer />
+            <FloatingWhatsApp />
+          </ThemeProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

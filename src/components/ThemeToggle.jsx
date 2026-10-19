@@ -10,7 +10,7 @@ export default function ThemeToggle({ className = '' }) {
   if (!mounted) {
     // Avoid layout shift during SSR/hydration
     return (
-      <div className={`w-16 h-8 rounded-full border border-yellow-500/40 bg-black/40 ${className}`} />
+      <div className={`w-[68px] h-[34px] rounded-full border border-[#C67D00]/50 bg-[#F2ECE1] ${className}`} />
     );
   }
 

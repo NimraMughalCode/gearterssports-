@@ -3,26 +3,26 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 const ThemeContext = createContext({
-  theme: 'dark',
+  theme: 'light',
   toggleTheme: () => {},
   setTheme: () => {},
-  isDark: true,
+  isDark: false,
 });
 
 const THEME_STORAGE_KEY = 'gearters-theme';
 
 export function ThemeProvider({ children }) {
-  const [theme, setThemeState] = useState('dark');
+  const [theme, setThemeState] = useState('light');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     try {
       const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-      const initialTheme = savedTheme === 'light' ? 'light' : 'dark';
+      const initialTheme = savedTheme === 'dark' ? 'dark' : 'light';
       setThemeState(initialTheme);
       applyTheme(initialTheme);
     } catch {
-      applyTheme('dark');
+      applyTheme('light');
     }
     setMounted(true);
   }, []);
