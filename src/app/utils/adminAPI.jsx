@@ -200,3 +200,180 @@ export async function getPortfolio() {
   if (error) throw error;
   return data;
 }
+
+////////////////////
+// 🔹 BLOG APIS   //
+////////////////////
+
+// ✅ Generate SEO-friendly slug for blogs
+export function generateBlogSlug(title) {
+  if (!title) return "article-" + Date.now();
+  return title
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "") // remove non-alphanumeric except spaces & hyphens
+    .replace(/[\s_-]+/g, "-") // replace spaces and underscores with single hyphen
+    .replace(/^-+|-+$/g, ""); // trim leading/trailing hyphens
+}
+
+// ✅ Get all blogs (optionally filter for published only)
+export async function getBlogs({ publishedOnly = false, limit } = {}) {
+  let query = supabase
+    .from("blogs")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (publishedOnly) {
+    query = query.eq("is_published", true);
+  }
+
+  if (limit) {
+    query = query.limit(limit);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    console.error("Error fetching blogs:", error);
+    return [];
+  }
+  return data || [];
+}
+
+// ✅ Get featured blogs for landing page
+export async function getFeaturedBlogs(limit = 3) {
+  const { data, error } = await supabase
+    .from("blogs")
+    .select("*")
+    .eq("is_published", true)
+    .eq("is_featured", true)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("Error fetching featured blogs:", error);
+    // Fallback: If no featured, grab the latest published blogs
+    const { data: latest } = await supabase
+      .from("blogs")
+      .select("*")
+      .eq("is_published", true)
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    return latest || [];
+  }
+
+  // If fewer than limit featured blogs found, fill in with recent published ones
+  if (!data || data.length === 0) {
+    const { data: fallback } = await supabase
+      .from("blogs")
+      .select("*")
+      .eq("is_published", true)
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    return fallback || [];
+  }
+
+  return data;
+}
+
+// ✅ Fetch single blog by slug with fallback to ID
+export async function fetchBlogBySlug(slug) {
+  if (!slug) return null;
+
+  // 1. Direct slug lookup
+  const { data, error } = await supabase
+    .from("blogs")
+    .select("*")
+    .eq("slug", slug)
+    .single();
+
+  if (!error && data) return data;
+
+  // 2. Numeric fallback lookup
+  if (!isNaN(slug)) {
+    const { data: byId } = await supabase
+      .from("blogs")
+      .select("*")
+      .eq("id", slug)
+      .single();
+    if (byId) return byId;
+  }
+
+  return null;
+}
+
+// ✅ Add new blog
+export async function addBlog({
+  title,
+  slug,
+  excerpt,
+  content,
+  cover_image,
+  category = "Boxing & Combat",
+  author = "Gearters Sports Team",
+  read_time = "4 min read",
+  is_featured = false,
+  is_published = true,
+  meta_title,
+  meta_description,
+  meta_keywords,
+}) {
+  const finalSlug = (slug || generateBlogSlug(title)).toLowerCase();
+
+  const { data, error } = await supabase
+    .from("blogs")
+    .insert([
+      {
+        title,
+        slug: finalSlug,
+        excerpt: excerpt || "",
+        content,
+        cover_image: cover_image || "",
+        category: category || "Boxing & Combat",
+        author: author || "Gearters Sports Team",
+        read_time: read_time || "4 min read",
+        is_featured: Boolean(is_featured),
+        is_published: Boolean(is_published),
+        meta_title: meta_title || title,
+        meta_description: meta_description || excerpt || "",
+        meta_keywords: meta_keywords || "",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    ])
+    .select()
+    .single();
+
+  if (error) throw new Error("Failed to add blog: " + error.message);
+  return data;
+}
+
+// ✅ Update existing blog
+export async function updateBlog({ id, ...fields }) {
+  if (fields.title && !fields.slug) {
+    fields.slug = generateBlogSlug(fields.title);
+  }
+  if (fields.slug) {
+    fields.slug = fields.slug.toLowerCase().trim();
+  }
+
+  fields.updated_at = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from("blogs")
+    .update(fields)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) throw new Error("Failed to update blog: " + error.message);
+  return data;
+}
+
+// ✅ Delete blog
+export async function deleteBlog(id) {
+  const { error } = await supabase.from("blogs").delete().eq("id", id);
+  if (error) throw new Error("Failed to delete blog: " + error.message);
+  return true;
+}
+

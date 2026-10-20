@@ -63,6 +63,12 @@ export default function Header() {
             Products
           </Link>
           <Link
+            href="/blogs"
+            className={`${pathname.startsWith("/blogs") ? "text-[#FCA600] font-semibold" : "hover:text-[#FCA600]"} transition`}
+          >
+            Blog
+          </Link>
+          <Link
             href="/about"
             className={`${pathname === "/about" ? "text-[#FCA600] font-semibold" : "hover:text-[#FCA600]"} transition`}
           >
@@ -128,6 +134,14 @@ export default function Header() {
           className={`${pathname.startsWith("/products") ? "text-[#FCA600] font-semibold" : "hover:text-[#FCA600]"} text-base`}
         >
           Products
+        </Link>
+
+        <Link
+          href="/blogs"
+          onClick={() => setMenuOpen(false)}
+          className={`${pathname.startsWith("/blogs") ? "text-[#FCA600] font-semibold" : "hover:text-[#FCA600]"} text-base`}
+        >
+          Blog
         </Link>
 
         <Link
