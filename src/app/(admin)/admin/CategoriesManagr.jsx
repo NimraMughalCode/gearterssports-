@@ -88,7 +88,7 @@ export default function CategoriesManager({
 
                 {/* Subcategories */}
                 <input
-                  value={editingCategory.subcategories.join(', ')}
+                  value={(editingCategory.subcategories || []).join(', ')}
                   onChange={(e) =>
                     setEditingCategory({
                       ...editingCategory,
@@ -151,7 +151,7 @@ export default function CategoriesManager({
               <>
                 <h3 className="text-lg font-bold text-yellow-400">{cat.title}</h3>
                 <p className="text-sm text-gray-300">
-                  Subcategories: {cat.subcategories.join(', ')}
+                  Subcategories: {(cat.subcategories || []).join(', ')}
                 </p>
 
                 {/* SHOW CATEGORY IMAGE */}

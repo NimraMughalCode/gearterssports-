@@ -4,44 +4,118 @@ import { supabase } from "@/app/utils/supabaseClient";
 // 🔹 CATEGORY APIS //
 //////////////////////
 
-// ✅ Get all categories
+// ✅ Get all categories (relational join with subcategories table)
 export async function getCategories() {
   const { data, error } = await supabase
     .from("categories")
-    .select("*")
-    .order("id", { ascending: true });
+    .select("id, title, img_src, created_at, subcategories(id, title, slug, display_order)")
+    .order("id", { ascending: true })
+    .order("id", { foreignTable: "subcategories", ascending: true });
 
   if (error) throw new Error(error.message);
-  return data;
+
+  return (data || []).map((cat) => ({
+    ...cat,
+    subcategories: (cat.subcategories || []).map((s) => s.title),
+    subcategories_data: cat.subcategories || [],
+  }));
 }
 
-// ✅ Add new category
-export async function addCategory({ title, subcategories, img_src }) {
-   console.log("Sending to Supabase:", { title, subcategories, img_src });
-  const { error } = await supabase.from("categories").insert([
-    {
-      title,
-      subcategories,
-        img_src, 
-      created_at: new Date().toISOString(),
-    },
-  ]);
-
-  if (error) throw new Error("Failed to add category: " + error.message);
-}
-
-// ✅ Update existing category
-export async function updateCategory({ id, title, subcategories,  img_src }) {
-  const { error } = await supabase
+// ✅ Add new category (relational subcategories creation)
+export async function addCategory({ title, subcategories = [], img_src }) {
+  console.log("Sending to Supabase:", { title, subcategories, img_src });
+  const { data: newCat, error: catError } = await supabase
     .from("categories")
-    .update({
-      title,
-      subcategories,
-      img_src
-    })
+    .insert([
+      {
+        title,
+        img_src,
+        created_at: new Date().toISOString(),
+      },
+    ])
+    .select()
+    .single();
+
+  if (catError) throw new Error("Failed to add category: " + catError.message);
+
+  if (newCat?.id && Array.isArray(subcategories) && subcategories.length > 0) {
+    const subRows = subcategories
+      .map((s) => (typeof s === "string" ? s.trim() : s?.title?.trim()))
+      .filter(Boolean)
+      .map((subTitle) => ({
+        category_id: newCat.id,
+        title: subTitle,
+        slug: subTitle
+          .toLowerCase()
+          .replace(/[^a-zA-Z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, ""),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }));
+
+    if (subRows.length > 0) {
+      const { error: subErr } = await supabase
+        .from("subcategories")
+        .insert(subRows);
+      if (subErr) console.error("Error creating subcategories:", subErr);
+    }
+  }
+
+  return newCat;
+}
+
+// ✅ Update existing category (relational subcategories sync)
+export async function updateCategory({ id, title, subcategories, img_src }) {
+  const updateFields = { title };
+  if (img_src !== undefined) updateFields.img_src = img_src;
+
+  const { error: catError } = await supabase
+    .from("categories")
+    .update(updateFields)
     .eq("id", id);
 
-  if (error) throw new Error("Failed to update category: " + error.message);
+  if (catError) throw new Error("Failed to update category: " + catError.message);
+
+  if (Array.isArray(subcategories)) {
+    const cleanTitles = subcategories
+      .map((s) => (typeof s === "string" ? s.trim() : s?.title?.trim()))
+      .filter(Boolean);
+
+    const { data: existingSubs } = await supabase
+      .from("subcategories")
+      .select("id, title")
+      .eq("category_id", id);
+
+    const existingMap = new Map(
+      (existingSubs || []).map((s) => [s.title.toLowerCase(), s])
+    );
+
+    const toInsert = cleanTitles
+      .filter((t) => !existingMap.has(t.toLowerCase()))
+      .map((subTitle) => ({
+        category_id: id,
+        title: subTitle,
+        slug: subTitle
+          .toLowerCase()
+          .replace(/[^a-zA-Z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, ""),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }));
+
+    const newTitlesSet = new Set(cleanTitles.map((t) => t.toLowerCase()));
+    const toDeleteIds = (existingSubs || [])
+      .filter((s) => !newTitlesSet.has(s.title.toLowerCase()))
+      .map((s) => s.id);
+
+    if (toInsert.length > 0) {
+      await supabase.from("subcategories").insert(toInsert);
+    }
+
+    if (toDeleteIds.length > 0) {
+      await supabase.from("subcategories").delete().in("id", toDeleteIds);
+    }
+  }
 }
 
 // ✅ Delete category
@@ -51,33 +125,103 @@ export async function deleteCategory(id) {
   if (error) throw new Error("Failed to delete category: " + error.message);
 }
 
+//////////////////////////
+// 🔹 SUBCATEGORY APIS //
+//////////////////////////
+
+// ✅ Get all subcategories (optionally filtered by category_id)
+export async function getSubcategories(categoryId = null) {
+  try {
+    let query = supabase
+      .from("subcategories")
+      .select("*, categories(id, title)");
+
+    if (categoryId) {
+      query = query.eq("category_id", categoryId);
+    }
+
+    const { data, error } = await query.order("title", { ascending: true });
+    if (error) {
+      return [];
+    }
+    return data || [];
+  } catch (err) {
+    return [];
+  }
+}
+
+// ✅ Add new subcategory
+export async function addSubcategory({ category_id, title, slug, display_order }) {
+  const cleanSlug =
+    slug ||
+    title
+      ?.toLowerCase()
+      .trim()
+      .replace(/[^a-zA-Z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+  const payload = {
+    category_id,
+    title: title.trim(),
+    slug: cleanSlug,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  if (display_order !== undefined && display_order !== null && display_order !== "") {
+    payload.display_order = parseInt(display_order, 10);
+  }
+
+  const { data, error } = await supabase
+    .from("subcategories")
+    .insert([payload])
+    .select()
+    .single();
+
+  if (error) throw new Error("Failed to add subcategory: " + error.message);
+  return data;
+}
+
+// ✅ Update subcategory
+export async function updateSubcategory({ id, ...fields }) {
+  fields.updated_at = new Date().toISOString();
+  const { data, error } = await supabase
+    .from("subcategories")
+    .update(fields)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) throw new Error("Failed to update subcategory: " + error.message);
+  return data;
+}
+
+// ✅ Delete subcategory
+export async function deleteSubcategory(id) {
+  const { error } = await supabase.from("subcategories").delete().eq("id", id);
+  if (error) throw new Error("Failed to delete subcategory: " + error.message);
+  return true;
+}
+
 ////////////////////
 // 🔹 PRODUCT APIS //
 ////////////////////
 
-// ✅ Get all products (ordered by admin custom position first, then newest uploaded first)
+// ✅ Get all products (relational join with subcategories, display order first, newest uploaded first)
 export async function getProducts() {
   let { data, error } = await supabase
     .from("products")
-    .select("*")
+    .select("id, name, article_no, description, img_src, other_images, slug, display_order, created_at, subcategory_id, subcategories(id, title, slug, category_id)")
     .order("display_order", { ascending: true, nullsFirst: false })
     .order("created_at", { ascending: false })
     .order("id", { ascending: false });
 
-  // Fallback if display_order column hasn't been created yet in Supabase
-  if (error && (error.code === "42703" || error.message?.includes("display_order"))) {
-    const fallback = await supabase
-      .from("products")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .order("id", { ascending: false });
-
-    if (fallback.error) throw new Error(fallback.error.message);
-    return fallback.data;
-  }
-
   if (error) throw new Error(error.message);
-  return data;
+
+  return (data || []).map((p) => ({
+    ...p,
+    subcategory: p.subcategories?.title || "",
+  }));
 }
 
 // ✅ Slug generator helper
@@ -105,18 +249,36 @@ export async function addProduct({
   description,
   img_src,
   subcategory,
+  subcategory_id,
   other_images,
   slug,
   display_order,
 }) {
   const finalSlug = slug || generateSlug(name, article_no);
 
+  let resolvedSubcategoryId = subcategory_id;
+  if (!resolvedSubcategoryId && subcategory) {
+    try {
+      const { data: matchedSub } = await supabase
+        .from("subcategories")
+        .select("id")
+        .ilike("title", subcategory.trim())
+        .limit(1)
+        .maybeSingle();
+      if (matchedSub?.id) {
+        resolvedSubcategoryId = matchedSub.id;
+      }
+    } catch (e) {
+      console.warn("Subcategory lookup error:", e);
+    }
+  }
+
   const payload = {
     name,
     article_no,
     description,
     img_src,
-    subcategory,
+    subcategory_id: resolvedSubcategoryId || null,
     other_images,
     slug: finalSlug,
     created_at: new Date().toISOString(),
@@ -131,26 +293,13 @@ export async function addProduct({
     payload.display_order = parsedOrder;
   }
 
-  let { error } = await supabase.from("products").insert([payload]);
-
-  // Graceful fallback if display_order column doesn't exist yet in Supabase
-  if (
-    error &&
-    (error.code === "42703" || error.message?.includes("display_order")) &&
-    payload.display_order !== undefined
-  ) {
-    delete payload.display_order;
-    const retry = await supabase.from("products").insert([payload]);
-    error = retry.error;
-  }
-
+  const { error } = await supabase.from("products").insert([payload]);
   if (error) throw new Error("Failed to add product: " + error.message);
 }
 
 // ✅ Update product
 export async function updateProduct({ id, ...fields }) {
   if (!fields.slug && (fields.name || fields.article_no)) {
-    // If name or article_no is being updated without explicit slug, regenerate slug
     const { data: existing } = await supabase
       .from("products")
       .select("name, article_no")
@@ -162,6 +311,26 @@ export async function updateProduct({ id, ...fields }) {
     fields.slug = generateSlug(nameToUse, artNoToUse);
   }
 
+  // If subcategory string is passed, resolve to subcategory_id and strip the string field
+  if (fields.subcategory !== undefined) {
+    if (fields.subcategory && !fields.subcategory_id) {
+      try {
+        const { data: matchedSub } = await supabase
+          .from("subcategories")
+          .select("id")
+          .ilike("title", fields.subcategory.trim())
+          .limit(1)
+          .maybeSingle();
+        if (matchedSub?.id) {
+          fields.subcategory_id = matchedSub.id;
+        }
+      } catch (e) {
+        console.warn("Subcategory lookup error:", e);
+      }
+    }
+    delete fields.subcategory;
+  }
+
   if (fields.display_order !== undefined) {
     if (fields.display_order === "" || fields.display_order === null) {
       fields.display_order = null;
@@ -171,24 +340,12 @@ export async function updateProduct({ id, ...fields }) {
     }
   }
 
-  let { error } = await supabase
+  delete fields.subcategories;
+
+  const { error } = await supabase
     .from("products")
     .update(fields)
     .eq("id", id);
-
-  // Graceful fallback if display_order column doesn't exist yet in Supabase
-  if (
-    error &&
-    (error.code === "42703" || error.message?.includes("display_order")) &&
-    fields.display_order !== undefined
-  ) {
-    delete fields.display_order;
-    const retry = await supabase
-      .from("products")
-      .update(fields)
-      .eq("id", id);
-    error = retry.error;
-  }
 
   if (error) throw new Error("Failed to update product: " + error.message);
 }
@@ -227,34 +384,40 @@ export async function deleteProduct(id) {
 export async function fetchProduct(id) {
   const { data, error } = await supabase
     .from("products")
-    .select("*")
+    .select("id, name, article_no, description, img_src, other_images, slug, display_order, created_at, subcategory_id, subcategories(id, title, slug, category_id)")
     .eq("id", id)
     .single();
 
   if (error) throw new Error(error.message);
-  return data;
+  return {
+    ...data,
+    subcategory: data.subcategories?.title || "",
+  };
 }
 
 export async function fetchProductBySlug(slug) {
   if (!slug) return null;
 
+  const selectQuery = "id, name, article_no, description, img_src, other_images, slug, display_order, created_at, subcategory_id, subcategories(id, title, slug, category_id)";
+  const normalize = (prod) => (prod ? { ...prod, subcategory: prod.subcategories?.title || "" } : null);
+
   // 1. Try direct slug match
   const { data, error } = await supabase
     .from("products")
-    .select("*")
+    .select(selectQuery)
     .eq("slug", slug)
     .single();
 
-  if (!error && data) return data;
+  if (!error && data) return normalize(data);
 
   // 2. Fallback: If slug is numeric, check by id
   if (!isNaN(slug)) {
     const { data: byId } = await supabase
       .from("products")
-      .select("*")
+      .select(selectQuery)
       .eq("id", slug)
       .single();
-    if (byId) return byId;
+    if (byId) return normalize(byId);
   }
 
   // 3. Fallback: Check if slug ends with -[id] (e.g. product-name-23)
@@ -263,15 +426,14 @@ export async function fetchProductBySlug(slug) {
     const extractedId = idMatch[1];
     const { data: byExtractedId } = await supabase
       .from("products")
-      .select("*")
+      .select(selectQuery)
       .eq("id", extractedId)
       .single();
-    if (byExtractedId) return byExtractedId;
+    if (byExtractedId) return normalize(byExtractedId);
   }
 
   return null;
 }
-
 
 export async function getPortfolio() {
   const { data, error } = await supabase
@@ -458,4 +620,3 @@ export async function deleteBlog(id) {
   if (error) throw new Error("Failed to delete blog: " + error.message);
   return true;
 }
-

@@ -150,7 +150,7 @@ export default function ProductsManager({
               >
                 <option value="">Select Subcategory</option>
                 {categories.flatMap((cat) =>
-                  cat.subcategories.map((sub) => (
+                  (cat.subcategories || []).map((sub) => (
                     <option key={`${cat.id}-${sub}`} value={sub}>
                       {cat.title} → {sub}
                     </option>
@@ -469,7 +469,7 @@ export default function ProductsManager({
                         >
                           <option value="">Select Subcategory</option>
                           {categories.flatMap((cat) =>
-                            cat.subcategories.map((sub) => (
+                            (cat.subcategories || []).map((sub) => (
                               <option key={`${cat.id}-${sub}`} value={sub}>
                                 {cat.title} → {sub}
                               </option>

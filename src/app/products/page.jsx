@@ -64,18 +64,18 @@ function Products() {
 
     if (urlCategory) {
       const cat = categories.find((c) => c.title === urlCategory);
-      return cat?.subcategories ?? [];
+      return Array.isArray(cat?.subcategories) ? cat.subcategories : [];
     }
 
     if (selectedCategory === "all") {
-      return categories.flatMap((c) => c.subcategories ?? []);
+      return categories.flatMap((c) => (Array.isArray(c.subcategories) ? c.subcategories : []));
     }
 
     const matched = categories.find(
       (c) => c.title === selectedCategory
     );
 
-    return matched?.subcategories ?? [];
+    return Array.isArray(matched?.subcategories) ? matched.subcategories : [];
   }, [categories, selectedCategory, urlCategory]);
 
  const hasActiveFilters =
@@ -103,7 +103,7 @@ function Products() {
     if (!category) return [];
 
     list = list.filter((p) =>
-      category.subcategories.includes(p.subcategory)
+      Array.isArray(category.subcategories) && category.subcategories.includes(p.subcategory)
     );
   } else if (selectedCategory !== "all") {
     const category = categories.find(
@@ -113,7 +113,7 @@ function Products() {
     if (!category) return [];
 
     list = list.filter((p) =>
-      category.subcategories.includes(p.subcategory)
+      Array.isArray(category.subcategories) && category.subcategories.includes(p.subcategory)
     );
   }
 

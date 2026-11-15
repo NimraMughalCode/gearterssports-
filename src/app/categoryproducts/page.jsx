@@ -70,7 +70,11 @@ function Products() {
       ) || null;
 
     setSelectedCategory(matchedCategory);
-    setSelectedSubcategory(matchedCategory?.subcategories?.[0] || null);
+    setSelectedSubcategory(
+      Array.isArray(matchedCategory?.subcategories) && matchedCategory.subcategories.length > 0
+        ? matchedCategory.subcategories[0]
+        : null
+    );
   }, [urlCategory, categories]);
 
   // --------------------------------------
@@ -152,9 +156,9 @@ function Products() {
 
 
         {/* SUBCATEGORIES */}
-        {urlCategory && selectedCategory && (
+        {urlCategory && selectedCategory && Array.isArray(selectedCategory.subcategories) && (
           <div className="flex gap-4 mb-8 overflow-x-auto no-scrollbar whitespace-nowrap">
-            {selectedCategory.subcategories.map((sub) => (
+            {(selectedCategory.subcategories || []).map((sub) => (
               <button
                 key={sub}
                 onClick={() => setSelectedSubcategory(sub)}
