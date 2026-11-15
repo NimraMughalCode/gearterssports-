@@ -55,12 +55,26 @@ export async function deleteCategory(id) {
 // 🔹 PRODUCT APIS //
 ////////////////////
 
-// ✅ Get all products
+// ✅ Get all products (ordered by admin custom position first, then newest uploaded first)
 export async function getProducts() {
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("products")
     .select("*")
-    .order("id", { ascending: true });
+    .order("display_order", { ascending: true, nullsFirst: false })
+    .order("created_at", { ascending: false })
+    .order("id", { ascending: false });
+
+  // Fallback if display_order column hasn't been created yet in Supabase
+  if (error && (error.code === "42703" || error.message?.includes("display_order"))) {
+    const fallback = await supabase
+      .from("products")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false });
+
+    if (fallback.error) throw new Error(fallback.error.message);
+    return fallback.data;
+  }
 
   if (error) throw new Error(error.message);
   return data;
@@ -93,21 +107,42 @@ export async function addProduct({
   subcategory,
   other_images,
   slug,
+  display_order,
 }) {
   const finalSlug = slug || generateSlug(name, article_no);
 
-  const { error } = await supabase.from("products").insert([
-    {
-      name,
-      article_no,
-      description,
-      img_src,
-      subcategory,
-      other_images,
-      slug: finalSlug,
-      created_at: new Date().toISOString(),
-    },
-  ]);
+  const payload = {
+    name,
+    article_no,
+    description,
+    img_src,
+    subcategory,
+    other_images,
+    slug: finalSlug,
+    created_at: new Date().toISOString(),
+  };
+
+  const parsedOrder =
+    display_order !== undefined && display_order !== "" && display_order !== null
+      ? parseInt(display_order, 10)
+      : null;
+
+  if (parsedOrder !== null && !isNaN(parsedOrder)) {
+    payload.display_order = parsedOrder;
+  }
+
+  let { error } = await supabase.from("products").insert([payload]);
+
+  // Graceful fallback if display_order column doesn't exist yet in Supabase
+  if (
+    error &&
+    (error.code === "42703" || error.message?.includes("display_order")) &&
+    payload.display_order !== undefined
+  ) {
+    delete payload.display_order;
+    const retry = await supabase.from("products").insert([payload]);
+    error = retry.error;
+  }
 
   if (error) throw new Error("Failed to add product: " + error.message);
 }
@@ -127,12 +162,59 @@ export async function updateProduct({ id, ...fields }) {
     fields.slug = generateSlug(nameToUse, artNoToUse);
   }
 
-  const { error } = await supabase
+  if (fields.display_order !== undefined) {
+    if (fields.display_order === "" || fields.display_order === null) {
+      fields.display_order = null;
+    } else {
+      const parsed = parseInt(fields.display_order, 10);
+      fields.display_order = isNaN(parsed) ? null : parsed;
+    }
+  }
+
+  let { error } = await supabase
     .from("products")
     .update(fields)
     .eq("id", id);
 
+  // Graceful fallback if display_order column doesn't exist yet in Supabase
+  if (
+    error &&
+    (error.code === "42703" || error.message?.includes("display_order")) &&
+    fields.display_order !== undefined
+  ) {
+    delete fields.display_order;
+    const retry = await supabase
+      .from("products")
+      .update(fields)
+      .eq("id", id);
+    error = retry.error;
+  }
+
   if (error) throw new Error("Failed to update product: " + error.message);
+}
+
+// ✅ Quick update display position for a product
+export async function updateProductPosition(id, position) {
+  const parsed =
+    position !== "" && position !== null && position !== undefined
+      ? parseInt(position, 10)
+      : null;
+
+  const val = isNaN(parsed) ? null : parsed;
+
+  const { error } = await supabase
+    .from("products")
+    .update({ display_order: val })
+    .eq("id", id);
+
+  if (error) {
+    if (error.code === "42703" || error.message?.includes("display_order")) {
+      throw new Error(
+        "Please run the SQL command in supabase_products_order_setup.sql in your Supabase SQL Editor to enable custom ordering."
+      );
+    }
+    throw new Error("Failed to update product position: " + error.message);
+  }
 }
 
 // ✅ Delete product

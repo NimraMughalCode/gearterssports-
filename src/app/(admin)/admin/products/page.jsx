@@ -8,6 +8,7 @@ import {
   getProducts,
   updateProduct,
   deleteProduct,
+  updateProductPosition,
 } from "@/app/utils/adminAPI";
 import ProductsManager from "../ProductsManager";
 import AdminSeoGuideline from "@/components/AdminSeoGuideline";
@@ -32,6 +33,7 @@ export default function AdminProductsPage() {
   const [articleNo, setArticleNo] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [selectedSubcategory, setSelectedSubcategory] = useState("");
+  const [displayOrder, setDisplayOrder] = useState("");
   const [productImageFile, setProductImageFile] = useState(null);
   const [otherImages, setOtherImages] = useState([]);
   const [otherImageFiles, setOtherImageFiles] = useState([]);
@@ -135,6 +137,7 @@ export default function AdminProductsPage() {
         img_src: finalImageURL,
         subcategory: selectedSubcategory,
         other_images: allOtherImages,
+        display_order: displayOrder,
       });
 
       // Reset fields
@@ -142,6 +145,7 @@ export default function AdminProductsPage() {
       setArticleNo("");
       setProductDescription("");
       setSelectedSubcategory("");
+      setDisplayOrder("");
       setProductImageFile(null);
       setOtherImages([]);
       setOtherImageFiles([]);
@@ -230,6 +234,7 @@ export default function AdminProductsPage() {
         img_src: finalImageURL,
         subcategory,
         other_images: finalOtherImages,
+        display_order: editingProduct.display_order,
       });
 
       setEditingProduct(null);
@@ -239,6 +244,18 @@ export default function AdminProductsPage() {
       toast.success("Product updated successfully!", { id: toastId });
     } catch (err) {
       toast.error(err.message || "Failed to update product", { id: toastId });
+    }
+  }
+
+  async function handleQuickUpdatePosition(productId, newPosition) {
+    const toastId = toast.loading("Updating position...");
+    try {
+      await updateProductPosition(productId, newPosition);
+      await fetchProducts();
+      toast.success("Product position updated!", { id: toastId });
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Failed to update position", { id: toastId });
     }
   }
 
@@ -306,6 +323,8 @@ export default function AdminProductsPage() {
           articleNo={articleNo}
           productDescription={productDescription}
           selectedSubcategory={selectedSubcategory}
+          displayOrder={displayOrder}
+          setDisplayOrder={setDisplayOrder}
           productImageFile={productImageFile}
           setProductName={setProductName}
           setArticleNo={setArticleNo}
@@ -318,6 +337,7 @@ export default function AdminProductsPage() {
           editingProductFile={editingProductFile}
           setEditingProductFile={setEditingProductFile}
           handleUpdateProduct={handleUpdateProduct}
+          handleQuickUpdatePosition={handleQuickUpdatePosition}
           handleDeleteProduct={handleDeleteProduct}
           otherImages={otherImages}
           setOtherImages={setOtherImages}

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Upload, X, Image as ImageIcon, Plus, Trash2 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Upload, X, Image as ImageIcon, Plus, Trash2, Pin, Check, Search, RotateCcw, ArrowUpDown, Sparkles } from 'lucide-react';
+
 
 export default function ProductsManager({
   categories,
@@ -10,6 +11,8 @@ export default function ProductsManager({
   articleNo,
   productDescription,
   selectedSubcategory,
+  displayOrder,
+  setDisplayOrder,
   productImageFile,
   setProductName,
   setArticleNo,
@@ -22,6 +25,7 @@ export default function ProductsManager({
   editingProductFile,
   setEditingProductFile,
   handleUpdateProduct,
+  handleQuickUpdatePosition,
   handleDeleteProduct,
   otherImages,
   setOtherImages,
@@ -29,6 +33,8 @@ export default function ProductsManager({
   setOtherImageFiles,
 }) {
   const [filterSubcategory, setFilterSubcategory] = useState('');
+  const [adminSearch, setAdminSearch] = useState('');
+  const [filterPinnedOnly, setFilterPinnedOnly] = useState(false);
 
   // STATES FOR ADD PRODUCT MODE
   const [productImageType, setProductImageType] = useState("file");
@@ -74,6 +80,31 @@ export default function ProductsManager({
     setEditingOtherImages((prev) => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
+  // Filtered Products for Admin List
+  const filteredProducts = useMemo(() => {
+    let list = Array.isArray(products) ? products : [];
+
+    if (filterSubcategory) {
+      list = list.filter((p) => p.subcategory === filterSubcategory);
+    }
+
+    if (filterPinnedOnly) {
+      list = list.filter((p) => p.display_order !== null && p.display_order !== undefined);
+    }
+
+    if (adminSearch.trim()) {
+      const q = adminSearch.toLowerCase().trim();
+      list = list.filter(
+        (p) =>
+          p.name?.toLowerCase().includes(q) ||
+          p.article_no?.toLowerCase().includes(q) ||
+          p.subcategory?.toLowerCase().includes(q)
+      );
+    }
+
+    return list;
+  }, [products, filterSubcategory, filterPinnedOnly, adminSearch]);
+
   return (
     <>
       {/* Add Product */}
@@ -95,7 +126,7 @@ export default function ProductsManager({
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-semibold text-gray-300 uppercase mb-1">
                 Article No
@@ -126,6 +157,26 @@ export default function ProductsManager({
                   ))
                 )}
               </select>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <label className="block text-xs font-semibold text-yellow-300 uppercase flex items-center gap-1">
+                  <Pin className="w-3.5 h-3.5 text-yellow-400" /> Website Position
+                </label>
+                <span className="text-[10px] text-gray-400">Optional</span>
+              </div>
+              <input
+                type="number"
+                min="1"
+                value={displayOrder || ''}
+                onChange={(e) => setDisplayOrder && setDisplayOrder(e.target.value)}
+                placeholder="Auto (Newest at top)"
+                className="p-2.5 w-full bg-gray-800 border border-yellow-500/60 rounded focus:border-yellow-400 text-white outline-none placeholder:text-gray-500 text-sm"
+              />
+              <p className="text-[11px] text-gray-400 mt-1">
+                Leave blank for auto newest. Set <span className="text-yellow-400 font-semibold">1</span> to pin at top.
+              </p>
             </div>
           </div>
 
@@ -398,7 +449,7 @@ export default function ProductsManager({
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-xs font-semibold text-gray-300 uppercase mb-1">Article No</label>
                         <input
@@ -425,6 +476,40 @@ export default function ProductsManager({
                             ))
                           )}
                         </select>
+                      </div>
+
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="block text-xs font-semibold text-yellow-300 uppercase flex items-center gap-1">
+                            <Pin className="w-3.5 h-3.5 text-yellow-400" /> Website Position
+                          </label>
+                          {editingProduct.display_order && (
+                            <button
+                              type="button"
+                              onClick={() => setEditingProduct({ ...editingProduct, display_order: null })}
+                              className="text-[11px] text-yellow-400 hover:underline"
+                            >
+                              Reset to Auto
+                            </button>
+                          )}
+                        </div>
+                        <input
+                          type="number"
+                          min="1"
+                          value={editingProduct.display_order ?? ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setEditingProduct({
+                              ...editingProduct,
+                              display_order: val === '' ? null : parseInt(val, 10),
+                            });
+                          }}
+                          placeholder="Auto (Newest)"
+                          className="p-2.5 bg-gray-800 border border-yellow-500/60 rounded text-white w-full outline-none focus:border-yellow-400 placeholder:text-gray-500 text-sm"
+                        />
+                        <p className="text-[11px] text-gray-400 mt-1">
+                          Blank = Auto by date. Number = Locked rank (1, 2, 3...).
+                        </p>
                       </div>
                     </div>
 
