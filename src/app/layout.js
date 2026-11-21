@@ -88,13 +88,20 @@ export default function RootLayout({ children }) {
             __html: `
               (function() {
                 try {
+                  var path = window.location.pathname || '';
+                  var isStorefront = !path.startsWith('/admin');
                   var savedTheme = localStorage.getItem('gearters-theme');
-                  if (savedTheme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                    document.documentElement.classList.remove('light');
-                  } else {
+
+                  if (isStorefront) {
+                    // Auto-convert any live users on dark theme into light theme
                     document.documentElement.classList.remove('dark');
                     document.documentElement.classList.add('light');
+                    if (savedTheme === 'dark') {
+                      localStorage.setItem('gearters-theme', 'light');
+                    }
+                  } else {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.classList.remove('light');
                   }
                 } catch (e) {}
               })();

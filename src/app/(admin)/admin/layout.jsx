@@ -22,7 +22,7 @@ export default function AdminLayout({ children }) {
   const [passwordInput, setPasswordInput] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
 
-  // Automatically enforce Dark Theme whenever on Admin portal
+  // Automatically enforce Dark Theme whenever on Admin portal, and restore Light Theme when leaving
   useEffect(() => {
     if (theme !== "dark") {
       setTheme("dark");
@@ -32,6 +32,15 @@ export default function AdminLayout({ children }) {
     try {
       localStorage.setItem("gearters-theme", "dark");
     } catch {}
+
+    return () => {
+      // Auto-restore Light theme when leaving admin portal
+      document.documentElement.classList.remove("dark");
+      document.documentElement.classList.add("light");
+      try {
+        localStorage.setItem("gearters-theme", "light");
+      } catch {}
+    };
   }, [theme, setTheme]);
 
   useEffect(() => {

@@ -60,7 +60,7 @@ export default function Header() {
             href="/products"
             className={`${pathname === "/products" || pathname === "/categoryproducts" ? "text-[#FCA600] font-semibold" : "hover:text-[#FCA600]"} transition`}
           >
-            Products
+
           </Link>
           <Link
             href="/blogs"

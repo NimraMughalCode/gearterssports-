@@ -17,10 +17,21 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     try {
+      const isStorefront = typeof window !== 'undefined' && !window.location.pathname.startsWith('/admin');
       const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-      const initialTheme = savedTheme === 'dark' ? 'dark' : 'light';
-      setThemeState(initialTheme);
-      applyTheme(initialTheme);
+
+      // Auto-convert any live users on dark theme into light theme on the storefront
+      if (isStorefront) {
+        if (savedTheme === 'dark') {
+          localStorage.setItem(THEME_STORAGE_KEY, 'light');
+        }
+        setThemeState('light');
+        applyTheme('light');
+      } else {
+        const initialTheme = savedTheme === 'dark' ? 'dark' : 'light';
+        setThemeState(initialTheme);
+        applyTheme(initialTheme);
+      }
     } catch {
       applyTheme('light');
     }
