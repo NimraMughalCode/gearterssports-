@@ -92,6 +92,11 @@ export default function AdminLayout({ children }) {
       icon: "solar:clapperboard-play-bold",
     },
     {
+      name: "Testimonials",
+      href: "/admin/testimonials",
+      icon: "solar:chat-round-video-bold",
+    },
+    {
       name: "Blogs / Articles",
       href: "/admin/blogs",
       icon: "solar:document-text-bold",

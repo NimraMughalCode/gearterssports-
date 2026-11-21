@@ -90,7 +90,7 @@ export default function Header() {
 
         {/* Actions (Desktop: Social Icons + Theme Toggle) */}
         <div className="hidden md:flex items-center space-x-4">
-          <ThemeToggle />
+          {/* <ThemeToggle /> */}
 
           <Link href="https://www.facebook.com/share/16oHMtQQQS/?mibextid=wwXIfr" target="_blank">
             <Icon icon="logos:facebook" width="26" height="26" className="hover:opacity-80 transition" />
@@ -103,7 +103,7 @@ export default function Header() {
 
         {/* Mobile Actions: Theme Toggle + Menu Hamburger */}
         <div className="md:hidden flex items-center space-x-3">
-          <ThemeToggle />
+          {/* <ThemeToggle /> */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="p-2 rounded-md z-[60] text-current"

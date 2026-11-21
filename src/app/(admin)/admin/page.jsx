@@ -11,6 +11,7 @@ export default function AdminDashboardPage() {
     categoriesCount: 0,
     productsCount: 0,
     portfolioCount: 0,
+    testimonialsCount: 0,
     campaignsCount: 0,
     totalEmailsSent: 0,
     avgOpenRate: 0,
@@ -24,10 +25,11 @@ export default function AdminDashboardPage() {
   async function loadDashboardMetrics() {
     setLoading(true);
     try {
-      const [cats, prods, portfolioRes, campaignsRes] = await Promise.all([
+      const [cats, prods, portfolioRes, testimonialsRes, campaignsRes] = await Promise.all([
         getCategories(),
         getProducts(),
         supabase.from("portfolio").select("id", { count: "exact", head: true }),
+        supabase.from("testimonials").select("id", { count: "exact", head: true }),
         supabase.from("campaigns").select("id, sent_count, opened_count"),
       ]);
 
@@ -40,6 +42,7 @@ export default function AdminDashboardPage() {
         categoriesCount: cats?.length || 0,
         productsCount: prods?.length || 0,
         portfolioCount: portfolioRes?.count || 0,
+        testimonialsCount: testimonialsRes?.count || 0,
         campaignsCount: campaigns.length,
         totalEmailsSent: totalSent,
         avgOpenRate: avgOpenRate,
@@ -75,6 +78,14 @@ export default function AdminDashboardPage() {
       icon: "solar:clapperboard-play-bold",
       href: "/admin/portfolio",
       color: "from-purple-500/20 to-pink-500/10 text-purple-400 border-purple-500/30",
+    },
+    {
+      title: "Client Testimonials",
+      count: stats.testimonialsCount,
+      subtitle: "16:9 Client video reviews",
+      icon: "solar:chat-round-video-bold",
+      href: "/admin/testimonials",
+      color: "from-amber-500/20 to-orange-500/10 text-orange-400 border-orange-500/30",
     },
     {
       title: "Email Campaigns",

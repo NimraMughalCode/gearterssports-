@@ -3,6 +3,7 @@ import CategoriesGrid from "@/components/CategoriesGrid";
 import PortfolioSection from "@/components/OurPortfolio";
 import HeroCarousel from "@/components/HeroCarousel";
 import WhyChooseUs from "@/components/WhyChooseUs";
+import ClientTestimonials from "@/components/ClientsTestimonials";
 import FeaturedBlogs from "@/components/FeaturedBlogs";
 
 export default function Home() {
@@ -14,6 +15,9 @@ export default function Home() {
         <CategoriesGrid />
       </div>
       <WhyChooseUs />
+      <div id="testimonials">
+        <ClientTestimonials />
+      </div>
       <div id="journal">
         <FeaturedBlogs />
       </div>

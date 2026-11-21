@@ -620,3 +620,92 @@ export async function deleteBlog(id) {
   if (error) throw new Error("Failed to delete blog: " + error.message);
   return true;
 }
+
+////////////////////////////////
+// 🔹 TESTIMONIAL APIS (16:9) //
+////////////////////////////////
+
+// ✅ Get all video testimonials
+export async function getTestimonials() {
+  try {
+    const { data, error } = await supabase
+      .from("testimonials")
+      .select("*")
+      .order("display_order", { ascending: true, nullsFirst: false })
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.warn("Could not fetch testimonials from database:", error.message);
+      return [];
+    }
+    return data || [];
+  } catch (err) {
+    console.warn("Testimonials error:", err);
+    return [];
+  }
+}
+
+// ✅ Add video testimonial
+export async function addTestimonial({
+  client_name,
+  client_title,
+  review_text,
+  video_url,
+  thumbnail_url,
+  rating = 5,
+  display_order,
+}) {
+  const payload = {
+    client_name: client_name.trim(),
+    client_title: (client_title || "").trim(),
+    review_text: (review_text || "").trim(),
+    video_url,
+    thumbnail_url: thumbnail_url || "",
+    rating: Number(rating) || 5,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  if (display_order !== undefined && display_order !== "" && display_order !== null) {
+    payload.display_order = parseInt(display_order, 10);
+  }
+
+  const { data, error } = await supabase
+    .from("testimonials")
+    .insert([payload])
+    .select()
+    .single();
+
+  if (error) throw new Error("Failed to add testimonial: " + error.message);
+  return data;
+}
+
+// ✅ Update video testimonial
+export async function updateTestimonial({ id, ...fields }) {
+  fields.updated_at = new Date().toISOString();
+  if (fields.rating !== undefined) fields.rating = Number(fields.rating) || 5;
+  if (fields.display_order !== undefined) {
+    if (fields.display_order === "" || fields.display_order === null) {
+      fields.display_order = null;
+    } else {
+      fields.display_order = parseInt(fields.display_order, 10);
+    }
+  }
+
+  const { data, error } = await supabase
+    .from("testimonials")
+    .update(fields)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) throw new Error("Failed to update testimonial: " + error.message);
+  return data;
+}
+
+// ✅ Delete video testimonial
+export async function deleteTestimonial(id) {
+  const { error } = await supabase.from("testimonials").delete().eq("id", id);
+  if (error) throw new Error("Failed to delete testimonial: " + error.message);
+  return true;
+}
